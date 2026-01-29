@@ -1,0 +1,81 @@
+.custom-food-screen {
+  flex: 1;
+  background-color: var(--color-bg-primary);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease;
+}
+
+.custom-food-content {
+  flex: 1;
+  padding: 1rem;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  overflow-y: auto;
+  transition: background-color 0.3s ease;
+}
+
+.custom-food-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.custom-food-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: var(--color-text-primary);
+}
+
+.custom-food-section {
+  margin-bottom: 2rem;
+}
+
+.custom-food-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.custom-food-section label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.custom-food-section label strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.error-message {
+  color: #dc2626;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: rgba(254, 242, 242, 0.8);
+  border-radius: 8px;
+  font-size: 14px;
+}

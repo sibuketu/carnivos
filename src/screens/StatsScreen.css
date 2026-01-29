@@ -1,0 +1,117 @@
+.stats-screen-container {
+  padding: 8px;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #09090b;
+  /* Dark background */
+  min-height: 100vh;
+}
+
+.stats-screen-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stats-screen-header {
+  margin-bottom: 1rem;
+}
+
+.stats-screen-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  color: #e4e4e7;
+  /* Light text */
+  text-shadow: 0 0 10px rgba(244, 63, 94, 0.3);
+  /* Subtle glow */
+}
+
+.stats-screen-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #27272a;
+  /* Dark border */
+}
+
+.stats-screen-tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #a1a1aa;
+  /* Muted text */
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: -2px;
+}
+
+.stats-screen-tab:hover {
+  color: #e4e4e7;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.stats-screen-tab.active {
+  color: #f43f5e;
+  /* Neon Red */
+  border-bottom-color: #f43f5e;
+  text-shadow: 0 0 8px rgba(244, 63, 94, 0.6);
+}
+
+.stats-screen-period-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Period buttons should be styled in TSX or here if classes are used. 
+   Assuming inline styles in TSX are replaced by these classes if possible, 
+   or strict override. */
+
+.stats-screen-nutrient-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stats-screen-nutrient-selector {
+  margin-bottom: 0.5rem;
+}
+
+.stats-screen-chart-container {
+  padding: 1rem;
+  background-color: #18181b;
+  /* Dark Card */
+  border-radius: 12px;
+  border: 1px solid #27272a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  /* Deep shadow */
+}
+
+.stats-screen-weight-section {
+  padding: 1rem;
+  background-color: #18181b;
+  /* Dark Card */
+  border-radius: 12px;
+  border: 1px solid #27272a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Add custom scrollbar for neon feel if needed */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}

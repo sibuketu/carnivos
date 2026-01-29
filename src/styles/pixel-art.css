@@ -1,0 +1,84 @@
+/**
+ * Pixel Art UI Styles
+ * Undertale-level pixelation for the entire app
+ * 16x16 or 32x32 pixel style
+ */
+
+/* ドット絵UIが有効な場合のみ適用 */
+[data-pixel-art='true'] *,
+[data-pixel-art='true'] *::before,
+[data-pixel-art='true'] *::after {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* テキストもドット絵風に（Undertale風） */
+[data-pixel-art='true'] {
+  font-family: 'Courier New', 'Courier', monospace;
+  font-smooth: never;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  text-rendering: optimizeSpeed;
+}
+
+/* ボタンやカードをドット絵風に（角丸なし、太いボーダー） */
+[data-pixel-art='true'] button,
+[data-pixel-art='true'] .card,
+[data-pixel-art='true'] .gauge,
+[data-pixel-art='true'] input,
+[data-pixel-art='true'] textarea,
+[data-pixel-art='true'] select,
+[data-pixel-art='true'] .gift-message-item,
+[data-pixel-art='true'] .shop-item-card {
+  border-style: solid !important;
+  border-width: 3px !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+}
+
+/* グラデーションを無効化（単色のみ） */
+[data-pixel-art='true'] * {
+  background-image: none !important;
+}
+
+/* グラデーション背景を単色に変換 */
+[data-pixel-art='true'] .gauge,
+[data-pixel-art='true'] .gradient {
+  background: #dc2626 !important; /* デフォルトの赤色 */
+}
+
+/* アニメーションを簡素化（即座に変化） */
+[data-pixel-art='true'] * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* シャドウを無効化 */
+[data-pixel-art='true'] * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* 画像をドット絵風に */
+[data-pixel-art='true'] img,
+[data-pixel-art='true'] svg {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* フォントサイズを調整（ドット絵風に見えるように） */
+[data-pixel-art='true'] {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+/* アイコンをドット絵風に */
+[data-pixel-art='true'] .icon,
+[data-pixel-art='true'] [class*='icon'] {
+  font-size: 16px;
+  line-height: 1;
+}

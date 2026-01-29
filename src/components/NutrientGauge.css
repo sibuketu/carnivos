@@ -1,0 +1,56 @@
+.nutrient-gauge-container {
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: var(--color-bg-secondary);
+  border-radius: 10px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    background-color 0.3s ease;
+}
+
+.nutrient-gauge-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nutrient-gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.nutrient-gauge-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.nutrient-gauge-value {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.nutrient-gauge-bar-container {
+  height: 8px;
+  background-color: var(--color-bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+}
+
+.nutrient-gauge-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.nutrient-gauge-status {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #34c759;
+  font-weight: 500;
+}

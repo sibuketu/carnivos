@@ -1,0 +1,97 @@
+﻿# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - heading "Settings" [level=1] [ref=e7]
+      - button "Navigate to user settings screen" [ref=e9] [cursor=pointer]:
+        - generic [ref=e10]:
+          - heading "User Settings" [level=2] [ref=e11]
+          - paragraph [ref=e12]: Basic information, goals, metabolic status, etc.
+        - generic [ref=e13]: →
+      - button "Navigate to language settings screen" [ref=e15] [cursor=pointer]:
+        - generic [ref=e16]:
+          - heading "Language Settings" [level=2] [ref=e17]
+          - paragraph [ref=e18]: "Current: English"
+        - generic [ref=e19]: →
+      - generic [ref=e20]:
+        - heading "Debug Mode" [level=2] [ref=e21]
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - generic [ref=e24]: Show dummy data (30 days of sample data)
+            - generic [ref=e25]:
+              - checkbox [checked]
+          - generic [ref=e27]: "⚠️ Debug Mode ON: Dummy data is displayed"
+      - button "Open custom food registration screen" [ref=e29] [cursor=pointer]:
+        - generic [ref=e30]:
+          - heading "Custom Food Registration" [level=2] [ref=e31]
+          - paragraph [ref=e32]: Enter food name, AI suggests, edit and save
+        - generic [ref=e33]: →
+      - button "Navigate to UI settings screen" [ref=e35] [cursor=pointer]:
+        - generic [ref=e36]:
+          - heading "UI Settings" [level=2] [ref=e37]
+          - paragraph [ref=e38]: Font size, display settings, etc.
+        - generic [ref=e39]: →
+      - button "Navigate to salt settings screen" [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]:
+          - heading "Salt Settings" [level=2] [ref=e43]
+          - paragraph [ref=e44]: "Salt Type: Table Salt / 0.5g/per shave"
+        - generic [ref=e45]: →
+      - button "Navigate to carbohydrate target settings screen" [ref=e47] [cursor=pointer]:
+        - generic [ref=e48]:
+          - heading "Carb Target Settings" [level=2] [ref=e49]
+          - paragraph [ref=e50]: "Current: 0g/common.perDay"
+        - generic [ref=e51]: →
+      - generic [ref=e52]:
+        - heading "Data Management" [level=3] [ref=e53]
+        - generic [ref=e54]:
+          - button "📥 Export Data" [ref=e55] [cursor=pointer]
+          - button "📤 Import Data" [ref=e56] [cursor=pointer]
+      - generic [ref=e57]:
+        - button "Navigate to data export screen" [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]:
+            - heading "Export Data" [level=2] [ref=e60]
+            - paragraph [ref=e61]: Download all data in JSON format
+          - generic [ref=e62]: →
+        - button "Navigate to data delete screen" [ref=e63] [cursor=pointer]:
+          - generic [ref=e64]:
+            - heading "Delete Data" [level=2] [ref=e65]
+            - paragraph [ref=e66]: Delete all data (cannot be undone)
+          - generic [ref=e67]: →
+      - button "Navigate to feedback screen" [ref=e69] [cursor=pointer]:
+        - generic [ref=e70]:
+          - heading "フィードバックを送信" [level=2] [ref=e71]
+          - paragraph [ref=e72]: バグ報告、機能リクエスト、ご意見
+        - generic [ref=e73]: →
+      - generic [ref=e74]:
+        - button "Navigate to privacy policy screen" [ref=e75] [cursor=pointer]:
+          - generic [ref=e76]:
+            - heading "プライバシーポリシー" [level=2] [ref=e77]
+            - paragraph [ref=e78]: 個人情報の取り扱いについて
+          - generic [ref=e79]: →
+        - button "Navigate to terms of service screen" [ref=e80] [cursor=pointer]:
+          - generic [ref=e81]:
+            - heading "利用規約" [level=2] [ref=e82]
+            - paragraph [ref=e83]: サービスの利用条件
+          - generic [ref=e84]: →
+      - generic [ref=e85]:
+        - generic [ref=e86]: アプリ情報
+        - generic [ref=e87]:
+          - generic [ref=e88]: CarnivOS
+          - generic [ref=e89]: バージョン 0.0.0
+    - navigation "Main navigation" [ref=e90]:
+      - button "Home screen" [ref=e91] [cursor=pointer]:
+        - generic [ref=e92]: 🏠
+        - generic [ref=e93]: Home
+      - button "History screen" [ref=e94] [cursor=pointer]:
+        - generic [ref=e95]: 📊
+        - generic [ref=e96]: History
+      - button "Other screen" [ref=e97] [cursor=pointer]:
+        - generic [ref=e98]: 🧪
+        - generic [ref=e99]: Other
+      - button "Settings screen" [ref=e100] [cursor=pointer]:
+        - generic [ref=e101]: ⚙️
+        - generic [ref=e102]: Settings
+  - button "💬" [ref=e103]
+```

@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+/* Gemini Navigation Container */
+.gemini-nav-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    /* Subtle glass border */
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.gemini-nav-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 64px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Nav Items */
+.gemini-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #666;
+    /* Muted inactive state */
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 60px;
+}
+
+.gemini-nav-item svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+}
+
+.gemini-nav-item span {
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* Active State - NEON RED */
+.gemini-nav-item.active {
+    color: #FF0055;
+    /* Neon Red */
+}
+
+.gemini-nav-item.active svg {
+    color: #FF0055;
+    filter: drop-shadow(0 0 8px rgba(255, 0, 85, 0.6));
+    /* Red glow */
+}
+
+/* Central Mic Button */
+.gemini-mic-wrapper {
+    position: relative;
+    top: -24px;
+    /* Float above */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.gemini-mic-button {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF4B4B, #FF0055);
+    /* Gemini/Google colors or Neon Red */
+    border: 4px solid #050505;
+    /* Matches body bg to look cut out */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 20px rgba(255, 0, 85, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gemini-mic-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 10px rgba(255, 0, 85, 0.2);
+}
+
+.gemini-mic-label {
+    margin-top: 4px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #888;
+    letter-spacing: 0.1em;
+}

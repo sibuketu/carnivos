@@ -1,0 +1,168 @@
+.settings-screen-container {
+  flex: 1;
+  background-color: var(--color-bg-primary);
+  transition: background-color 0.3s ease;
+}
+
+.settings-screen-content {
+  padding: 8px;
+}
+
+.settings-screen-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.settings-screen-section {
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: var(--color-bg-secondary);
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.settings-screen-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.settings-screen-option-button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+  font-size: 16px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.settings-screen-option-button:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.settings-screen-option-button.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.settings-screen-button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settings-screen-button-row .settings-screen-option-button {
+  flex: 1;
+  min-width: 80px;
+  text-align: center;
+}
+
+.settings-screen-switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 15px;
+}
+
+.settings-screen-switch-label-group {
+  flex: 1;
+}
+
+.settings-screen-switch-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.settings-screen-switch-description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.settings-screen-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.settings-screen-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-screen-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.settings-screen-switch-slider:before {
+  position: absolute;
+  content: '';
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.settings-screen-switch input:checked + .settings-screen-switch-slider {
+  background-color: #007aff;
+}
+
+.settings-screen-switch input:checked + .settings-screen-switch-slider:before {
+  transform: translateX(22px);
+}
+
+.settings-screen-link-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-screen-link-button {
+  padding: 0.75rem 1rem;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.settings-screen-link-button:hover {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}

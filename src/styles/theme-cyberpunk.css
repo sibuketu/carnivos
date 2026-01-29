@@ -1,0 +1,134 @@
+/* Cyberpunk / Bio-Hacking Theme */
+:root {
+  /* Backgrounds */
+  --color-bg-primary: #0a0a0f; /* Deep charcoal/black */
+  --color-bg-secondary: #13131f; /* Slightly lighter panel bg */
+  --color-bg-tertiary: #1c1c2e; /* Card bg */
+
+  /* Text */
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+
+  /* Accents - Neon Style */
+  --color-accent: #f43f5e; /* Neon Red (Steak/Blood) */
+  --color-accent-glow: rgba(244, 63, 94, 0.5);
+
+  --color-protein: #3b82f6; /* Neon Blue */
+  --color-protein-glow: rgba(59, 130, 246, 0.5);
+
+  --color-fat: #f43f5e; /* Neon Red */
+  --color-fat-glow: rgba(244, 63, 94, 0.5);
+
+  --color-carb: #10b981; /* Neon Green (Matrix style) */
+
+  /* Borders & Glass */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(20, 20, 30, 0.7);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  /* Font */
+  --font-family-tech: 'Courier New', Courier, monospace; /* Temporary tech font */
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: 'Inter', sans-serif; /* Keep readable font for main text */
+}
+
+/* Glassmorphism Cards */
+.home-screen-section,
+.nutrient-gauge-container,
+.argument-card-modal {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: var(--glass-border);
+  box-shadow:
+    0 0 15px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+/* Neon Glow for Buttons */
+button {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: var(--font-family-tech);
+}
+
+/* Gauges - Glowing Bars */
+.nutrient-gauge-bar {
+  box-shadow: 0 0 10px currentColor; /* Glow effect */
+}
+
+/* Specific overrides for gauge colors to enable glow */
+.nutrient-gauge-bar[style*='background-color: #3b82f6'],
+.nutrient-gauge-bar[style*='background-color: rgb(59, 130, 246)'] {
+  box-shadow: 0 0 12px var(--color-protein-glow);
+}
+
+.nutrient-gauge-bar[style*='background-color: #f43f5e'],
+.nutrient-gauge-bar[style*='background-color: #dc2626'],
+.nutrient-gauge-bar[style*='background-color: rgb(244, 63, 94)'] {
+  box-shadow: 0 0 12px var(--color-fat-glow);
+}
+
+/* App Navigation - Cyberpunk Style */
+.app-navigation {
+  background: rgba(10, 10, 15, 0.95);
+  border-top: 1px solid rgba(244, 63, 94, 0.3); /* Red border line */
+  box-shadow: 0 -4px 20px rgba(244, 63, 94, 0.1);
+}
+
+.app-nav-button.active {
+  color: var(--color-accent);
+  text-shadow: 0 0 8px var(--color-accent);
+}
+
+.app-nav-button.active::before {
+  background-color: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent);
+}
+
+/* Headers */
+h1,
+h2,
+h3 {
+  font-family: var(--font-family-tech);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* Input Fields */
+input,
+select,
+textarea {
+  background-color: #0f0f16 !important;
+  border: 1px solid #333 !important;
+  color: #fff !important;
+  font-family: var(--font-family-tech) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 8px var(--color-accent-glow) !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}

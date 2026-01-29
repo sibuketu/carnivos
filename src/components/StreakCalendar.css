@@ -1,0 +1,141 @@
+.streak-calendar-container {
+  width: 100%;
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.streak-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.streak-calendar-nav-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.streak-calendar-nav-button:hover {
+  background-color: #f3f4f6;
+}
+
+.streak-calendar-month-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0;
+}
+
+.streak-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.streak-calendar-weekday {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 0.5rem;
+}
+
+.streak-calendar-grid-wrapper {
+  position: relative;
+}
+
+.streak-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  position: relative;
+  overflow: visible;
+}
+
+.streak-calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  position: relative;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s;
+  overflow: visible;
+}
+
+.streak-calendar-day.empty {
+  background-color: transparent;
+  border: none;
+}
+
+.streak-calendar-day.normal {
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+.streak-calendar-day.hasLog {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.streak-calendar-day.hasViolation {
+  background-color: #fee2e2;
+  border-color: #dc2626;
+}
+
+.streak-calendar-day.inStreak {
+  background-color: #d1fae5;
+  border-color: #10b981;
+}
+
+.streak-calendar-day.streak {
+  background-color: #10b981;
+  color: white;
+  font-weight: bold;
+}
+
+.streak-calendar-day-number {
+  position: relative;
+  z-index: 2;
+  font-size: 14px;
+}
+
+.streak-line {
+  pointer-events: none;
+}
+
+.streak-calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.streak-calendar-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.streak-calendar-legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}

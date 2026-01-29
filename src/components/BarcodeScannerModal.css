@@ -1,0 +1,202 @@
+.barcode-scanner-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.barcode-scanner-modal {
+  background-color: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.barcode-scanner-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.barcode-scanner-modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #111827;
+}
+
+.barcode-scanner-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #78716c;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.barcode-scanner-modal-close:hover {
+  color: #111827;
+}
+
+.barcode-scanner-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.barcode-scanner-modal-start {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.barcode-scanner-modal-start-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.barcode-scanner-modal-start-button:hover {
+  background-color: #b91c1c;
+}
+
+.barcode-scanner-modal-scanning {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.barcode-scanner-modal-video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background-color: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.barcode-scanner-modal-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.barcode-scanner-modal-scan-line {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background-color: #dc2626;
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0%,
+  100% {
+    top: 20%;
+  }
+  50% {
+    top: 80%;
+  }
+}
+
+.barcode-scanner-modal-scanning-text {
+  text-align: center;
+  color: #78716c;
+  font-size: 14px;
+}
+
+.barcode-scanner-modal-error {
+  text-align: center;
+  padding: 2rem 0;
+  color: #dc2626;
+}
+
+.barcode-scanner-modal-retry-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.barcode-scanner-modal-retry-button:hover {
+  background-color: #e5e7eb;
+}
+
+.barcode-scanner-modal-result {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.barcode-scanner-modal-success {
+  color: #059669;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.barcode-scanner-modal-barcode {
+  font-size: 12px;
+  color: #78716c;
+  margin-bottom: 1rem;
+}
+
+.barcode-scanner-modal-loading {
+  color: #78716c;
+  font-size: 14px;
+}
+
+.barcode-scanner-modal-food-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.barcode-scanner-modal-food-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.barcode-scanner-modal-add-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.barcode-scanner-modal-add-button:hover {
+  background-color: #b91c1c;
+}

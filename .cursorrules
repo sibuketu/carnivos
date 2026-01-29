@@ -1,0 +1,27 @@
+# Cursor Rules
+
+**全ルールは `../../second-brain/rules/master_rule.mdc` を参照。**
+
+このファイルはCursor専用の補足のみ記載。
+
+---
+
+## Cursor専用ガイド
+
+### 作業開始時
+1. `../../second-brain/rules/master_rule.mdc` を読む
+2. タスク指示書（Obsidian）を確認
+3. 実装開始
+
+### 報告形式
+- 技術用語禁止（ユーザーは非エンジニア）
+- 「〇〇ボタンを押すと△△できるようになりました」形式
+
+---
+
+## Quote & Answer Protocol
+ユーザーの質問には番号と改行をつけて答えよ。
+
+---
+
+**マスタールール**: `../../second-brain/rules/master_rule.mdc`

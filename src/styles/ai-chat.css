@@ -1,0 +1,1126 @@
+/* AI Chat UI - ChatGPT/Claude/Perplexity Style */
+
+/* Floating Action Button (FAB) - ドラッグ可能 */
+.ai-chat-fab-button {
+  position: fixed;
+  /* bottom と right はインラインスタイルで上書きされる */
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  border: none;
+  background-color: var(--color-accent);
+  color: #fff;
+  font-size: 24px;
+  cursor: grab;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s ease;
+  z-index: 1001;
+  /* ナビゲーション等より上に */
+  user-select: none;
+  touch-action: none;
+}
+
+.ai-chat-fab-button:active {
+  cursor: grabbing;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* オンボーディング中のスポットライト効果 */
+.ai-chat-fab-button.onboarding-spotlight {
+  animation: onboardingSpotlightPulse 2s ease-in-out infinite;
+  box-shadow:
+    0 4px 20px rgba(230, 57, 80, 0.6),
+    0 0 40px rgba(230, 57, 80, 0.4),
+    0 0 60px rgba(230, 57, 80, 0.2);
+  transform: scale(1.1);
+  z-index: 1000 !important;
+}
+
+/* スポットライト用のツールチップ */
+.ai-chat-fab-button.onboarding-spotlight::before {
+  content: '👆 ここをタップ';
+  position: fixed;
+  bottom: 170px;
+  right: 24px;
+  background-color: var(--color-accent);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  animation: onboardingTooltipPulse 2s ease-in-out infinite;
+  z-index: 999;
+  pointer-events: none;
+}
+
+/* 矢印（AIボタンを指す） */
+.ai-chat-fab-button.onboarding-spotlight::after {
+  content: '↓';
+  position: fixed;
+  bottom: 150px;
+  right: 52px;
+  font-size: 32px;
+  color: var(--color-accent);
+  animation: onboardingArrowBounce 1.5s ease-in-out infinite;
+  z-index: 999;
+  pointer-events: none;
+  text-shadow: 0 2px 8px rgba(230, 57, 80, 0.6);
+  font-weight: bold;
+}
+
+/* モバイル対応：スポットライト時の位置調整 */
+@media (max-width: 480px) {
+  .ai-chat-fab-button.onboarding-spotlight::before {
+    bottom: 170px;
+    right: 16px;
+  }
+
+  .ai-chat-fab-button.onboarding-spotlight::after {
+    bottom: 150px;
+    right: 44px;
+  }
+}
+
+@keyframes onboardingSpotlightPulse {
+
+  0%,
+  100% {
+    box-shadow:
+      0 4px 20px rgba(230, 57, 80, 0.6),
+      0 0 40px rgba(230, 57, 80, 0.4),
+      0 0 60px rgba(230, 57, 80, 0.2);
+    transform: scale(1.1);
+  }
+
+  50% {
+    box-shadow:
+      0 4px 30px rgba(230, 57, 80, 0.8),
+      0 0 60px rgba(230, 57, 80, 0.6),
+      0 0 80px rgba(230, 57, 80, 0.4);
+    transform: scale(1.15);
+  }
+}
+
+@keyframes onboardingArrowBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.7;
+  }
+}
+
+@keyframes onboardingOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes onboardingTooltipPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: translateX(-50%) translateY(-4px);
+  }
+}
+
+.ai-chat-fab-button:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+}
+
+.ai-chat-fab-button:active {
+  transform: scale(0.95);
+}
+
+/* Drawer (ウィジェット) Style - 後ろの画面を触れるように */
+.ai-chat-modal-overlay {
+  display: none !important;
+  /* 背景のオーバーレイを非表示にし、後ろの画面を操作可能にする */
+}
+
+/* フェードインアニメーションは不要になったため削除 */
+
+.ai-chat-modal {
+  position: fixed;
+  bottom: 0;
+  /* 下部に固定（デフォルト） */
+  right: 0;
+  /* 右側に固定（デフォルト） */
+  width: 100%;
+  /* モバイルは全幅 */
+  height: 90vh;
+  /* 高さ */
+  /* backdrop-filter: blur(10px); は削除し、不透明にする */
+  background-color: #1a1a1a;
+  /* 不透明なダークグレー */
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  /* 影を濃く */
+  display: flex;
+  flex-direction: column;
+  z-index: 2000;
+  /* ナビゲーションよりさらに上 */
+  transition: transform 0.3s ease-out,
+    max-width 0.3s ease,
+    height 0.3s ease,
+    max-height 0.3s ease,
+    border-radius 0.3s ease;
+  border: 1px solid var(--color-border);
+  /* 境界線を明確に */
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+  z-index: 1001;
+}
+
+.ai-chat-modal-fullscreen {
+  max-width: 100%;
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+}
+
+/* 全画面表示時、他のUI要素を非表示 */
+body.ai-chat-fullscreen-mode .app-container,
+body.ai-chat-fullscreen-mode .app-content,
+body.ai-chat-fullscreen-mode .app-navigation,
+body.ai-chat-fullscreen-mode nav,
+body.ai-chat-fullscreen-mode footer,
+body.ai-chat-fullscreen-mode .ai-chat-fab-button {
+  display: none !important;
+}
+
+/* 全画面表示時のオーバーレイも非表示 */
+body.ai-chat-fullscreen-mode .ai-chat-modal-overlay {
+  display: none;
+}
+
+/* 全画面表示時、bodyのスクロールを無効化 */
+body.ai-chat-fullscreen-mode {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* 全画面表示時、モーダルを確実に全画面に */
+body.ai-chat-fullscreen-mode .ai-chat-modal-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  z-index: 99999 !important;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* モバイル対応: 画面幅が小さい場合は全幅 */
+@media (max-width: 480px) {
+  .ai-chat-modal {
+    max-width: 100%;
+    height: 85vh;
+    border-radius: 20px 20px 0 0;
+  }
+}
+
+/* 吹き出しUI（バブル）スタイル - アプリ操作中も見られる、ドラッグ・リサイズ可能 */
+.ai-chat-bubble {
+  position: fixed;
+  background-color: #1a1a1a;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  overflow: hidden;
+  animation: bubbleSlideIn 0.3s ease;
+  border: 1px solid var(--color-border);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    width 0.3s ease,
+    height 0.3s ease,
+    left 0.3s ease,
+    top 0.3s ease;
+  user-select: none;
+  resize: none;
+  /* ブラウザのデフォルトリサイズを無効化 */
+}
+
+.ai-chat-bubble:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* リサイズハンドル（4つの角） */
+.ai-chat-bubble-resize-handle {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  z-index: 1001;
+  touch-action: none;
+  background: linear-gradient(135deg,
+      transparent 0%,
+      transparent 40%,
+      var(--color-border) 40%,
+      var(--color-border) 45%,
+      transparent 45%,
+      transparent 55%,
+      var(--color-border) 55%,
+      var(--color-border) 60%,
+      transparent 60%);
+  transition: background 0.2s ease;
+  pointer-events: auto;
+  cursor: nwse-resize;
+}
+
+.ai-chat-bubble-resize-handle:hover {
+  background: linear-gradient(135deg,
+      transparent 0%,
+      transparent 40%,
+      var(--color-accent) 40%,
+      var(--color-accent) 45%,
+      transparent 45%,
+      transparent 55%,
+      var(--color-accent) 55%,
+      var(--color-accent) 60%,
+      transparent 60%);
+}
+
+/* 左上 */
+.ai-chat-bubble-resize-handle-top-left {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+  border-radius: 16px 0 0 0;
+  transform: rotate(0deg);
+}
+
+/* 右上 */
+.ai-chat-bubble-resize-handle-top-right {
+  top: 4px;
+  right: 4px;
+  cursor: nesw-resize;
+  border-radius: 0 16px 0 0;
+  transform: rotate(90deg);
+}
+
+/* 左下 */
+.ai-chat-bubble-resize-handle-bottom-left {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+  border-radius: 0 0 0 16px;
+  transform: rotate(-90deg);
+}
+
+/* 右下 */
+.ai-chat-bubble-resize-handle-bottom-right {
+  bottom: 0;
+  right: 0;
+  cursor: nwse-resize;
+  border-radius: 0 0 16px 0;
+  transform: rotate(180deg);
+}
+
+@keyframes bubbleSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ai-chat-bubble-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid var(--color-border);
+  background-color: #1a1a1a;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+  flex-shrink: 0;
+  touch-action: none;
+  /* ドラッグ時のスクロールを防ぐ */
+}
+
+.ai-chat-bubble-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  transition: color 0.3s ease;
+  flex: 1;
+}
+
+.ai-chat-bubble-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ai-chat-bubble-toggle-button,
+.ai-chat-bubble-close-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0.25rem;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  min-height: 28px;
+  touch-action: manipulation;
+}
+
+.ai-chat-bubble-toggle-button:hover,
+.ai-chat-bubble-close-button:hover {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.ai-chat-bubble .ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.625rem;
+  background-color: var(--color-bg-root);
+  min-height: 150px;
+  transition: background-color 0.3s ease;
+  /* max-heightは動的に計算されるため削除 */
+}
+
+.ai-chat-bubble .ai-chat-input-container {
+  padding: 0.625rem;
+  border-top: 1px solid var(--color-border);
+  background-color: #1a1a1a;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  /* モバイル対応: 安全エリアを考慮 */
+  padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+  /* 可視性の向上 */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.ai-chat-bubble .ai-chat-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.ai-chat-bubble .ai-chat-textarea {
+  flex: 1;
+  font-size: 12px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  min-height: 32px;
+  max-height: 80px;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  touch-action: manipulation;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  resize: none;
+  overflow-y: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ai-chat-bubble .ai-chat-textarea:focus {
+  border-color: var(--color-accent);
+  background-color: var(--color-bg-primary);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.ai-chat-bubble .ai-chat-textarea::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 0.6;
+}
+
+.ai-chat-bubble .ai-chat-voice-button {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.ai-chat-bubble .ai-chat-voice-button:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.ai-chat-bubble .ai-chat-voice-button.active {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.ai-chat-bubble .ai-chat-send-button {
+  padding: 0.5rem 0.875rem;
+  font-size: 12px;
+  min-width: 56px;
+  height: 32px;
+}
+
+.ai-chat-bubble .ai-chat-message {
+  max-width: 90%;
+}
+
+.ai-chat-bubble .ai-chat-message-bubble {
+  padding: 0.5rem 0.75rem;
+  font-size: 12px;
+  border-radius: 12px;
+}
+
+.ai-chat-bubble .ai-chat-empty-state {
+  padding: 1rem;
+}
+
+.ai-chat-bubble .ai-chat-empty-state-text {
+  font-size: 12px;
+}
+
+/* UI切り替えボタン */
+.ai-chat-ui-toggle-button {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0.375rem 0.5rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  touch-action: manipulation;
+}
+
+.ai-chat-ui-toggle-button:hover {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* モバイル対応: 吹き出しUI */
+@media (max-width: 480px) {
+  .ai-chat-bubble {
+    width: calc(100% - 40px);
+    max-width: 280px;
+    max-height: 350px;
+  }
+
+  .ai-chat-bubble .ai-chat-messages {
+    max-height: 230px;
+  }
+}
+
+.ai-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  transition: border-color 0.3s ease;
+  background-color: var(--color-bg-primary);
+}
+
+.ai-chat-header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.ai-chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ai-chat-mode-selector {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.ai-chat-mode-button {
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.ai-chat-mode-button.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  opacity: 1;
+  cursor: default;
+}
+
+.ai-chat-mode-button:disabled {
+  cursor: not-allowed;
+}
+
+.ai-chat-close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0.25rem;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.ai-chat-close-button:hover {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background-color: var(--color-bg-root);
+  min-height: 300px;
+  max-height: calc(90vh - 180px);
+  transition: background-color 0.3s ease;
+}
+
+.ai-chat-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 2rem;
+}
+
+.ai-chat-empty-state-text {
+  font-size: 14px;
+  margin-bottom: 1.5rem;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.ai-chat-message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ai-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 85%;
+  animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-chat-message-user {
+  align-self: flex-end;
+}
+
+.ai-chat-message-assistant {
+  align-self: flex-start;
+}
+
+.ai-chat-message-bubble {
+  padding: 0.875rem 1rem;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.ai-chat-message-user .ai-chat-message-bubble {
+  background-color: var(--color-accent);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.ai-chat-message-assistant .ai-chat-message-bubble {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 4px;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.ai-chat-input-container {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+  position: relative;
+  z-index: 10;
+  /* モバイル対応: 安全エリアを考慮 */
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  /* 可視性の向上: Mobbinスタイル */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  /* モバイル対応: タッチフレンドリー */
+  flex-shrink: 0;
+}
+
+.ai-chat-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.ai-chat-textarea {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  font-size: 15px;
+  font-family: inherit;
+  resize: none;
+  min-height: 44px;
+  max-height: 120px;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  outline: none;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  /* モバイル対応: タッチフレンドリー */
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ai-chat-textarea:focus {
+  border-color: var(--color-accent);
+  background-color: var(--color-bg-primary);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.ai-chat-textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.ai-chat-voice-button {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.ai-chat-voice-button:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.ai-chat-voice-button.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.ai-chat-send-button {
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  height: 44px;
+  flex-shrink: 0;
+  /* モバイル対応: タッチフレンドリー */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ai-chat-send-button:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+  transform: scale(1.02);
+}
+
+.ai-chat-send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-chat-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.ai-chat-loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border);
+  border-top: 2px solid var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tips Card */
+.ai-chat-tips-card {
+  padding: 1rem;
+  background-color: var(--color-warning-light);
+  border: 1px solid var(--color-warning);
+  border-radius: 12px;
+  font-size: 13px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.ai-chat-tips-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.ai-chat-tips-title {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  flex: 1;
+  transition: color 0.3s ease;
+}
+
+.ai-chat-tips-save-button {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0.25rem 0.5rem;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ai-chat-tips-save-button:hover {
+  border-color: var(--color-warning);
+  background-color: var(--color-bg-secondary);
+}
+
+.ai-chat-tips-save-button.saved {
+  border-color: var(--color-warning);
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.ai-chat-tips-content {
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  transition: color 0.3s ease;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.ai-chat-tips-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.ai-chat-tips-next-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-warning);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ai-chat-tips-next-button:hover {
+  background-color: var(--color-warning);
+  opacity: 0.9;
+}
+
+/* Expert Message Card */
+.ai-chat-expert-message {
+  padding: 1rem;
+  background-color: var(--color-bg-primary);
+  border: 2px solid var(--color-accent);
+  border-radius: 12px;
+  font-size: 13px;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.ai-chat-expert-message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.ai-chat-expert-message-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.ai-chat-expert-message-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0.25rem;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.ai-chat-expert-message-close:hover {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.ai-chat-expert-message-content {
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  transition: color 0.3s ease;
+}
+
+.ai-chat-expert-message-content p {
+  margin: 0 0 0.75rem 0;
+}
+
+.ai-chat-expert-message-content ol {
+  margin: 0 0 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.ai-chat-expert-message-content li {
+  margin-bottom: 0.5rem;
+}
+
+.ai-chat-expert-message-content strong {
+  color: var(--color-accent);
+}
+
+/* Todo Card */
+.ai-chat-todo-card {
+  padding: 0.875rem 1rem;
+  background-color: var(--color-warning-light);
+  border: 1px solid var(--color-warning);
+  border-radius: 12px;
+  font-size: 14px;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.ai-chat-todo-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.ai-chat-todo-description {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.ai-chat-todo-action-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-warning);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ai-chat-todo-action-button:hover {
+  opacity: 0.9;
+}
+
+/* Scrollbar styling */
+.ai-chat-messages::-webkit-scrollbar {
+  width: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ai-chat-messages::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}

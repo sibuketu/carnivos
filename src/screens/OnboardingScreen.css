@@ -1,0 +1,634 @@
+.onboarding-screen-container {
+  flex: 1;
+  background-color: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.onboarding-screen-content {
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.onboarding-screen-icon {
+  font-size: 64px;
+  margin-bottom: 0.5rem;
+}
+
+.onboarding-screen-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.onboarding-screen-description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.onboarding-screen-progress {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.onboarding-screen-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #d1d5db;
+  transition: all 0.3s;
+}
+
+.onboarding-screen-progress-dot.active {
+  background-color: var(--color-accent);
+  width: 24px;
+  border-radius: 4px;
+}
+
+.onboarding-screen-progress-dot.completed {
+  background-color: var(--color-accent);
+}
+
+.onboarding-screen-buttons {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.onboarding-screen-button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.onboarding-screen-button-primary {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.onboarding-screen-button-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.onboarding-screen-button-secondary {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.onboarding-screen-button-secondary:hover {
+  background-color: var(--color-bg-primary);
+}
+
+.onboarding-screen-button-back {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.onboarding-screen-button-back:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+/* 言語選択UI */
+.onboarding-language-selector {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.onboarding-language-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.onboarding-language-button:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-bg-primary);
+}
+
+.onboarding-language-button.active {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(230, 57, 80, 0.3);
+}
+
+.onboarding-language-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.onboarding-language-subtitle {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 0.125rem;
+}
+
+.onboarding-language-button.active .onboarding-language-subtitle {
+  opacity: 0.9;
+}
+
+.onboarding-language-check {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* プロフィールセクション */
+.onboarding-profile-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.onboarding-profile-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.onboarding-profile-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 性別ボタン */
+.onboarding-gender-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.onboarding-gender-button {
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.onboarding-gender-button:hover {
+  border-color: var(--color-accent);
+}
+
+.onboarding-gender-button.active {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(230, 57, 80, 0.3);
+  transform: scale(1.02);
+}
+
+.onboarding-gender-button.active::after {
+  content: '✓';
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
+
+/* 体重入力 */
+.onboarding-weight-input {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.onboarding-weight-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+/* 目標グリッド */
+.onboarding-goal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.onboarding-goal-button {
+  position: relative;
+  padding: 0.75rem 0.5rem;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.onboarding-goal-button:hover {
+  border-color: var(--color-accent);
+}
+
+.onboarding-goal-button.active {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(230, 57, 80, 0.3);
+  transform: scale(1.02);
+}
+
+.onboarding-goal-button.active::after {
+  content: '✓';
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.onboarding-goal-icon {
+  font-size: 20px;
+}
+
+.onboarding-goal-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 代謝状態ボタン */
+.onboarding-metabolic-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.onboarding-metabolic-button {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.onboarding-metabolic-button:hover {
+  border-color: var(--color-accent);
+}
+
+.onboarding-metabolic-button.active {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(230, 57, 80, 0.3);
+}
+
+.onboarding-metabolic-button.active::after {
+  content: '✓';
+  font-size: 16px;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.onboarding-metabolic-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.onboarding-metabolic-desc {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.onboarding-metabolic-button.active .onboarding-metabolic-desc {
+  opacity: 0.9;
+}
+
+/* 糖質目標の説明 */
+.onboarding-carb-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: rgba(230, 57, 80, 0.1);
+  border: 1px solid rgba(230, 57, 80, 0.3);
+  text-align: left;
+  margin-top: 0.5rem;
+}
+
+.onboarding-carb-notice-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.onboarding-carb-notice-text {
+  flex: 1;
+}
+
+.onboarding-carb-notice-text strong {
+  display: block;
+  font-size: 14px;
+  color: var(--color-accent);
+  margin-bottom: 0.25rem;
+}
+
+.onboarding-carb-notice-text p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* 通知情報 */
+.onboarding-notification-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.onboarding-notification-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background-color: var(--color-bg-secondary);
+  text-align: left;
+}
+
+.onboarding-notification-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.onboarding-notification-item span:last-child {
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+/* モバイル対応 */
+@media (max-height: 700px) {
+  .onboarding-screen-container {
+    padding: 1rem;
+  }
+
+  .onboarding-screen-content {
+    gap: 1rem;
+  }
+
+  .onboarding-screen-icon {
+    font-size: 48px;
+    margin-bottom: 0.25rem;
+  }
+
+  .onboarding-profile-section {
+    gap: 1rem;
+  }
+}
+
+/* 決済モーダル */
+.onboarding-payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1.5rem;
+}
+
+.onboarding-payment-modal {
+  background-color: var(--color-bg-primary);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.onboarding-payment-modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.onboarding-payment-modal-description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+}
+
+.onboarding-payment-modal-pricing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.onboarding-payment-modal-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.onboarding-payment-modal-price-amount {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-accent);
+}
+
+.onboarding-payment-modal-price-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.onboarding-payment-modal-arrow {
+  font-size: 20px;
+  color: var(--color-text-secondary);
+}
+
+.onboarding-payment-modal-or {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  width: 100%;
+}
+
+.onboarding-payment-modal-note {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 0 0 1.5rem 0;
+  font-style: italic;
+}
+
+.onboarding-payment-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.onboarding-payment-modal-button {
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.onboarding-payment-modal-button-primary {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.onboarding-payment-modal-button-primary:hover {
+  background-color: #c91c3b;
+  transform: translateY(-1px);
+}
+
+.onboarding-payment-modal-button-secondary {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.onboarding-payment-modal-button-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+/* プラン選択 */
+.onboarding-payment-modal-plan-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.onboarding-payment-modal-plan {
+  position: relative;
+  padding: 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  background-color: var(--color-bg-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.onboarding-payment-modal-plan:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+.onboarding-payment-modal-plan.active {
+  border-color: var(--color-accent);
+  border-width: 3px;
+  background: linear-gradient(135deg, rgba(230, 57, 80, 0.15), rgba(230, 57, 80, 0.05));
+  box-shadow: 0 0 0 4px rgba(230, 57, 80, 0.25), 0 4px 12px rgba(230, 57, 80, 0.3);
+  transform: scale(1.02);
+}
+
+.plan-badge {
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  background: linear-gradient(135deg, var(--color-accent), #ff6b6b);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(230, 57, 80, 0.3);
+}
+
+.plan-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.plan-price {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-accent);
+  margin-bottom: 0.25rem;
+}
+
+.plan-detail {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.plan-savings {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.onboarding-payment-modal-plan.active .plan-name::before {
+  content: '✅ ';
+  font-size: 18px;
+  margin-right: 4px;
+}

@@ -1,0 +1,23 @@
+{
+	"appId": "com.primallogic.app",
+	"appName": "CarnivOS",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https",
+		"iosScheme": "https"
+	},
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 2000,
+			"launchAutoHide": true,
+			"backgroundColor": "#0A0A0A",
+			"androidSplashResourceName": "splash",
+			"androidScaleType": "CENTER_CROP",
+			"showSpinner": false,
+			"iosSpinnerStyle": "small",
+			"spinnerColor": "#ffffff"
+		}
+	},
+	"packageClassList": []
+}
+

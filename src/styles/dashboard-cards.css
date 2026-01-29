@@ -1,0 +1,52 @@
+/*
+  Minimalist Card Design System (Gemini Style)
+  - No bloated CSS.
+  - Clear hierarchy.
+  - "Steal Like an Artist" from Notion & Gemini.
+*/
+
+.dashboard-card {
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Subtle border */
+    border-radius: 12px;
+    /* iOS standard is rising */
+    padding: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-card h3 {
+    font-size: 0.875rem;
+    /* 14px */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    /* Muted text for labels */
+    margin: 0;
+    font-weight: 600;
+}
+
+.dashboard-card .value {
+    font-size: 2rem;
+    /* 32px */
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+}
+
+.dashboard-card .unit {
+    font-size: 0.875rem;
+    color: #666;
+    margin-left: 4px;
+}

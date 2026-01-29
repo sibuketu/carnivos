@@ -1,0 +1,160 @@
+.symptom-checker-section {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 12px;
+  border: 2px solid #fbbf24;
+}
+
+.symptom-checker-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0 0 0.5rem 0;
+}
+
+.symptom-checker-subtitle {
+  font-size: 0.875rem;
+  color: #78350f;
+  margin: 0 0 1rem 0;
+}
+
+.symptom-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.symptom-button {
+  padding: 0.75rem 1.25rem;
+  background: white;
+  border: 2px solid #f59e0b;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #92400e;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.symptom-button:hover {
+  background: #fef3c7;
+  border-color: #d97706;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.symptom-button:active {
+  transform: translateY(0);
+}
+
+/* モーダル */
+.symptom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.symptom-modal-content {
+  background: var(--color-bg-primary);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+.symptom-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.symptom-modal-close:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.symptom-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 1.5rem 0;
+  padding-right: 2rem;
+  transition: color 0.3s ease;
+}
+
+.symptom-modal-section {
+  margin-bottom: 1.5rem;
+}
+
+.symptom-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.symptom-modal-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 0.75rem 0;
+  transition: color 0.3s ease;
+}
+
+.symptom-modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.symptom-modal-list li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  transition: color 0.3s ease;
+}
+
+.symptom-modal-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #f59e0b;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.symptom-modal-logic {
+  padding: 1rem;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 4px;
+  color: #78350f;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.875rem;
+}

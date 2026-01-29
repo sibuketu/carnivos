@@ -1,0 +1,142 @@
+.argument-card-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  z-index: 1000;
+}
+
+.argument-card-container {
+  background-color: var(--color-bg-primary);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  max-height: 80vh;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.argument-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--color-border);
+  transition: border-color 0.3s ease;
+}
+
+.argument-card-title {
+  font-size: 20px;
+  font-weight: bold;
+  flex: 1;
+  margin: 0;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.argument-card-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background-color: var(--color-bg-secondary);
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.argument-card-close:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.argument-card-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.argument-card-level {
+  margin-bottom: 20px;
+}
+
+.argument-card-level-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.argument-card-level-card {
+  background-color: var(--color-bg-secondary);
+  padding: 16px;
+  border-radius: 8px;
+  border-left-width: 4px;
+  border-left-style: solid;
+  transition: background-color 0.3s ease;
+}
+
+.argument-card-level1-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.argument-card-level2-text {
+  font-size: 16px;
+  color: var(--color-text-primary);
+  line-height: 1.8;
+  white-space: pre-line;
+  transition: color 0.3s ease;
+}
+
+.argument-card-level3-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 20px;
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.argument-card-expand-button {
+  padding: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.argument-card-expand-button:hover {
+  opacity: 0.9;
+}
+
+.argument-card-verdict-badge {
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 20px;
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}

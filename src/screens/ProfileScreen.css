@@ -1,0 +1,304 @@
+.profile-screen-container {
+  flex: 1;
+  background-color: var(--color-bg-primary);
+  transition: background-color 0.3s ease;
+}
+
+.profile-screen-content {
+  padding: 8px;
+}
+
+.profile-screen-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.profile-screen-section {
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: var(--color-bg-secondary);
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.profile-screen-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.profile-screen-option-button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+  font-size: 16px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.profile-screen-option-button:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.profile-screen-option-button.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.profile-screen-switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 15px;
+}
+
+.profile-screen-switch-label-group {
+  flex: 1;
+}
+
+.profile-screen-switch-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.profile-screen-switch-description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.profile-screen-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.profile-screen-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.profile-screen-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-bg-tertiary);
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.profile-screen-switch-slider:before {
+  position: absolute;
+  content: '';
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--color-bg-primary);
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.profile-screen-switch input:checked + .profile-screen-switch-slider {
+  background-color: var(--color-accent);
+}
+
+.profile-screen-switch input:checked + .profile-screen-switch-slider:before {
+  transform: translateX(22px);
+}
+
+.profile-screen-hint {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.profile-screen-save-button {
+  width: 100%;
+  background-color: var(--color-accent);
+  padding: 16px;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  transition: background-color 0.2s;
+}
+
+.profile-screen-save-button:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.profile-screen-input-group {
+  margin-bottom: 20px;
+}
+
+.profile-screen-field-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.profile-screen-field-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.profile-screen-priority-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.profile-screen-priority-required {
+  background-color: #ff3b30;
+  color: #fff;
+}
+
+.profile-screen-priority-recommended {
+  background-color: #ff9500;
+  color: #fff;
+}
+
+.profile-screen-priority-optional {
+  background-color: #8e8e93;
+  color: #fff;
+}
+
+.profile-screen-field-description {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  margin-left: auto;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.profile-screen-number-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-screen-number-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.profile-screen-unit {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  min-width: 40px;
+  transition: color 0.3s ease;
+}
+
+.profile-screen-button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-screen-button-row .profile-screen-option-button {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* 折りたたみ機能のスタイル */
+.profile-screen-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.profile-screen-section-header:hover {
+  opacity: 0.8;
+}
+
+.profile-screen-section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-screen-collapse-icon {
+  transition:
+    transform 0.3s,
+    color 0.3s ease;
+  font-size: 18px;
+  color: var(--color-text-secondary);
+}
+
+.profile-screen-collapse-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.profile-screen-section-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.profile-screen-section-content.collapsed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.profile-screen-section-visibility-toggle {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--color-bg-secondary);
+  transition:
+    background-color 0.2s,
+    color 0.3s ease;
+}
+
+.profile-screen-section-visibility-toggle:hover {
+  background-color: var(--color-bg-tertiary);
+}

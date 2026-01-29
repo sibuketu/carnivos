@@ -1,0 +1,365 @@
+.interactive-butcher-container {
+  flex: 1;
+  background-color: var(--color-bg-primary);
+  padding: 20px;
+  overflow-y: auto;
+  transition: background-color 0.3s ease;
+}
+
+.interactive-butcher-back {
+  padding: 10px 20px;
+  background-color: var(--color-bg-secondary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: var(--color-text-primary);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.interactive-butcher-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-svg-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.interactive-butcher-svg {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  cursor: pointer;
+}
+
+.interactive-butcher-path {
+  transition: fill 0.2s ease;
+  cursor: pointer;
+}
+
+.interactive-butcher-path:hover {
+  opacity: 0.8;
+  filter: brightness(1.1);
+}
+
+.interactive-butcher-hint {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin-top: 15px;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-foods-list {
+  margin-top: 30px;
+}
+
+.interactive-butcher-foods-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-food-button {
+  width: 100%;
+  padding: 20px;
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 15px;
+  transition: all 0.2s;
+}
+
+.interactive-butcher-food-button:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: #34c759;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.interactive-butcher-food-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-food-verdict {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-food-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 40px;
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+/* 数量入力パネル */
+.interactive-butcher-quantity-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--color-bg-primary);
+  border-top: 2px solid var(--color-border);
+  padding: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.interactive-butcher-quantity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.interactive-butcher-quantity-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-back-button {
+  padding: 8px 16px;
+  background-color: var(--color-bg-secondary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* スマートプリセット */
+.interactive-butcher-presets {
+  margin-bottom: 20px;
+}
+
+.interactive-butcher-presets h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-preset-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.interactive-butcher-preset-button {
+  padding: 12px 24px;
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+  color: var(--color-text-primary);
+}
+
+.interactive-butcher-preset-button:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+}
+
+.interactive-butcher-preset-button.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+}
+
+/* Pack & Portion */
+.interactive-butcher-pack-portion {
+  margin-bottom: 20px;
+}
+
+.interactive-butcher-pack-portion h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-pack-slider {
+  margin-bottom: 15px;
+}
+
+.interactive-butcher-pack-slider label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-bg-tertiary);
+  outline: none;
+  -webkit-appearance: none;
+  transition: background-color 0.3s ease;
+}
+
+.interactive-butcher-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+}
+
+.interactive-butcher-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  border: none;
+}
+
+.interactive-butcher-portion-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.interactive-butcher-portion-button {
+  padding: 10px 20px;
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  color: var(--color-text-primary);
+}
+
+.interactive-butcher-portion-button:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: #34c759;
+}
+
+.interactive-butcher-portion-button.active {
+  background-color: #34c759;
+  border-color: #34c759;
+  color: white;
+}
+
+.interactive-butcher-calculated-amount {
+  padding: 10px;
+  background-color: #e8f5e9;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+/* 個数入力 */
+.interactive-butcher-piece-input {
+  margin-bottom: 20px;
+}
+
+.interactive-butcher-piece-input h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.interactive-butcher-piece-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.interactive-butcher-piece-button {
+  padding: 12px;
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  color: var(--color-text-primary);
+}
+
+.interactive-butcher-piece-button:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: #ffd700;
+}
+
+.interactive-butcher-piece-button.active {
+  background-color: #ffd700;
+  border-color: #ffd700;
+  color: #333;
+}
+
+/* 確認ボタン */
+.interactive-butcher-confirm-button {
+  width: 100%;
+  padding: 16px;
+  background-color: #34c759;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.interactive-butcher-confirm-button:hover {
+  background-color: #30b050;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

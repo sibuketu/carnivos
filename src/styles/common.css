@@ -1,0 +1,361 @@
+/* Common UI Components - iOS Settings App Style */
+
+/* Navigation Item (遷移式ボタン) */
+.nav-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  min-height: 44px; /* タッチフレンドリーなサイズ */
+  background-color: var(--color-bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  outline: none;
+  touch-action: manipulation; /* タッチ操作の最適化 */
+}
+
+.nav-item:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.nav-item:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.nav-item-content {
+  flex: 1;
+}
+
+.nav-item-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.nav-item-description {
+  margin: 0.25rem 0 0 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.nav-item-arrow {
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  margin-left: 1rem;
+  transition: color 0.3s ease;
+}
+
+/* Back Button (戻るボタン) */
+.back-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0.25rem;
+  margin-right: 0.5rem;
+  transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button:hover {
+  color: var(--color-text-primary);
+}
+
+/* Screen Header (画面ヘッダー) */
+.screen-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.screen-header-content {
+  flex: 1;
+}
+
+.screen-header-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+/* Card/Info Box */
+.info-card {
+  padding: 0.5rem;
+  background-color: var(--color-bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.info-card-highlight {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+}
+
+/* Button Groups */
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.button-group-button {
+  flex: 1;
+  min-width: 80px;
+  min-height: 44px; /* タッチフレンドリーなサイズ */
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  font-weight: 500;
+  touch-action: manipulation; /* タッチ操作の最適化 */
+}
+
+.button-group-button:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.button-group-button.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Primary Action Button */
+.primary-button {
+  width: 100%;
+  min-height: 44px; /* タッチフレンドリーなサイズ */
+  padding: 1rem;
+  background-color: var(--color-accent);
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  touch-action: manipulation; /* タッチ操作の最適化 */
+}
+
+.primary-button:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.primary-button:disabled {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+/* Secondary Action Button */
+.secondary-button {
+  width: 100%;
+  min-height: 44px; /* タッチフレンドリーなサイズ */
+  padding: 0.75rem 1rem;
+  background-color: var(--color-bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation; /* タッチ操作の最適化 */
+}
+
+.secondary-button:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+}
+
+/* Food Info Display */
+.food-info-display {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--color-bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.food-info-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+.food-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+/* Section Container */
+.section-container {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: var(--color-bg-secondary);
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+/* Toggle Button */
+.toggle-button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.toggle-button:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.toggle-button.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.toggle-button:disabled {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-required {
+  background-color: #ff3b30;
+  color: #fff;
+}
+
+.badge-recommended {
+  background-color: #ff9500;
+  color: #fff;
+}
+
+.badge-optional {
+  background-color: #8e8e93;
+  color: #fff;
+}
+
+/* Input Field */
+.input-field {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  background-color: var(--color-bg-primary);
+}
+
+.input-field::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+/* Number Input Row */
+.number-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.number-input-row .input-field {
+  flex: 1;
+}
+
+.number-input-row .unit-label {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  min-width: 40px;
+  transition: color 0.3s ease;
+}
+
+/* Switch Container (デバッグモードなど) */
+.switch-container {
+  padding: 1rem;
+  background-color: var(--color-bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.switch-label {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.switch-status {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 0.5rem;
+  transition: color 0.3s ease;
+}

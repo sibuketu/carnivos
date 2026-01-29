@@ -1,0 +1,127 @@
+.salt-settings-screen-container {
+  flex: 1;
+  background-color: var(--color-bg-primary);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.salt-settings-screen-content {
+  flex: 1;
+  padding: 1rem;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.salt-settings-screen-section {
+  margin-top: 1.5rem;
+}
+
+.salt-settings-screen-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.salt-settings-screen-button-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.salt-settings-screen-button {
+  padding: 1rem;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  min-height: 44px;
+  touch-action: manipulation;
+  outline: none;
+}
+
+.salt-settings-screen-button:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.salt-settings-screen-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.salt-settings-screen-button.active {
+  background-color: var(--color-accent-light, #fef2f2);
+  border-color: var(--color-accent);
+}
+
+.salt-settings-screen-button-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.salt-settings-screen-button-description {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.salt-settings-screen-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.salt-settings-screen-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.salt-settings-screen-input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.salt-settings-screen-input-unit {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+.salt-settings-screen-hint {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.salt-settings-screen-reset-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.salt-settings-screen-reset-button:hover {
+  background-color: var(--color-bg-tertiary);
+}
