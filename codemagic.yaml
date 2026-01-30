@@ -16,6 +16,7 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
+          rm -rf node_modules package-lock.json
           npm install
       - name: Build web app
         script: |
