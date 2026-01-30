@@ -7,12 +7,11 @@ workflows:
       app_store_connect: CarnivOS API Key
     environment:
       vars:
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
         BUNDLE_ID: com.CarnivOS.app
       node: 22
       xcode: latest
-      cocoapods: default
     scripts:
       - name: Install dependencies
         script: |
@@ -26,20 +25,7 @@ workflows:
           # Always create fresh iOS project for consistency
           rm -rf ios
           npx cap add ios
-          echo "=== Directory structure after cap add ios ==="
-          ls -la ios/
-          ls -la ios/App/ || echo "ios/App not found"
-          echo "=== Running cap sync ==="
           npx cap sync ios
-          echo "=== Directory structure after cap sync ==="
-          ls -la ios/App/
-          cat ios/App/Podfile || echo "Podfile not found"
-      - name: Install CocoaPods dependencies
-        script: |
-          cd ios/App
-          echo "=== Current directory contents ==="
-          ls -la
-          pod install
       - name: Fetch signing files
         script: |
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
@@ -56,7 +42,7 @@ workflows:
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
+            --project "$XCODE_PROJECT" \
             --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
