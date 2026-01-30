@@ -23,11 +23,9 @@ workflows:
           npm run build
       - name: Setup iOS project
         script: |
-          # Check if iOS project exists, if not create it
-          if [ ! -d "ios/App/App.xcodeproj" ]; then
-            echo "iOS project not found, creating..."
-            npx cap add ios
-          fi
+          # Always create fresh iOS project for consistency
+          rm -rf ios
+          npx cap add ios
           npx cap sync ios
       - name: Install CocoaPods dependencies
         script: |
