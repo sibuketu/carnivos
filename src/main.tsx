@@ -4,7 +4,10 @@ import './index.css';
 import App from './App.tsx';
 import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
 
-createRoot(document.getElementById('root')!).render(
+const container = document.getElementById('root');
+if (!container) throw new Error('Failed to find the root element');
+
+createRoot(container).render(
   <StrictMode>
     <GlobalErrorBoundary>
       <App />

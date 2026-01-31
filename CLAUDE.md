@@ -34,14 +34,24 @@
   - ❌「GitHubリポジトリの中身を確認してください」
   - ✅ `WebFetch("https://github.com/user/repo")` で自分で確認
 
-### 7.2. 直リンクで一発
-**ステップバイステップのガイドより、直接URLを1つ渡せ。**
+### 7.2. 【絶対厳守】直リンクで一発
+**ステップバイステップのガイドより、直接URLを1つ渡せ。URLは必ずコードブロック。**
 
-- **禁止行動**: 「1.Settingsを開く→2.Identifiersをクリック→3.+ボタンを押す」
-- **正しい行動**: 目的のページへの直リンクを1つ提示
+- **禁止行動**: 
+  - 「1.Settingsを開く→2.Identifiersをクリック→3.+ボタンを押す」
+  - URLを普通のテキストで書く
+  - URLなしでナビゲーション手順だけ書く
+- **必須行動**: 
+  - 目的のページへの直リンクをコードブロックで提示
+  - **全てのURL**をコードブロック形式で書く（例外なし）
+- **違反時**: 即座にやり直し
 - **例**:
-  - ❌「Apple Developer Portalを開いて、Certificates, Identifiers & Profilesに行って、Identifiersを選んで...」
-  - ✅ `https://developer.apple.com/account/resources/identifiers/add/bundleId`
+  - ❌「Teams → Personal Account → Team integrations を開く」
+  - ❌ 普通のテキスト: https://example.com
+  - ✅ コードブロック:
+    ```
+    https://codemagic.io/teams
+    ```
 
 ### 7.3. 詰まったらバトンタッチ
 **ブラウザ操作等で詰まったら、無理せず即座にユーザーに返せ。**

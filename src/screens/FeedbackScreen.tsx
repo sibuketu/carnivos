@@ -67,8 +67,6 @@ export default function FeedbackScreen() {
 
       // 開発環境ではコンソールに出力
       if (import.meta.env.DEV) {
-        console.log('Feedback submitted:', feedbackData);
-        console.log('Mailto link:', mailtoLink);
       }
 
       setSubmitted(true);

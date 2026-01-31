@@ -55,7 +55,6 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
       } catch (error) {
         // エラーは無視（手動入力にフォールバック）
         if (import.meta.env.DEV) {
-          console.log('Google Fit data fetch failed:', error);
         }
       } finally {
         setIsLoadingGoogleFit(false);

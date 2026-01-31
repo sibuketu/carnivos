@@ -11,7 +11,7 @@ import { saveTip, unsaveTip, isTipSaved } from '../utils/savedTips';
 import { useTranslation } from '../utils/i18n';
 import { useApp } from '../context/AppContext';
 import MiniNutrientGauge from '../components/MiniNutrientGauge';
-import { getNutrientColor } from '../utils/gaugeUtils';
+import { getNutrientColor, NUTRIENT_GROUPS } from '../utils/gaugeUtils';
 import { VoiceInputManager, type VoiceInputResult } from '../utils/voiceInput';
 import type { FoodItem } from '../types';
 import './CustomFoodScreen.css';
@@ -802,782 +802,123 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
           {showAdvancedNutrients && (
             <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5rem',
               }}
             >
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.sodium || 0}
-                    previewAmount={0}
-                    target={5000}
-                    color="#64748b"
-                    unit="mg"
-                    nutrientKey="sodium"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.sodium')}
+              {(() => {
+                // Adjust CustomFoodScreen targets to match what was hardcoded or standard
+                interface NutrientInputConfig {
+                  key: string;
+                  label: string;
+                  target: number;
+                  unit: string;
+                  step: string;
+                  nutrientKey: string; // for MiniNutrientGauge color lookup
+                }
+
+                const electrolyteConfigs: NutrientInputConfig[] = [
+                  { key: 'sodium', label: t('customFood.sodium'), target: 5000, unit: 'mg', step: '0.1', nutrientKey: 'sodium' },
+                  { key: 'potassium', label: t('customFood.potassium'), target: 4500, unit: 'mg', step: '0.1', nutrientKey: 'potassium' },
+                  { key: 'magnesium', label: t('customFood.magnesium'), target: 600, unit: 'mg', step: '0.1', nutrientKey: 'magnesium' },
+                ];
+
+                const otherConfigs: NutrientInputConfig[] = [
+                  { key: 'zinc', label: t('customFood.zinc'), target: 11, unit: 'mg', step: '0.01', nutrientKey: 'zinc' },
+                  { key: 'iron', label: t('customFood.iron'), target: 8, unit: 'mg', step: '0.01', nutrientKey: 'iron' },
+                  { key: 'vitaminA', label: `${t('customFood.vitaminA')} (IU/100g)`, target: 5000, unit: 'IU', step: '1', nutrientKey: 'vitamin_a' },
+                  { key: 'vitaminD', label: `${t('customFood.vitaminD')} (IU/100g)`, target: 2000, unit: 'IU', step: '0.1', nutrientKey: 'vitamin_d' },
+                  { key: 'vitaminK2', label: t('customFood.vitaminK2'), target: 200, unit: 'μg', step: '0.1', nutrientKey: 'vitamin_k2' },
+                  { key: 'vitaminB12', label: t('customFood.vitaminB12'), target: 2.4, unit: 'μg', step: '0.01', nutrientKey: 'vitamin_b12' },
+                  { key: 'omega3', label: t('customFood.omega3'), target: 2, unit: 'g', step: '0.01', nutrientKey: 'omega3' },
+                  { key: 'omega6', label: t('customFood.omega6'), target: 5, unit: 'g', step: '0.01', nutrientKey: 'omega6' },
+                  { key: 'calcium', label: t('customFood.calcium'), target: 1000, unit: 'mg', step: '0.1', nutrientKey: 'calcium' },
+                  { key: 'phosphorus', label: t('customFood.phosphorus'), target: 700, unit: 'mg', step: '0.1', nutrientKey: 'phosphorus' },
+                  { key: 'glycine', label: t('customFood.glycine'), target: 10, unit: 'g', step: '0.01', nutrientKey: 'glycine' },
+                  { key: 'methionine', label: t('customFood.methionine'), target: 2, unit: 'g', step: '0.01', nutrientKey: 'methionine' },
+                  { key: 'taurine', label: t('customFood.taurine'), target: 500, unit: 'mg', step: '0.1', nutrientKey: 'taurine' },
+                  { key: 'vitaminB5', label: t('customFood.vitaminB5'), target: 0, unit: '', step: '0.01', nutrientKey: 'vitamin_b5' }, // Target 0/Empty unit in original?
+                  { key: 'vitaminB9', label: t('customFood.vitaminB9'), target: 0, unit: '', step: '0.1', nutrientKey: 'vitamin_b9' },
+                  { key: 'chromium', label: t('customFood.chromium'), target: 0, unit: '', step: '0.1', nutrientKey: 'chromium' },
+                  { key: 'molybdenum', label: t('customFood.molybdenum'), target: 0, unit: '', step: '0.1', nutrientKey: 'molybdenum' },
+                  { key: 'fluoride', label: t('customFood.fluoride'), target: 0, unit: '', step: '0.01', nutrientKey: 'fluoride' },
+                  { key: 'chloride', label: t('customFood.chloride'), target: 0, unit: '', step: '0.1', nutrientKey: 'chloride' },
+                  { key: 'boron', label: t('customFood.boron'), target: 0, unit: '', step: '0.01', nutrientKey: 'boron' },
+                  { key: 'nickel', label: t('customFood.nickel'), target: 0, unit: '', step: '0.01', nutrientKey: 'nickel' },
+                  { key: 'silicon', label: t('customFood.silicon'), target: 0, unit: '', step: '0.1', nutrientKey: 'silicon' },
+                  { key: 'vanadium', label: t('customFood.vanadium'), target: 0, unit: '', step: '0.1', nutrientKey: 'vanadium' },
+                ];
+
+                const renderInput = (config: NutrientInputConfig) => (
+                  <div key={config.key}>
+                    <div>
+                      {config.target > 0 && (
+                        <MiniNutrientGauge
+                          label=""
+                          currentDailyTotal={(nutrients as any)?.[config.key] || 0}
+                          previewAmount={0}
+                          target={config.target}
+                          color={getNutrientColor(config.nutrientKey)}
+                          unit={config.unit}
+                          nutrientKey={config.nutrientKey}
+                        />
+                      )}
+                      <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
+                        {config.label}
+                      </div>
+                    </div>
+                    <input
+                      type="number"
+                      value={(nutrients as any)?.[config.key] || ''}
+                      onChange={(e) =>
+                        updateNutrient(
+                          config.key as any,
+                          e.target.value ? parseFloat(e.target.value) : undefined
+                        )
+                      }
+                      placeholder="0"
+                      step={config.step}
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        marginTop: '0.5rem',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '4px',
+                      }}
+                    />
                   </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.sodium || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'sodium',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.magnesium || 0}
-                    previewAmount={0}
-                    target={600}
-                    color="#64748b"
-                    unit="mg"
-                    nutrientKey="magnesium"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.magnesium')}
+                );
+
+                const renderSection = (label: string, configs: NutrientInputConfig[]) => (
+                  <div>
+                    <h4 style={{
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      color: '#4b5563',
+                      marginBottom: '1rem',
+                      borderBottom: '1px solid #e5e7eb',
+                      paddingBottom: '0.5rem'
+                    }}>
+                      {label}
+                    </h4>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap: '1rem',
+                    }}>
+                      {configs.map(renderInput)}
+                    </div>
                   </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.magnesium || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'magnesium',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.potassium || 0}
-                    previewAmount={0}
-                    target={4500}
-                    color="#64748b"
-                    unit="mg"
-                    nutrientKey="potassium"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.potassium')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.potassium || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'potassium',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.zinc || 0}
-                    previewAmount={0}
-                    target={11}
-                    color="#64748b"
-                    unit="mg"
-                    nutrientKey="zinc"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.zinc')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.zinc || ''}
-                  onChange={(e) =>
-                    updateNutrient('zinc', e.target.value ? parseFloat(e.target.value) : undefined)
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.iron || 0}
-                    previewAmount={0}
-                    target={8}
-                    color="#64748b"
-                    unit="mg"
-                    nutrientKey="iron"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.iron')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.iron || ''}
-                  onChange={(e) =>
-                    updateNutrient('iron', e.target.value ? parseFloat(e.target.value) : undefined)
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.vitaminA || 0}
-                    previewAmount={0}
-                    target={5000}
-                    color="#64748b"
-                    unit="IU"
-                    nutrientKey="vitamin_a"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.vitaminA')} (IU/100g)
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.vitaminA || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'vitaminA',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.vitaminD || 0}
-                    previewAmount={0}
-                    target={2000}
-                    color="#64748b"
-                    unit="IU"
-                    nutrientKey="vitamin_d"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.vitaminD')} (IU/100g)
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.vitaminD || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'vitaminD',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.vitaminK2 || 0}
-                    previewAmount={0}
-                    target={200}
-                    color="#64748b"
-                    unit="μg"
-                    nutrientKey="vitamin_k2"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.vitaminK2')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.vitaminK2 || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'vitaminK2',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.vitaminB12 || 0}
-                    previewAmount={0}
-                    target={2.4}
-                    color="#64748b"
-                    unit="μg"
-                    nutrientKey="vitamin_b12"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.vitaminB12')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.vitaminB12 || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'vitaminB12',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.omega3 || 0}
-                    previewAmount={0}
-                    target={2}
-                    color="#64748b"
-                    unit="g"
-                    nutrientKey="omega3"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.omega3')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.omega3 || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'omega3',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.omega6 || 0}
-                    previewAmount={0}
-                    target={5}
-                    color="#64748b"
-                    unit="g"
-                    nutrientKey="omega6"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.omega6')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.omega6 || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'omega6',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.calcium || 0}
-                    previewAmount={0}
-                    target={1000}
-                    color="#64748b"
-                    unit="mg"
-                    nutrientKey="calcium"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.calcium')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.calcium || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'calcium',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.phosphorus || 0}
-                    previewAmount={0}
-                    target={700}
-                    color="#64748b"
-                    unit="mg"
-                    nutrientKey="phosphorus"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.phosphorus')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.phosphorus || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'phosphorus',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.glycine || 0}
-                    previewAmount={0}
-                    target={10}
-                    color="#64748b"
-                    unit="g"
-                    nutrientKey="glycine"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.glycine')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.glycine || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'glycine',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.methionine || 0}
-                    previewAmount={0}
-                    target={2}
-                    color="#64748b"
-                    unit="g"
-                    nutrientKey="methionine"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.methionine')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.methionine || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'methionine',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <div>
-                <div>
-                  <MiniNutrientGauge
-                    label=""
-                    currentDailyTotal={nutrients?.taurine || 0}
-                    previewAmount={0}
-                    target={500}
-                    color="#64748b"
-                    unit="mg"
-                    nutrientKey="taurine"
-                  />
-                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: 0 }}>
-                    {t('customFood.taurine')}
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  value={nutrients?.taurine || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'taurine',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.5rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </div>
-              <label>
-                {t('customFood.vitaminB5')}
-                <input
-                  type="number"
-                  value={nutrients?.vitaminB5 || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'vitaminB5',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.vitaminB9')}
-                <input
-                  type="number"
-                  value={nutrients?.vitaminB9 || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'vitaminB9',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.chromium')}
-                <input
-                  type="number"
-                  value={nutrients?.chromium || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'chromium',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.molybdenum')}
-                <input
-                  type="number"
-                  value={nutrients?.molybdenum || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'molybdenum',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.fluoride')}
-                <input
-                  type="number"
-                  value={nutrients?.fluoride || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'fluoride',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.chloride')}
-                <input
-                  type="number"
-                  value={nutrients?.chloride || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'chloride',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.boron')}
-                <input
-                  type="number"
-                  value={nutrients?.boron || ''}
-                  onChange={(e) =>
-                    updateNutrient('boron', e.target.value ? parseFloat(e.target.value) : undefined)
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.nickel')}
-                <input
-                  type="number"
-                  value={nutrients?.nickel || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'nickel',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.01"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.silicon')}
-                <input
-                  type="number"
-                  value={nutrients?.silicon || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'silicon',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
-              <label>
-                {t('customFood.vanadium')}
-                <input
-                  type="number"
-                  value={nutrients?.vanadium || ''}
-                  onChange={(e) =>
-                    updateNutrient(
-                      'vanadium',
-                      e.target.value ? parseFloat(e.target.value) : undefined
-                    )
-                  }
-                  placeholder="0"
-                  step="0.1"
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginTop: '0.25rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                  }}
-                />
-              </label>
+                );
+
+                return (
+                  <>
+                    {renderSection(NUTRIENT_GROUPS.electrolytes.label, electrolyteConfigs)}
+                    {renderSection(NUTRIENT_GROUPS.other.label, otherConfigs)}
+                  </>
+                );
+              })()}
             </div>
           )}
         </div>

@@ -83,7 +83,6 @@ export function deleteHealthData(date: string): boolean {
 export async function syncWithAppleHealth(): Promise<HealthData | null> {
   // 将来実装予定
   if (import.meta.env.DEV) {
-    console.log('Apple Health連携はモバイルアプリで実装予定です');
   }
   return null;
 }
@@ -97,7 +96,6 @@ export async function syncWithAppleHealth(): Promise<HealthData | null> {
 export async function syncWithGoogleFit(): Promise<HealthData | null> {
   // 将来実装予定
   if (import.meta.env.DEV) {
-    console.log('Google Fit連携はモバイルアプリで実装予定です');
   }
   return null;
 }

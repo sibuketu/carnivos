@@ -8,8 +8,8 @@ import type { FoodItem } from './types';
 import type { Session } from '@supabase/supabase-js';
 // メイン画面（即座に読み込む必要がある）
 import HomeScreen from './screens/HomeScreen';
-import ProfileScreen from './screens/ProfileScreen';
-import LabsScreen from './screens/LabsScreen';
+
+import OthersScreen from './screens/OthersScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import CustomFoodScreen from './screens/CustomFoodScreen';
 import AuthScreen from './screens/AuthScreen';
@@ -101,6 +101,54 @@ function AppContent() {
           setShowAuth(false);
         }
       });
+    }
+  }, []);
+
+  // URLパスまたはパラメータによる画面切り替え（/privacy, /terms, ?screen=privacy など）
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    const params = new URLSearchParams(window.location.search);
+    const screenParam = params.get('screen');
+
+    // パスベースの画面切り替え
+    const pathMappings: Record<string, string> = {
+      '/privacy': 'privacy',
+      '/privacy-policy': 'privacy',
+      '/terms': 'terms',
+      '/terms-of-service': 'terms',
+    };
+
+    // 許可された画面名のリスト
+    const allowedScreens = ['privacy', 'terms'] as const;
+
+    // パスから画面を判定
+    if (pathMappings[pathname]) {
+      setCurrentScreen(pathMappings[pathname] as typeof allowedScreens[number]);
+      return;
+    }
+
+    // クエリパラメータから画面を判定
+    if (screenParam && allowedScreens.includes(screenParam as any)) {
+      setCurrentScreen(screenParam as typeof allowedScreens[number]);
+    }
+  }, []);
+
+  // 決済完了のリダイレクト処理
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get('payment');
+
+    if (paymentStatus === 'success') {
+      // 成功した場合、オンボーディング完了として扱う
+      localStorage.setItem('primal_logic_onboarding_completed', 'true');
+      setCurrentScreen('home');
+      // URLパラメータを削除（スッキリさせるため）
+      window.history.replaceState({}, '', window.location.pathname);
+
+      // 少し遅延させてトースト表示（DOMのマウントを待つ）
+      setTimeout(() => {
+        (window as any).showToast?.('ようこそ！CarnivOSへ（決済完了）');
+      }, 1000);
     }
   }, []);
 
@@ -268,9 +316,12 @@ function AppContent() {
               onAddFoodReady={handleAddFoodReady}
             />
           )}
-          {currentScreen === 'profile' && <ProfileScreen />}
+
           {currentScreen === 'settings' && (
-            <SettingsScreen onShowOnboarding={() => setCurrentScreen('onboarding')} />
+            <SettingsScreen
+              onShowOnboarding={() => setCurrentScreen('onboarding')}
+              onBack={() => setCurrentScreen('labs')}
+            />
           )}
           {currentScreen === 'userSettings' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
@@ -282,7 +333,7 @@ function AppContent() {
               <LazyHistoryScreen />
             </Suspense>
           )}
-          {currentScreen === 'labs' && <LabsScreen />}
+          {currentScreen === 'labs' && <OthersScreen />}
           {currentScreen === 'streakTracker' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
               <LazyStreakTrackerScreen onBack={() => setCurrentScreen('labs')} />
@@ -347,22 +398,22 @@ function AppContent() {
           )}
           {currentScreen === 'language' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyLanguageSettingsScreen onBack={() => setCurrentScreen('profile')} />
+              <LazyLanguageSettingsScreen onBack={() => setCurrentScreen('labs')} />
             </Suspense>
           )}
           {currentScreen === 'salt' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazySaltSettingsScreen onBack={() => setCurrentScreen('profile')} />
+              <LazySaltSettingsScreen onBack={() => setCurrentScreen('labs')} />
             </Suspense>
           )}
           {currentScreen === 'carbTarget' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyCarbTargetSettingsScreen onBack={() => setCurrentScreen('profile')} />
+              <LazyCarbTargetSettingsScreen onBack={() => setCurrentScreen('labs')} />
             </Suspense>
           )}
           {currentScreen === 'nutrientCustom' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyNutrientTargetCustomizationScreen onBack={() => setCurrentScreen('profile')} />
+              <LazyNutrientTargetCustomizationScreen onBack={() => setCurrentScreen('labs')} />
             </Suspense>
           )}
           {currentScreen === 'gift' && (
@@ -417,20 +468,11 @@ function AppContent() {
           <button
             className={`app-nav-button ${currentScreen === 'labs' ? 'active' : ''}`}
             onClick={() => setCurrentScreen('labs')}
-            aria-label={t('nav.labsAriaLabel')}
+            aria-label={t('nav.othersAriaLabel')}
             aria-current={currentScreen === 'labs' ? 'page' : undefined}
           >
-            <span style={{ fontSize: '20px' }} aria-hidden="true">🧪</span>
-            <span>{t('nav.labs')}</span>
-          </button>
-          <button
-            className={`app-nav-button ${currentScreen === 'profile' ? 'active' : ''}`}
-            onClick={() => setCurrentScreen('profile')}
-            aria-label={t('nav.profileAriaLabel')}
-            aria-current={currentScreen === 'profile' ? 'page' : undefined}
-          >
-            <span style={{ fontSize: '20px' }} aria-hidden="true">⚙️</span>
-            <span>{t('nav.profile')}</span>
+            <span style={{ fontSize: '20px' }} aria-hidden="true">📑</span>
+            <span>{t('nav.others')}</span>
           </button>
         </nav>
       </div>

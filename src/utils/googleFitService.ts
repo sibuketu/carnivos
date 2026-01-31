@@ -30,7 +30,6 @@ export async function authenticateGoogleFit(): Promise<boolean> {
   const apiKey = import.meta.env.VITE_GOOGLE_FIT_API_KEY;
   if (!apiKey) {
     if (import.meta.env.DEV) {
-      console.log('Google Fit API key is not set. Set VITE_GOOGLE_FIT_API_KEY in .env file.');
     }
     return false;
   }

@@ -158,7 +158,6 @@ export default function MiniNutrientGauge({
   // Logic Armor: ロジックがある場合はコンソールに出力（将来はツールチップで表示）
   useEffect(() => {
     if (logic && import.meta.env.DEV) {
-      console.log(`[Logic Armor] ${label}: ${logic}`);
     }
   }, [label, logic]);
 

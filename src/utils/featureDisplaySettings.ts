@@ -39,6 +39,9 @@ export type FeatureKey =
   | 'bodyCompositionSettings' // 体組成設定
   | 'metabolicStressIndicators' // 代謝ストレス指標
   | 'nutrientTargetCustomization' // 栄養素目標値のカスタマイズ
+  | 'diary' // 日記
+  | 'gift' // ギフト
+  | 'shop' // ショップ
   // 非表示基本の機能（今は見せない）
   | 'recipeScreen' // レシピ画面
   | 'photoAnalysisModal'; // 写真分析モーダル
@@ -250,6 +253,27 @@ export const ALL_FEATURE_DISPLAY_CONFIGS: FeatureDisplayConfig[] = [
     category: 'other',
     defaultVisible: true,
     description: '栄養素目標値の手動設定',
+  },
+  {
+    key: 'diary',
+    label: '日記',
+    category: 'other',
+    defaultVisible: true,
+    description: '日々の記録',
+  },
+  {
+    key: 'gift',
+    label: 'ギフト',
+    category: 'other',
+    defaultVisible: true,
+    description: 'ギフト機能',
+  },
+  {
+    key: 'shop',
+    label: 'ショップ',
+    category: 'other',
+    defaultVisible: true,
+    description: 'ショップ機能',
   },
   // 非表示基本の機能（今は見せない）
   {

@@ -545,7 +545,7 @@ export default function AISpeedDial({
         });
       } catch (err) {
         if (import.meta.env.DEV) {
-          console.log('Share cancelled');
+
         }
       }
     } else {
@@ -652,7 +652,7 @@ export default function AISpeedDial({
 
     try {
       if (import.meta.env.DEV) {
-        console.log('Sending chat message:', userMessage);
+
       }
 
       // AIチャットにユーザープロファイル、日記、過去の食事記録を常に渡す
@@ -679,9 +679,9 @@ export default function AISpeedDial({
         gender: userProfile.gender,
       } : undefined);
       if (import.meta.env.DEV) {
-        console.log('Received AI response:', aiResponse.answer.substring(0, 100));
+
         if (aiResponse.todos && aiResponse.todos.length > 0) {
-          console.log('Received Todos:', aiResponse.todos.length);
+
         }
       }
 

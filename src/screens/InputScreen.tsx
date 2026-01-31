@@ -166,7 +166,6 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
       } catch (error) {
         // エラーは無視（手動入力にフォールバック）
         if (import.meta.env.DEV) {
-          console.log('Weather data fetch failed:', error);
         }
       } finally {
         setIsLoadingWeather(false);

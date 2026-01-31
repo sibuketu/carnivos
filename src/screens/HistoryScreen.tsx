@@ -12,7 +12,7 @@ import ArgumentCard from '../components/ArgumentCard';
 import { getFeatureDisplaySettings } from '../utils/featureDisplaySettings';
 import { useApp } from '../context/AppContext';
 import { getCarnivoreTargets } from '../data/carnivoreTargets';
-import { getNutrientColor } from '../utils/gaugeUtils';
+import { getNutrientColor, NUTRIENT_GROUPS } from '../utils/gaugeUtils';
 import MiniNutrientGauge from '../components/MiniNutrientGauge';
 import { getNutrientDisplayMode, isNutrientVisibleInMode } from '../utils/nutrientPriority';
 import { searchFoods } from '../data/foodsDatabase';
@@ -430,19 +430,19 @@ export default function HistoryScreen() {
             const totalProtein = filteredLogs.reduce(
               (sum, log) =>
                 sum +
-                (log.calculatedMetrics.animalEffectiveProtein ??
-                  log.calculatedMetrics.effectiveProtein ??
+                (log.calculatedMetrics?.animalEffectiveProtein ??
+                  log.calculatedMetrics?.effectiveProtein ??
                   0),
               0
             );
             const totalFat = filteredLogs.reduce(
-              (sum, log) => sum + (log.calculatedMetrics.fatTotal || 0),
+              (sum, log) => sum + (log.calculatedMetrics?.fatTotal || 0),
               0
             );
             const avgProtein = totalProtein / filteredLogs.length;
             const avgFat = totalFat / filteredLogs.length;
             const violationCount = filteredLogs.filter(
-              (log) => log.calculatedMetrics.hasViolation
+              (log) => log.calculatedMetrics?.hasViolation
             ).length;
             const violationRate = (violationCount / filteredLogs.length) * 100;
 
@@ -621,11 +621,11 @@ export default function HistoryScreen() {
                           {/* タンパク質・脂質の達成状況 */}
                           {(() => {
                             const protein =
-                              item.calculatedMetrics.animalEffectiveProtein ??
-                              item.calculatedMetrics.effectiveProtein ??
+                              item.calculatedMetrics?.animalEffectiveProtein ??
+                              item.calculatedMetrics?.effectiveProtein ??
                               0;
-                            const fat = item.calculatedMetrics.fatTotal || 0;
-                            const proteinTarget = item.calculatedMetrics.proteinRequirement || 110;
+                            const fat = item.calculatedMetrics?.fatTotal || 0;
+                            const proteinTarget = item.calculatedMetrics?.proteinRequirement || 110;
                             const fatTarget = 150;
                             const proteinOk = protein >= proteinTarget;
                             const fatOk = fat >= fatTarget;
@@ -642,7 +642,7 @@ export default function HistoryScreen() {
                             );
                           })()}
                           {/* 違反表示 */}
-                          {item.calculatedMetrics.hasViolation && (
+                          {item.calculatedMetrics?.hasViolation && (
                             <span
                               style={{
                                 fontSize: '12px',
@@ -816,6 +816,7 @@ export default function HistoryScreen() {
                                 </div>
                                 {(() => {
                                   const metrics = item.calculatedMetrics;
+                                  if (!metrics) return null;
                                   const protein = metrics.animalEffectiveProtein ?? metrics.effectiveProtein ?? 0;
                                   const fat = metrics.fatTotal || 0;
                                   const proteinTarget = metrics.proteinRequirement ?? targets.protein ?? 110;
@@ -824,33 +825,24 @@ export default function HistoryScreen() {
 
                                   type NutrientConfig = { key: string; label: string; current: number; target: number; unit: string };
 
-                                  const electrolytes: NutrientConfig[] = [
-                                    { key: 'sodium', label: 'Sodium', current: metrics.sodiumTotal || 0, target: targets.sodium || 5000, unit: 'mg' },
-                                    { key: 'potassium', label: 'Potassium', current: metrics.potassiumTotal || 0, target: targets.potassium || 4500, unit: 'mg' },
-                                    { key: 'magnesium', label: 'Magnesium', current: metrics.magnesiumTotal || 0, target: targets.magnesium || 400, unit: 'mg' },
-                                  ];
-
-                                  const macros: NutrientConfig[] = [
-                                    { key: 'protein', label: 'Protein (Effective)', current: protein, target: proteinTarget, unit: 'g' },
-                                    { key: 'fat', label: 'Fat', current: fat, target: fatTarget, unit: 'g' },
-                                  ];
-
-                                  const others: NutrientConfig[] = [
-                                    { key: 'zinc', label: 'Zinc (Effective)', current: metrics.effectiveZinc || 0, target: targets.zinc || 11, unit: 'mg' },
-                                    { key: 'iron', label: 'Iron (Effective)', current: metrics.effectiveIron || 0, target: targets.iron || 8, unit: 'mg' },
-                                    { key: 'vitamin_a', label: 'Vitamin A', current: metrics.effectiveVitaminA || 0, target: targets.vitamin_a || 5000, unit: 'IU' },
-                                    { key: 'vitamin_d', label: 'Vitamin D', current: metrics.vitaminDTotal || 0, target: targets.vitamin_d || 2000, unit: 'IU' },
-                                    { key: 'vitamin_b12', label: 'Vitamin B12', current: metrics.vitaminB12Total || 0, target: targets.vitamin_b12 || 2.4, unit: 'μg' },
-                                    { key: 'choline', label: 'Choline', current: metrics.cholineTotal || 0, target: targets.choline || 550, unit: 'mg' },
-                                    { key: 'omega3', label: 'Omega-3', current: metrics.omega3Total || 0, target: 2, unit: 'g' },
-                                  ];
-
-                                  const filterVisible = (items: NutrientConfig[]) =>
-                                    items.filter(n => isNutrientVisibleInMode(n.key, displayMode));
-
-                                  const visibleElectrolytes = filterVisible(electrolytes);
-                                  const visibleMacros = filterVisible(macros);
-                                  const visibleOthers = filterVisible(others);
+                                  // 全ての栄養素データを定義
+                                  const nutrientConfigs: Record<string, NutrientConfig> = {
+                                    // Electrolytes
+                                    sodium: { key: 'sodium', label: 'Sodium', current: metrics.sodiumTotal || 0, target: targets.sodium || 5000, unit: 'mg' },
+                                    potassium: { key: 'potassium', label: 'Potassium', current: metrics.potassiumTotal || 0, target: targets.potassium || 4500, unit: 'mg' },
+                                    magnesium: { key: 'magnesium', label: 'Magnesium', current: metrics.magnesiumTotal || 0, target: targets.magnesium || 400, unit: 'mg' },
+                                    // Macros
+                                    protein: { key: 'protein', label: 'Protein (Effective)', current: protein, target: proteinTarget, unit: 'g' },
+                                    fat: { key: 'fat', label: 'Fat', current: fat, target: fatTarget, unit: 'g' },
+                                    // Others
+                                    zinc: { key: 'zinc', label: 'Zinc (Effective)', current: metrics.effectiveZinc || 0, target: targets.zinc || 11, unit: 'mg' },
+                                    iron: { key: 'iron', label: 'Iron (Effective)', current: metrics.effectiveIron || 0, target: targets.iron || 8, unit: 'mg' },
+                                    vitamin_a: { key: 'vitamin_a', label: 'Vitamin A', current: metrics.effectiveVitaminA || 0, target: targets.vitamin_a || 5000, unit: 'IU' },
+                                    vitamin_d: { key: 'vitamin_d', label: 'Vitamin D', current: metrics.vitaminDTotal || 0, target: targets.vitamin_d || 2000, unit: 'IU' },
+                                    vitamin_b12: { key: 'vitamin_b12', label: 'Vitamin B12', current: metrics.vitaminB12Total || 0, target: targets.vitamin_b12 || 2.4, unit: 'μg' },
+                                    choline: { key: 'choline', label: 'Choline', current: metrics.cholineTotal || 0, target: targets.choline || 550, unit: 'mg' },
+                                    omega3: { key: 'omega3', label: 'Omega-3', current: metrics.omega3Total || 0, target: 2, unit: 'g' },
+                                  };
 
                                   const renderGauge = (n: NutrientConfig) => (
                                     <MiniNutrientGauge
@@ -864,38 +856,38 @@ export default function HistoryScreen() {
                                     />
                                   );
 
+                                  const renderGroup = (label: string, keys: readonly string[]) => {
+                                    const visibleConfigs = keys
+                                      .map(k => nutrientConfigs[k])
+                                      .filter(c => c && isNutrientVisibleInMode(c.key, displayMode));
+
+                                    if (visibleConfigs.length === 0) return null;
+
+                                    return (
+                                      <div>
+                                        <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280', marginBottom: '0.25rem' }}>
+                                          {label}
+                                        </h4>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                          {visibleConfigs.map(renderGauge)}
+                                        </div>
+                                      </div>
+                                    );
+                                  };
+
+                                  // Otherグループのキーを動的に算出
+                                  const tier1Keys = NUTRIENT_GROUPS.electrolytes.nutrients;
+                                  const tier2Keys = NUTRIENT_GROUPS.macros.nutrients;
+                                  const otherKeys = Object.keys(nutrientConfigs).filter(k =>
+                                    !tier1Keys.includes(k as any) &&
+                                    !tier2Keys.includes(k as any)
+                                  );
+
                                   return (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                      {visibleElectrolytes.length > 0 && (
-                                        <div>
-                                          <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280', marginBottom: '0.25rem' }}>
-                                            ⚡ Essentials (Electrolytes)
-                                          </h4>
-                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                            {visibleElectrolytes.map(renderGauge)}
-                                          </div>
-                                        </div>
-                                      )}
-                                      {visibleMacros.length > 0 && (
-                                        <div>
-                                          <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280', marginBottom: '0.25rem' }}>
-                                            🥩 Macros
-                                          </h4>
-                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                            {visibleMacros.map(renderGauge)}
-                                          </div>
-                                        </div>
-                                      )}
-                                      {visibleOthers.length > 0 && (
-                                        <div>
-                                          <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280', marginBottom: '0.25rem' }}>
-                                            📊 Other Verified Metrics
-                                          </h4>
-                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                            {visibleOthers.map(renderGauge)}
-                                          </div>
-                                        </div>
-                                      )}
+                                      {renderGroup(NUTRIENT_GROUPS.electrolytes.label, NUTRIENT_GROUPS.electrolytes.nutrients)}
+                                      {renderGroup(NUTRIENT_GROUPS.macros.label, NUTRIENT_GROUPS.macros.nutrients)}
+                                      {renderGroup(NUTRIENT_GROUPS.other.label, otherKeys)}
                                     </div>
                                   );
                                 })()}

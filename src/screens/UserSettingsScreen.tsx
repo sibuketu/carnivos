@@ -221,11 +221,11 @@ export default function UserSettingsScreen() {
   >(
     userProfile?.customNutrientTargets
       ? Object.fromEntries(
-          Object.entries(userProfile.customNutrientTargets).map(([key, value]) => [
-            key,
-            typeof value === 'number' ? { mode: 'manual' as const, value } : value,
-          ])
-        )
+        Object.entries(userProfile.customNutrientTargets).map(([key, value]) => [
+          key,
+          typeof value === 'number' ? { mode: 'manual' as const, value } : value,
+        ])
+      )
       : {}
   );
 
@@ -238,16 +238,16 @@ export default function UserSettingsScreen() {
     return saved
       ? JSON.parse(saved)
       : {
-          basicInfo: false, // 必須: 開く
-          goal: false, // 必須: 開く
-          metabolicStatus: false, // 必須: 開く
-          dietMode: false, // 推奨: 開く
-          dairyTolerance: true, // 任意: 閉じる
-          stressLevel: false, // 推奨: 開く
-          recommended: false, // 推奨: 開く
-          optional: true, // 任意: 閉じる
-          femaleSpecific: true, // 任意: 閉じる
-        };
+        basicInfo: false, // 必須: 開く
+        goal: false, // 必須: 開く
+        metabolicStatus: false, // 必須: 開く
+        dietMode: false, // 推奨: 開く
+        dairyTolerance: true, // 任意: 閉じる
+        stressLevel: false, // 推奨: 開く
+        recommended: false, // 推奨: 開く
+        optional: true, // 任意: 閉じる
+        femaleSpecific: true, // 任意: 閉じる
+      };
   });
 
   // セクションの表示ON/OFF状態
@@ -321,11 +321,11 @@ export default function UserSettingsScreen() {
         customNutrientTargets:
           Object.keys(customNutrientTargets).length > 0
             ? Object.fromEntries(
-                Object.entries(customNutrientTargets).map(([key, value]) => [
-                  key,
-                  value.mode === 'auto' ? { mode: 'auto' } : { mode: 'manual', value: value.value },
-                ])
-              )
+              Object.entries(customNutrientTargets).map(([key, value]) => [
+                key,
+                value.mode === 'auto' ? { mode: 'auto' } : { mode: 'manual', value: value.value },
+              ])
+            )
             : undefined,
       };
       try {
@@ -460,11 +460,11 @@ export default function UserSettingsScreen() {
       customNutrientTargets:
         Object.keys(customNutrientTargets).length > 0
           ? (Object.fromEntries(
-              Object.entries(customNutrientTargets).map(([key, config]) => [
-                key,
-                config.mode === 'manual' && config.value !== undefined ? config.value : 0,
-              ])
-            ) as Record<string, number>)
+            Object.entries(customNutrientTargets).map(([key, config]) => [
+              key,
+              config.mode === 'manual' ? { mode: 'manual', value: config.value } : { mode: 'auto' },
+            ])
+          ) as Record<string, { mode: 'auto' | 'manual'; value?: number }>)
           : undefined,
       ...userProfile,
     };
@@ -491,7 +491,7 @@ export default function UserSettingsScreen() {
         <div className="screen-header">
           <button
             onClick={() =>
-              window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'profile' }))
+              window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'labs' }))
             }
             className="back-button"
           >

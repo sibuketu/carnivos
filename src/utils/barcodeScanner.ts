@@ -181,7 +181,6 @@ export async function scanBarcodeFromCamera(
         } catch (error) {
           // スキャン中のエラーは無視（カメラが準備できていない場合など）
           if (import.meta.env.DEV) {
-            console.log('Barcode scan attempt failed:', error);
           }
         }
       }, 500);

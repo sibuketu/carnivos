@@ -28,7 +28,6 @@ export default function LanguageSettingsScreen({ onBack }: LanguageSettingsScree
   const handleLanguageChange = (lang: Language) => {
     try {
       if (import.meta.env.DEV) {
-        console.log('Language change requested:', lang);
       }
       // 言語を保存
       setLanguage(lang);

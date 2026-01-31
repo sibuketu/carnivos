@@ -682,7 +682,6 @@ export default function ButcherSelect({
   // パーツ選択ハンドラ
   const handlePartSelect = (partId: string) => {
     if (import.meta.env.DEV) {
-      console.log('Part selected:', partId);
     }
     setSelectedPart(partId);
 

@@ -4,6 +4,19 @@
   publish = "dist"
   command = "npm run build"
 
+# プライバシーポリシーページ（Google Play Console用）
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+# 利用規約ページ
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+# SPA用フォールバック
 [[redirects]]
   from = "/*"
   to = "/index.html"

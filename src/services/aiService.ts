@@ -290,8 +290,6 @@ async function original_chatWithAI(
   enableCitations: boolean = true
 ): Promise<string> {
   if (import.meta.env.DEV) {
-    console.log('chatWithAI called with message:', userMessage);
-    console.log('Gemini available:', isGeminiAvailable());
   }
 
   if (!isGeminiAvailable()) {
@@ -304,7 +302,6 @@ async function original_chatWithAI(
 
   try {
     if (import.meta.env.DEV) {
-      console.log('Calling Gemini API...');
     }
     // Stableモデルを使用（公式ドキュメントより: gemini-2.5-flash）
     const model = genAI!.getGenerativeModel({ model: 'gemini-2.5-flash' });
@@ -624,7 +621,6 @@ ${historyContext}
     const response = await result.response;
     const text = response.text();
     if (import.meta.env.DEV) {
-      console.log('Gemini API response received:', text.substring(0, 100));
     }
 
     if (!text || text.trim().length === 0) {
@@ -636,13 +632,10 @@ ${historyContext}
 
     if (import.meta.env.DEV) {
       if (parsedResponse.thinking) {
-        console.log('思考プロセスを抽出しました');
       }
       if (parsedResponse.verification) {
-        console.log('検証ステータス:', parsedResponse.verification.status);
       }
       if (parsedResponse.citations && parsedResponse.citations.length > 0) {
-        console.log('引用を抽出しました:', parsedResponse.citations.length);
       }
     }
 
@@ -672,9 +665,7 @@ ${historyContext}
     // <answer>タグから回答を抽出
     if (parsedResponse.answer && parsedResponse.answer.length > 0) {
       if (import.meta.env.DEV) {
-        console.log('XML構造から回答を抽出しました');
         if (parsedResponse.todos && parsedResponse.todos.length > 0 && import.meta.env.DEV) {
-          console.log('Todoを抽出しました:', parsedResponse.todos.length);
         }
       }
       // <thinking>タグやその他のタグを削除して返す
@@ -690,7 +681,6 @@ ${historyContext}
     // <answer>タグが見つからない場合、または空の場合は元のテキストを返す（後方互換性）
     // ただし、<thinking>タグなどは削除する
     if (import.meta.env.DEV) {
-      console.log('<answer>タグが見つかりませんでした。元のテキストを返します');
     }
     const cleanText = text
       .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
@@ -729,7 +719,6 @@ export async function chatWithAIStructured(
   } // ユーザープロファイル
 ): Promise<ChatAIResponse> {
   if (import.meta.env.DEV) {
-    console.log('chatWithAIStructured called with message:', userMessage);
   }
 
   if (!isGeminiAvailable()) {

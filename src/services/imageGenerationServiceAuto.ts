@@ -29,7 +29,6 @@ export async function generateImageAuto(prompt: string): Promise<string> {
 
   try {
     if (import.meta.env.DEV) {
-      console.log('Generating image with Replicate API:', prompt);
     }
 
     // Replicate APIでStable Diffusionを実行
@@ -81,7 +80,6 @@ export async function generateImageAuto(prompt: string): Promise<string> {
     if (result.status === 'succeeded' && result.output && result.output.length > 0) {
       const imageUrl = result.output[0];
       if (import.meta.env.DEV) {
-        console.log('Image generated successfully:', imageUrl);
       }
       return imageUrl;
     } else {

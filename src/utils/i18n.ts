@@ -82,21 +82,51 @@ const translations: Record<Language, Record<string, string>> = {
     'gift.reply': '返信',
     'gift.replyPlaceholder': '返信を入力...',
 
-    // Labs画面
+    // その他画面 (Old Labs)
+    'others.description': '分析・記録・設定など、その他の機能',
+    'others.analysis': '分析',
+    'others.records': '記録',
+    'others.settings': '設定',
+    'others.tips': 'Tips',
+    'others.store': 'ストア',
+
+    // Analysis Section
+    'analysis.bioHack': 'Bio-Hack Terminal',
+    'analysis.bioHackDescription': '代謝・細胞修復レベルの可視化',
+    'analysis.stats': '統計・グラフ',
+    'analysis.statsDescription': '栄養素の推移、体重の推移',
+    'analysis.streak': '習慣トラッカー',
+    'analysis.streakDescription': '継続日数の詳細確認',
+
+    // Tips Section (Old Knowledge)
+    'tips.title': 'Tips（豆知識）',
+    'tips.viewList': '一覧を見る',
+    'tips.history': '履歴・お気に入り',
+    'tips.noHistory': '履歴はまだありません',
+    'tips.list': 'Tips一覧',
+    'tips.listAll': 'すべて',
+    'tips.listSaved': '保存済み',
+    'tips.noSaved': '保存済みTipsはまだありません',
+    'tips.back': '← 戻る',
+    'tips.next': '次へ →',
+    'tips.share': '📤 Share',
+    'tips.saved': '保存済み',
+    'tips.save': '保存する',
+
+    // Records Section
+    'records.diary': '日記',
+    'records.diaryDescription': '体調・メンタル・身体能力を記録',
+
+    // Store Section (Old Support/Shop/Gift)
+    'store.title': 'ストア',
+    'store.description': '開発支援とアドオン',
+    'store.shop': 'ショップ',
+    'store.shopDescription': 'ドット絵UIなどのカスタマイズ',
+    'store.gift': 'Gift',
+    'store.giftDescription': '新規ユーザーへの割引として開発者を支援',
+
+    // Legacy Labs keys (Keep temporarily to avoid crash until refactor is complete)
     'labs.description': 'ここは必須かどうか迷った結果とりあえず実装した機能たちです',
-    'labs.diary': '日記',
-    'labs.diaryDescription': '体調・メンタル・身体能力などを記録',
-    'labs.stats': '統計・グラフ',
-    'labs.statsDescription': '栄養素の推移、体重の推移をグラフで表示',
-    'labs.community': 'コミュニティ',
-    'labs.communityDescription': 'データ主導のコミュニティ機能',
-    'labs.shop': 'ショップ',
-    'labs.shopDescription': 'ドット絵UIやその他のカスタマイズアイテムを購入できます。',
-    'labs.gift': 'Gift',
-    'labs.giftDescription': '新しい仲間を応援しよう。100%が新規ユーザーへの割引に変換されます。',
-    'labs.streakTracker': '習慣トラッカー',
-    'labs.streakTrackerDescription': 'ストリークを確認',
-    'labs.tips': 'Tips（豆知識）',
     'labs.viewTipsList': 'Tips一覧を見る',
     'labs.tipsHistory': 'Tips履歴・お気に入り',
     'labs.noTipsHistory': 'Tips履歴はまだありません',
@@ -488,13 +518,14 @@ const translations: Record<Language, Record<string, string>> = {
     // ナビゲーション
     'nav.home': 'ホーム',
     'nav.homeAriaLabel': 'ホーム画面',
-    'nav.profile': '設定',
+    'nav.profile': '設定 (旧)', // Deprecated
     'nav.profileAriaLabel': '設定画面',
+    'nav.settings': '設定', // New
     'nav.mainNavigationAriaLabel': 'メインナビゲーション',
     'nav.history': '履歴',
-    'nav.labs': 'その他',
+    'nav.others': 'その他',
     'nav.historyAriaLabel': '履歴画面',
-    'nav.labsAriaLabel': 'その他画面',
+    'nav.othersAriaLabel': 'その他画面',
 
     // その他
     'common.processing': '処理中...',
@@ -571,22 +602,51 @@ const translations: Record<Language, Record<string, string>> = {
     'gift.reply': 'Reply',
     'gift.replyPlaceholder': 'Enter your reply...',
 
-    // Labs screen
+    // Others screen (Old Labs)
+    'others.description': 'Analysis, Records, Settings, etc.',
+    'others.analysis': 'Analysis',
+    'others.records': 'Records',
+    'others.settings': 'Settings',
+    'others.tips': 'Tips',
+    'others.store': 'Store',
+
+    // Analysis Section
+    'analysis.bioHack': 'Bio-Hack Terminal',
+    'analysis.bioHackDescription': 'Visualization of metabolic and cell repair status',
+    'analysis.stats': 'Statistics',
+    'analysis.statsDescription': 'Nutrient trends, Weight trends',
+    'analysis.streak': 'Habit Tracker',
+    'analysis.streakDescription': 'Check detailed streak',
+
+    // Tips Section
+    'tips.title': 'Tips',
+    'tips.viewList': 'View List',
+    'tips.history': 'History & Favorites',
+    'tips.noHistory': 'No tips history',
+    'tips.list': 'Tips List',
+    'tips.listAll': 'All',
+    'tips.listSaved': 'Saved',
+    'tips.noSaved': 'No saved tips',
+    'tips.back': '← Back',
+    'tips.next': 'Next →',
+    'tips.share': '📤 Share',
+    'tips.saved': 'Saved',
+    'tips.save': 'Save',
+
+    // Records Section
+    'records.diary': 'Diary',
+    'records.diaryDescription': 'Record physical condition, mental state, etc.',
+
+    // Store Section
+    'store.title': 'Store',
+    'store.description': 'Support & Add-ons',
+    'store.shop': 'Shop',
+    'store.shopDescription': 'Customization items like Pixel Art UI',
+    'store.gift': 'Gift',
+    'store.giftDescription': 'Support the dev, converted to discounts for new users',
+
+    // Legacy Labs keys
     'labs.description': 'Features implemented while deciding if they are essential',
-    'labs.diary': 'Diary',
-    'labs.diaryDescription': 'Record physical condition, mental state, physical abilities, etc.',
-    'labs.stats': 'Statistics & Charts',
-    'labs.statsDescription': 'Display nutrient trends and weight trends in charts',
-    'labs.community': 'Community',
-    'labs.communityDescription': 'Data-driven community features',
-    'labs.shop': 'Shop',
-    'labs.shopDescription': 'Purchase pixel art UI and other customization items.',
-    'labs.gift': 'Gift',
-    'labs.giftDescription':
-      'Support new members. 100% will be converted to discounts for new users.',
-    'labs.streakTracker': 'Habit Tracker',
-    'labs.streakTrackerDescription': 'Check streak',
-    'labs.tips': 'Tips',
     'labs.viewTipsList': 'View Tips List',
     'labs.tipsHistory': 'Tips History & Favorites',
     'labs.noTipsHistory': 'No tips history yet',
@@ -955,14 +1015,15 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Navigation
     'nav.home': 'Home',
-    'nav.homeAriaLabel': 'Home screen',
-    'nav.profile': 'Settings',
-    'nav.profileAriaLabel': 'Settings screen',
+    'nav.homeAriaLabel': 'Home Screen',
+    'nav.profile': 'Settings (Old)', // Deprecated
+    'nav.profileAriaLabel': 'Settings Screen',
+    'nav.settings': 'Settings', // New
     'nav.mainNavigationAriaLabel': 'Main navigation',
     'nav.history': 'History',
-    'nav.labs': 'Other',
+    'nav.others': 'Other',
     'nav.historyAriaLabel': 'History screen',
-    'nav.labsAriaLabel': 'Other screen',
+    'nav.othersAriaLabel': 'Other screen',
 
     // Other
     'common.processing': 'Processing...',

@@ -203,16 +203,14 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
         },
         body: JSON.stringify({
           priceId: selectedPlan === 'monthly'
-            ? 'price_1SqsMI06Z0q3rla2rQkRS6gq' // 月額 ¥1,999/月
-            : 'price_1SsID506Z0q3rla2LtHXi6rc', // 年額 ¥9,999/年
+            ? 'price_1Sv4nR06Z0q3rla2GBp7jQop' // 月額 (Test)
+            : 'price_1Sv4n606Z0q3rla28iMGLD9O', // 年額 (Test)
           successUrl: `${origin}/?payment=success`,
           cancelUrl: `${origin}/?payment=canceled`,
         }),
       });
 
       const data = await response.json();
-      console.log('Checkout response:', { status: response.status, data });
-
       if (data.url) {
         // Stripe Checkoutにリダイレクト
         window.location.href = data.url;

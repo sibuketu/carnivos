@@ -14,6 +14,7 @@ import ArgumentCard from '../components/ArgumentCard';
 import RecoveryProtocolScreen from './RecoveryProtocolScreen';
 import ButcherSelect from '../components/butcher/ButcherSelect';
 import PFRatioGauge from '../components/gauge/PFRatioGauge';
+import StorageNutrientGauge from '../components/StorageNutrientGauge';
 // SymptomChecker is removed - replaced with AI Prompt Chips in Magic Input
 import { useNutrition, type PreviewData } from '../hooks/useNutrition';
 import { useSettings } from '../hooks/useSettings';
@@ -26,7 +27,7 @@ import { searchFoods, getFoodById } from '../data/foodsDatabase';
 import { getTodayLog, getDailyLogs } from '../utils/storage';
 import { calculateAllMetrics } from '../utils/nutrientCalculator';
 import { getCarnivoreTargets } from '../data/carnivoreTargets';
-import { getNutrientColor } from '../utils/gaugeUtils';
+import { getNutrientColor, NUTRIENT_GROUPS } from '../utils/gaugeUtils';
 import { isNutrientVisibleInMode, getNutrientDisplayMode } from '../utils/nutrientPriority';
 import { calculateStreak, type StreakData } from '../utils/streakCalculator';
 import { calculateTransitionProgress } from '../data/transitionGuide';
@@ -130,6 +131,51 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
   } | null>(null);
   const [followupAnswers, setFollowupAnswers] = useState<Record<string, string>>({});
   const [isAIProcessing, setIsAIProcessing] = useState(false);
+
+  // Storage Gauge State
+  const [storageLevels, setStorageLevels] = useState<{ [key: string]: number }>({
+    vitamin_a: 70,
+    vitamin_d: 70,
+    vitamin_b12: 70,
+    iron: 70,
+  });
+
+  // Storage Decay Logic
+  useEffect(() => {
+    const STORAGE_KEY = 'nutrient_storage_levels';
+    const LAST_UPDATE_KEY = 'nutrient_storage_last_update';
+
+    const savedStorage = localStorage.getItem(STORAGE_KEY);
+    const lastUpdate = localStorage.getItem(LAST_UPDATE_KEY);
+    const today = new Date().toISOString().split('T')[0];
+
+    let currentLevels = savedStorage
+      ? JSON.parse(savedStorage)
+      : { vitamin_a: 70, vitamin_d: 70, vitamin_b12: 70, iron: 70 };
+
+    if (lastUpdate && lastUpdate !== today) {
+      const lastDate = new Date(lastUpdate);
+      const currDate = new Date(today);
+      const diffTime = Math.abs(currDate.getTime() - lastDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      const DECAY_RATE_PER_DAY = 14;
+
+      Object.keys(currentLevels).forEach(key => {
+        currentLevels[key] = Math.max(0, currentLevels[key] - (DECAY_RATE_PER_DAY * diffDays));
+      });
+
+      // Update storage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(currentLevels));
+      localStorage.setItem(LAST_UPDATE_KEY, today);
+    } else if (!lastUpdate) {
+      // First run initialization
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(currentLevels));
+      localStorage.setItem(LAST_UPDATE_KEY, today);
+    }
+
+    setStorageLevels(currentLevels);
+  }, []);
 
   // 統一確認画面 (FoodEditModal) 用ステート
   const [showFoodEditModal, setShowFoodEditModal] = useState(false);
@@ -605,8 +651,10 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
     const displayMode = getNutrientDisplayMode();
 
     // Tierごとのグループ定義
-    const TIER_1_KEYS: NutrientKey[] = ['sodium', 'potassium', 'magnesium'];
-    const TIER_2_KEYS: NutrientKey[] = ['protein', 'fat', 'carbs'];
+    // Tierごとのグループ定義 (gaugeUtilsから取得)
+    const TIER_1_KEYS = [...NUTRIENT_GROUPS.electrolytes.nutrients] as NutrientKey[];
+    const TIER_2_KEYS = [...NUTRIENT_GROUPS.macros.nutrients] as NutrientKey[];
+    // 'carbs' は gaugeUtils.macros に含まれないため、Tier 3 (Other) に移動します
 
     // 表示可能なキーをフィルタリングするヘルパー
     const getVisibleKeys = (keys: NutrientKey[]) => {
@@ -656,7 +704,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
         {visibleTier1.length > 0 && (
           <div className="tier-section">
             <h3 className="text-sm font-bold text-gray-500 mb-2 flex items-center gap-1">
-              <span>⚡</span> Essentials (Electrolytes)
+              {NUTRIENT_GROUPS.electrolytes.label}
             </h3>
             <div className="space-y-2">
               {visibleTier1.map(renderGauge)}
@@ -668,7 +716,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
         {visibleTier2.length > 0 && (
           <div className="tier-section">
             <h3 className="text-sm font-bold text-gray-500 mb-2 flex items-center gap-1">
-              <span>🥩</span> Macros
+              {NUTRIENT_GROUPS.macros.label}
             </h3>
             <div className="space-y-2">
               {visibleTier2.map(renderGauge)}
@@ -680,14 +728,43 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
         {visibleTier3.length > 0 && (
           <div className="tier-section">
             <h3 className="text-sm font-bold text-gray-500 mb-2 flex items-center gap-1">
-              <span>📊</span> Other Verified Metrics
+              {NUTRIENT_GROUPS.other.label}
             </h3>
             <div className="space-y-2">
               {visibleTier3.map(renderGauge)}
             </div>
           </div>
         )}
-      </div>
+
+        {/* Storage Gauges Section (New) */}
+        <div className="tier-section">
+          <h3 className="text-sm font-bold text-gray-500 mb-2 flex items-center gap-1">
+            <span>📦</span> Nutrient Storage
+          </h3>
+          <div className="space-y-2">
+            <StorageNutrientGauge
+              label="Vitamin A"
+              currentStorage={storageLevels.vitamin_a}
+              nutrientKey="vitamin_a"
+            />
+            <StorageNutrientGauge
+              label="Vitamin D"
+              currentStorage={storageLevels.vitamin_d}
+              nutrientKey="vitamin_d"
+            />
+            <StorageNutrientGauge
+              label="Vitamin B12"
+              currentStorage={storageLevels.vitamin_b12}
+              nutrientKey="vitamin_b12"
+            />
+            <StorageNutrientGauge
+              label="Iron"
+              currentStorage={storageLevels.iron}
+              nutrientKey="iron"
+            />
+          </div>
+        </div>
+      </div >
     );
   }, [previewData, dailyLog]);
 
@@ -1271,7 +1348,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
               initialAnimal={mapAnimalType(selectedAnimal)!}
               onSelect={(animal, part) => {
                 if (import.meta.env.DEV) {
-                  console.log(`Selected: ${animal} - ${part}`);
+
                 }
               }}
               onPreviewChange={handlePreviewChange}

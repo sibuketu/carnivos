@@ -2,8 +2,19 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
+  root: process.cwd(),
+  server: {
+    fs: {
+      strict: false,
+    },
+    host: true,
+    port: 5174,
+    hmr: {
+      overlay: false,
+    },
+  },
+
   plugins: [
     react(),
     VitePWA({
@@ -37,13 +48,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom'],
   },
-  server: {
-    host: true,
-    port: 5174,
-    hmr: {
-      overlay: false,
-    },
-  },
+
   build: {
     rollupOptions: {
       output: {

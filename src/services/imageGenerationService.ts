@@ -30,12 +30,6 @@ export async function generateImage(
   // - https://www.craiyon.com/ (無料)
 
   if (import.meta.env.DEV) {
-    console.log('画像生成プロンプト:', prompt);
-    console.log('サイズ:', size);
-    console.log('\nこのプロンプトを以下の無料サービスで使用してください:');
-    console.log('- Replicate: https://replicate.com/');
-    console.log('- Hugging Face: https://huggingface.co/spaces/stabilityai/stable-diffusion');
-    console.log('- Craiyon: https://www.craiyon.com/');
   }
 
   // プロンプトをクリップボードにコピーする機能を提供
@@ -43,7 +37,6 @@ export async function generateImage(
     try {
       await navigator.clipboard.writeText(prompt);
       if (import.meta.env.DEV) {
-        console.log('プロンプトをクリップボードにコピーしました');
       }
     } catch (err) {
       logError(err, {

@@ -27,7 +27,6 @@ export async function getCurrentLocation(): Promise<{ lat: number; lon: number }
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
       if (import.meta.env.DEV) {
-        console.log('Geolocation API is not supported');
       }
       resolve(null);
       return;
@@ -61,7 +60,6 @@ export async function getCityName(lat: number, lon: number): Promise<string | nu
     const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
     if (!apiKey) {
       if (import.meta.env.DEV) {
-        console.log('OpenWeatherMap API key is not set');
       }
       return null;
     }
@@ -107,7 +105,6 @@ export async function getWeatherData(lat?: number, lon?: number): Promise<Weathe
 
     if (!location) {
       if (import.meta.env.DEV) {
-        console.log('Location not available');
       }
       return null;
     }
@@ -147,7 +144,6 @@ export async function getWeatherData(lat?: number, lon?: number): Promise<Weathe
     } catch (error) {
       // UV指数の取得に失敗しても続行
       if (import.meta.env.DEV) {
-        console.log('UV index fetch failed:', error);
       }
     }
 

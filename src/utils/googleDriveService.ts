@@ -20,7 +20,6 @@ export async function authenticateGoogleDrive(): Promise<boolean> {
   const apiKey = import.meta.env.VITE_GOOGLE_DRIVE_API_KEY;
   if (!apiKey) {
     if (import.meta.env.DEV) {
-      console.log('Google Drive API key is not set. Set VITE_GOOGLE_DRIVE_API_KEY in .env file.');
     }
     return false;
   }

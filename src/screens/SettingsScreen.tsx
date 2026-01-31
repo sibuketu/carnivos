@@ -5,20 +5,22 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../utils/i18n';
 import { useSettings } from '../hooks/useSettings';
 import { saveUserProfile } from '../utils/storage';
 import { isSupabaseAvailable } from '../lib/supabaseClient';
 import { requestNotificationPermission } from '../utils/defrostReminder';
 import HelpTooltip from '../components/common/HelpTooltip';
-import type { NutrientDisplayMode } from '../utils/nutrientPriority';
-import { getNutrientDisplayModeDescription } from '../utils/nutrientPriority';
+
 import './SettingsScreen.css';
 
 interface SettingsScreenProps {
   onShowOnboarding?: () => void;
+  onBack?: () => void;
 }
 
-export default function SettingsScreen({ onShowOnboarding }: SettingsScreenProps = {}) {
+export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScreenProps = {}) {
+  const { t } = useTranslation();
   const {
     showKnowledge,
     toggleKnowledge,
@@ -30,10 +32,7 @@ export default function SettingsScreen({ onShowOnboarding }: SettingsScreenProps
     toggleDarkMode,
     tipsEnabled,
     toggleTips,
-    debugMode,
     toggleDebugMode,
-    nutrientDisplayMode,
-    setNutrientDisplayMode,
   } = useSettings();
 
   const [fontSizeLocal, setFontSizeLocal] = useState(fontSize || 'medium');
@@ -88,7 +87,25 @@ export default function SettingsScreen({ onShowOnboarding }: SettingsScreenProps
   return (
     <div className="settings-screen-container">
       <div className="settings-screen-content">
-        <h1 className="settings-screen-title">設定</h1>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+          {onBack && (
+            <button
+              onClick={onBack}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '1.2rem',
+                cursor: 'pointer',
+                marginRight: '0.5rem',
+                padding: '0.25rem',
+              }}
+              aria-label="戻る"
+            >
+              ←
+            </button>
+          )}
+          <h1 className="settings-screen-title" style={{ marginBottom: 0 }}>{t('settings.title')}</h1>
+        </div>
 
         {/* 文字サイズ設定 */}
         <div className="settings-screen-section">
@@ -122,148 +139,7 @@ export default function SettingsScreen({ onShowOnboarding }: SettingsScreenProps
         </div>
 
         {/* 栄養素表示設定 */}
-        <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">栄養素表示設定</h2>
-          <div style={{ marginBottom: '1rem' }}>
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginBottom: '0.5rem',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-              }}
-            >
-              表示モード
-              <HelpTooltip text="カーニボアでは細かい数値管理は不要です。身体の声を聞きながら、必要に応じて詳細データを確認できます。" />
-            </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {/* シンプルモード */}
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.75rem',
-                  padding: '0.75rem',
-                  backgroundColor:
-                    nutrientDisplayMode === 'simple' ? '#dbeafe' : 'transparent',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  border:
-                    nutrientDisplayMode === 'simple' ? '2px solid #3b82f6' : '2px solid #e5e7eb',
-                }}
-              >
-                <input
-                  type="radio"
-                  name="nutrientDisplayMode"
-                  checked={nutrientDisplayMode === 'simple'}
-                  onChange={() => setNutrientDisplayMode('simple')}
-                  style={{ marginTop: '0.25rem', cursor: 'pointer' }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#1f2937',
-                      marginBottom: '0.25rem',
-                    }}
-                  >
-                    シンプルモード（推奨）
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
-                    {getNutrientDisplayModeDescription('simple')}
-                  </div>
-                </div>
-              </label>
 
-              {/* 標準モード */}
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.75rem',
-                  padding: '0.75rem',
-                  backgroundColor:
-                    nutrientDisplayMode === 'standard' ? '#dbeafe' : 'transparent',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  border:
-                    nutrientDisplayMode === 'standard'
-                      ? '2px solid #3b82f6'
-                      : '2px solid #e5e7eb',
-                }}
-              >
-                <input
-                  type="radio"
-                  name="nutrientDisplayMode"
-                  checked={nutrientDisplayMode === 'standard'}
-                  onChange={() => setNutrientDisplayMode('standard')}
-                  style={{ marginTop: '0.25rem', cursor: 'pointer' }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#1f2937',
-                      marginBottom: '0.25rem',
-                    }}
-                  >
-                    標準モード
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
-                    {getNutrientDisplayModeDescription('standard')}
-                  </div>
-                </div>
-              </label>
-
-              {/* 詳細モード */}
-              <label
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.75rem',
-                  padding: '0.75rem',
-                  backgroundColor:
-                    nutrientDisplayMode === 'detailed' ? '#dbeafe' : 'transparent',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  border:
-                    nutrientDisplayMode === 'detailed'
-                      ? '2px solid #3b82f6'
-                      : '2px solid #e5e7eb',
-                }}
-              >
-                <input
-                  type="radio"
-                  name="nutrientDisplayMode"
-                  checked={nutrientDisplayMode === 'detailed'}
-                  onChange={() => setNutrientDisplayMode('detailed')}
-                  style={{ marginTop: '0.25rem', cursor: 'pointer' }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#1f2937',
-                      marginBottom: '0.25rem',
-                    }}
-                  >
-                    詳細モード
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
-                    {getNutrientDisplayModeDescription('detailed')}
-                  </div>
-                </div>
-              </label>
-
-            </div>
-          </div>
-        </div>
 
         {/* 表示設定 */}
         <div className="settings-screen-section">
@@ -414,6 +290,22 @@ export default function SettingsScreen({ onShowOnboarding }: SettingsScreenProps
               }}
             >
               データインポート
+            </button>
+          </div>
+        </div>
+
+        {/* サポート */}
+        <div className="settings-screen-section">
+          <h2 className="settings-screen-section-title">サポート</h2>
+          <div className="settings-screen-button-row">
+            <button
+              className="settings-screen-option-button"
+              onClick={() => {
+                const event = new CustomEvent('navigateToScreen', { detail: 'feedback' });
+                window.dispatchEvent(event);
+              }}
+            >
+              バグ報告・フィードバック
             </button>
           </div>
         </div>

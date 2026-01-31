@@ -54,10 +54,10 @@ export async function saveDailyLog(log: DailyLog): Promise<void> {
           stress_level: log.status.stressLevel,
           bowel_movement: log.status.bowelMovement
             ? {
-                status: log.status.bowelMovement.status,
-                bristol_scale: log.status.bowelMovement.bristolScale,
-                notes: log.status.bowelMovement.notes,
-              }
+              status: log.status.bowelMovement.status,
+              bristol_scale: log.status.bowelMovement.bristolScale,
+              notes: log.status.bowelMovement.notes,
+            }
             : undefined,
         },
         fuel: log.fuel.map((f) => ({
@@ -114,16 +114,16 @@ export async function saveDailyLog(log: DailyLog): Promise<void> {
         },
         recovery_protocol: log.recoveryProtocol
           ? {
-              violation_type: log.recoveryProtocol.violationType,
-              is_active: log.recoveryProtocol.isActive,
-              fasting_target_hours: log.recoveryProtocol.fastingTargetHours,
-              activities: log.recoveryProtocol.activities,
-              diet_recommendations: log.recoveryProtocol.dietRecommendations,
-              supplements: log.recoveryProtocol.supplements,
-              warnings: log.recoveryProtocol.warnings,
-              protocol_id: log.recoveryProtocol.protocolId,
-              target_fast_end: log.recoveryProtocol.targetFastEnd,
-            }
+            violation_type: log.recoveryProtocol.violationType,
+            is_active: log.recoveryProtocol.isActive,
+            fasting_target_hours: log.recoveryProtocol.fastingTargetHours,
+            activities: log.recoveryProtocol.activities,
+            diet_recommendations: log.recoveryProtocol.dietRecommendations,
+            supplements: log.recoveryProtocol.supplements,
+            warnings: log.recoveryProtocol.warnings,
+            protocol_id: log.recoveryProtocol.protocolId,
+            target_fast_end: log.recoveryProtocol.targetFastEnd,
+          }
           : undefined,
         diary: log.diary,
         weight: log.weight,
@@ -158,7 +158,7 @@ export async function saveDailyLog(log: DailyLog): Promise<void> {
 
   // localStorageに保存（Supabaseが利用不可、またはエラー時）
   await saveToLocalStorage(log);
-  
+
   // キャッシュをクリア（次回getDailyLogs()で最新データを取得）
   clearDailyLogsCache();
 }
@@ -296,17 +296,17 @@ export async function getDailyLogs(): Promise<DailyLog[]> {
     // キャッシュがなく、取得中でもない場合は空配列を返す（無限ループ防止）
     return [];
   }
-  
+
   isGettingLogs = true;
   lastGetTime = now;
-  
+
   try {
     // デバッグモードチェック
     const debugMode = localStorage.getItem('settings_debug_mode');
     // JSON.parseでbooleanに変換（'true'文字列ではなく）
     const isDebugMode =
       debugMode === 'true' || (debugMode !== null && JSON.parse(debugMode) === true);
-    
+
     if (isDebugMode) {
       // キャッシュがあればそれを使用（毎回ランダム生成しない）
       if (cachedDebugData) {
@@ -318,7 +318,7 @@ export async function getDailyLogs(): Promise<DailyLog[]> {
       isGettingLogs = false;
       return cachedDebugData;
     }
-  
+
     // 通常モード: キャッシュをチェック（2秒以内ならキャッシュを返す）
     const cacheNow = Date.now();
     if (cachedNormalData && (cacheNow - lastCacheTime) < CACHE_DURATION) {
@@ -358,11 +358,11 @@ export async function getDailyLogs(): Promise<DailyLog[]> {
       // localStorageから取得
       result = getFromLocalStorageAll();
     }
-    
+
     // キャッシュを更新
     cachedNormalData = result;
     lastCacheTime = Date.now();
-    
+
     isGettingLogs = false;
     return result;
   } finally {
@@ -398,10 +398,10 @@ function convertLogRowToDailyLog(row: DailyLogRow): DailyLog {
       stressLevel: row.status.stress_level,
       bowelMovement: row.status.bowel_movement
         ? {
-            status: row.status.bowel_movement.status,
-            bristolScale: row.status.bowel_movement.bristol_scale,
-            notes: row.status.bowel_movement.notes,
-          }
+          status: row.status.bowel_movement.status,
+          bristolScale: row.status.bowel_movement.bristol_scale,
+          notes: row.status.bowel_movement.notes,
+        }
         : undefined,
     },
     fuel: row.fuel.map((f) => ({
@@ -429,16 +429,16 @@ function convertLogRowToDailyLog(row: DailyLogRow): DailyLog {
     } as CalculatedMetrics,
     recoveryProtocol: row.recovery_protocol
       ? {
-          violationType: row.recovery_protocol.violation_type as ViolationType,
-          isActive: row.recovery_protocol.is_active,
-          fastingTargetHours: row.recovery_protocol.fasting_target_hours,
-          activities: row.recovery_protocol.activities,
-          dietRecommendations: row.recovery_protocol.diet_recommendations,
-          supplements: row.recovery_protocol.supplements,
-          warnings: row.recovery_protocol.warnings,
-          protocolId: row.recovery_protocol.protocol_id,
-          targetFastEnd: row.recovery_protocol.target_fast_end,
-        }
+        violationType: row.recovery_protocol.violation_type as ViolationType,
+        isActive: row.recovery_protocol.is_active,
+        fastingTargetHours: row.recovery_protocol.fasting_target_hours,
+        activities: row.recovery_protocol.activities,
+        dietRecommendations: row.recovery_protocol.diet_recommendations,
+        supplements: row.recovery_protocol.supplements,
+        warnings: row.recovery_protocol.warnings,
+        protocolId: row.recovery_protocol.protocol_id,
+        targetFastEnd: row.recovery_protocol.target_fast_end,
+      }
       : undefined,
     diary: row.diary,
     weight: row.weight,
@@ -620,7 +620,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
         .eq('user_id', userId)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error && error.code !== 'PGRST116' && error.code !== '406') {
         logError(error, { component: 'storage', action: 'getUserProfile', step: 'supabase' });
         // フォールバック: localStorageから取得
         return getProfileFromLocalStorage();
