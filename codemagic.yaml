@@ -41,7 +41,10 @@ workflows:
         script: |
           cd ios/App
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" || echo 0)
-          agvtool new-version -all $((LATEST_BUILD_NUMBER + 1))
+          NEXT=$((LATEST_BUILD_NUMBER + 1))
+          # App Store Connect に既に 1 が存在する場合は最低 2 にする
+          [ "$NEXT" -lt 2 ] && NEXT=2
+          agvtool new-version -all $NEXT
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa \
