@@ -4,19 +4,16 @@
  * ユーザー設定画面: 基本情報、目標、代謝状態など
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import HelpTooltip from '../components/common/HelpTooltip';
+import { useState, useEffect, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import { saveUserProfile } from '../utils/storage';
 import { logError } from '../utils/errorHandler';
 import { useTranslation } from '../utils/i18n';
-import { getCarnivoreTargets } from '../data/carnivoreTargets';
-import { calculateNutrientImpact, getFieldImpactDescription } from '../utils/nutrientImpactHelper';
+import { getFieldImpactDescription } from '../utils/nutrientImpactHelper';
 import { getAllNutrientExplanations } from '../utils/nutrientExplanationHelper';
 import {
   ALL_NUTRIENT_DISPLAY_CONFIGS,
   getNutrientDisplaySettings,
-  saveNutrientDisplaySettings,
   toggleNutrientVisibility,
   toggleCategoryVisibility,
   setAllNutrientsVisible,
@@ -25,7 +22,6 @@ import {
 import {
   ALL_FEATURE_DISPLAY_CONFIGS,
   getFeatureDisplaySettings,
-  saveFeatureDisplaySettings,
   toggleFeatureVisibility as toggleFeatureVisibilityUtil,
   toggleCategoryVisibility as toggleFeatureCategoryVisibility,
   setAllFeaturesVisible,
@@ -34,14 +30,8 @@ import {
 import { USER_GOALS, METABOLIC_STATUS, DIET_MODES } from '../constants/carnivore_constants';
 import type { UserProfile } from '../types';
 import { calculateCaffeineFromCoffee } from '../utils/coffeeCaffeineCalculator';
-import {
-  calculateProfileCompletion,
-  calculateCategoryCompletion,
-  getCategoryName,
-  getCategoryPriority,
-  type FieldCategory,
-} from '../utils/profileCompletion';
-import './ProfileScreen.css';
+import { calculateProfileCompletion } from '../utils/profileCompletion';
+// import './ProfileScreen.css'; // Deleted
 
 type FieldPriority = 'required' | 'recommended' | 'optional';
 
@@ -216,7 +206,7 @@ export default function UserSettingsScreen() {
   const [coffeeInput, setCoffeeInput] = useState<string>(''); // コーヒー入力（例: "スタバのコーヒーShort", "コーヒー2杯"）
 
   // Phase 5: 栄養素目標値のカスタマイズ
-  const [customNutrientTargets, setCustomNutrientTargets] = useState<
+  const [customNutrientTargets, _setCustomNutrientTargets] = useState<
     Record<string, { mode: 'auto' | 'manual'; value?: number }>
   >(
     userProfile?.customNutrientTargets
@@ -502,7 +492,7 @@ export default function UserSettingsScreen() {
             <div
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}
             >
-              <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#3b82f6' }}>
+              <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#f43f5e' }}>
                 {calculateProfileCompletion(userProfile)}%
               </span>
               <span style={{ fontSize: '10px', color: '#9ca3af', lineHeight: '1.2' }}>
@@ -1757,7 +1747,7 @@ export default function UserSettingsScreen() {
                             }}
                             style={{
                               padding: '0.5rem 1rem',
-                              backgroundColor: current.mode === 'auto' ? '#3b82f6' : '#f3f4f6',
+                              backgroundColor: current.mode === 'auto' ? '#f43f5e' : '#f3f4f6',
                               color: current.mode === 'auto' ? 'white' : '#374151',
                               border: 'none',
                               borderRadius: '8px',
@@ -1776,7 +1766,7 @@ export default function UserSettingsScreen() {
                             }}
                             style={{
                               padding: '0.5rem 1rem',
-                              backgroundColor: current.mode === 'manual' ? '#3b82f6' : '#f3f4f6',
+                              backgroundColor: current.mode === 'manual' ? '#f43f5e' : '#f3f4f6',
                               color: current.mode === 'manual' ? 'white' : '#374151',
                               border: 'none',
                               borderRadius: '8px',
@@ -1856,7 +1846,7 @@ export default function UserSettingsScreen() {
             onClick={() => setShowPreview(!showPreview)}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: '#3b82f6',
+              backgroundColor: '#f43f5e',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -2073,7 +2063,7 @@ export default function UserSettingsScreen() {
                       disabled={allVisible}
                       style={{
                         padding: '0.25rem 0.75rem',
-                        backgroundColor: allVisible ? '#d1d5db' : '#3b82f6',
+                        backgroundColor: allVisible ? '#d1d5db' : '#f43f5e',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -2123,7 +2113,7 @@ export default function UserSettingsScreen() {
                           backgroundColor: isVisible ? '#f0f9ff' : '#f9fafb',
                           borderRadius: '6px',
                           cursor: 'pointer',
-                          border: `1px solid ${isVisible ? '#3b82f6' : '#e5e7eb'}`,
+                          border: `1px solid ${isVisible ? '#f43f5e' : '#e5e7eb'}`,
                         }}
                       >
                         <input
@@ -2183,7 +2173,7 @@ export default function UserSettingsScreen() {
               }}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: '#3b82f6',
+                backgroundColor: '#f43f5e',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -2257,7 +2247,7 @@ export default function UserSettingsScreen() {
                       disabled={allVisible}
                       style={{
                         padding: '0.25rem 0.75rem',
-                        backgroundColor: allVisible ? '#d1d5db' : '#3b82f6',
+                        backgroundColor: allVisible ? '#d1d5db' : '#f43f5e',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -2307,7 +2297,7 @@ export default function UserSettingsScreen() {
                           backgroundColor: isVisible ? '#f0f9ff' : '#f9fafb',
                           borderRadius: '6px',
                           cursor: 'pointer',
-                          border: `1px solid ${isVisible ? '#3b82f6' : '#e5e7eb'}`,
+                          border: `1px solid ${isVisible ? '#f43f5e' : '#e5e7eb'}`,
                         }}
                       >
                         <input

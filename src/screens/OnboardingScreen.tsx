@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { setLanguage, getLanguage, type Language } from '../utils/i18n';
+import { setLanguage, getLanguage, useTranslation, type Language } from '../utils/i18n';
 import { saveUserProfile, getUserProfile } from '../utils/storage';
 import { USER_GOALS, METABOLIC_STATUS } from '../constants/carnivore_constants';
 import type { UserProfile, UserGoal, MetabolicStatus } from '../types';
@@ -17,32 +17,11 @@ import './OnboardingScreen.css';
 interface OnboardingStep {
   title: string;
   description: string;
-  icon: string;
+  icon?: string;
   isLanguageStep?: boolean;
   isProfileStep?: boolean;
   isNotificationStep?: boolean;
 }
-
-const onboardingSteps: OnboardingStep[] = [
-  {
-    title: '言語を選択',
-    description: 'まず、アプリの表示言語を選択してください。後から変更することもできます。',
-    icon: '🌐',
-    isLanguageStep: true,
-  },
-  {
-    title: 'プロフィール',
-    description: 'あなたに最適な栄養目標を計算するための情報です。すべてスキップ可能です。',
-    icon: '👤',
-    isProfileStep: true,
-  },
-  {
-    title: '通知設定',
-    description: '電解質アラート、脂質不足リマインダーなどの通知を受け取れます。',
-    icon: '🔔',
-    isNotificationStep: true,
-  },
-];
 
 interface OnboardingScreenProps {
   onComplete: () => void;
@@ -52,10 +31,15 @@ interface OnboardingScreenProps {
 type MetabolicStageUI = 'just_started' | 'transitioning' | 'adapted';
 
 export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(getLanguage());
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly'); // デフォルトは年額（お得）
+
+  const onboardingSteps: OnboardingStep[] = [
+    { title: t('onboarding.step1Title'), description: t('onboarding.step1Desc'), icon: '🌐', isLanguageStep: true },
+    { title: t('onboarding.step2Title'), description: t('onboarding.step2Desc'), icon: '👤', isProfileStep: true },
+    { title: t('onboarding.step3Title'), description: t('onboarding.step3Desc'), icon: '🔔', isNotificationStep: true },
+  ];
 
   // プロフィール状態
   const [gender, setGender] = useState<'male' | 'female'>('male');
@@ -83,24 +67,24 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   }, []);
 
   const languages: { code: Language; name: string; nativeName: string }[] = [
-    { code: 'ja', name: 'Japanese', nativeName: '日本語' },
     { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'ja', name: 'Japanese', nativeName: '日本語' },
     { code: 'fr', name: 'French', nativeName: 'Français' },
     { code: 'de', name: 'German', nativeName: 'Deutsch' },
     { code: 'zh', name: 'Chinese', nativeName: '中文' },
   ];
 
   const goals: { code: UserGoal; name: string; icon: string }[] = [
-    { code: USER_GOALS.HEALING, name: '回復', icon: '💚' },
-    { code: USER_GOALS.PERFORMANCE, name: 'パフォーマンス', icon: '💪' },
-    { code: USER_GOALS.WEIGHT_LOSS, name: '減量', icon: '⚡' },
-    { code: USER_GOALS.AUTOIMMUNE_HEALING, name: '自己免疫回復', icon: '🛡️' },
+    { code: USER_GOALS.HEALING, name: t('onboarding.goalHealing'), icon: '💚' },
+    { code: USER_GOALS.PERFORMANCE, name: t('onboarding.goalPerformance'), icon: '💪' },
+    { code: USER_GOALS.WEIGHT_LOSS, name: t('onboarding.goalWeightLoss'), icon: '⚡' },
+    { code: USER_GOALS.AUTOIMMUNE_HEALING, name: t('onboarding.goalAutoimmune'), icon: '🛡️' },
   ];
 
   const metabolicStages: { code: MetabolicStageUI; name: string; description: string }[] = [
-    { code: 'just_started', name: '始めたばかり', description: '1週間以内' },
-    { code: 'transitioning', name: '移行中', description: '1週間〜1ヶ月' },
-    { code: 'adapted', name: '適応済み', description: '1ヶ月以上' },
+    { code: 'just_started', name: t('onboarding.metabolicJustStarted'), description: t('onboarding.metabolicJustStartedDesc') },
+    { code: 'transitioning', name: t('onboarding.metabolicTransitioning'), description: t('onboarding.metabolicTransitioningDesc') },
+    { code: 'adapted', name: t('onboarding.metabolicAdapted'), description: t('onboarding.metabolicAdaptedDesc') },
   ];
 
   const handleLanguageSelect = (lang: Language) => {
@@ -166,6 +150,8 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     const existingProfile = await getUserProfile();
     const updatedProfile: UserProfile = {
       ...existingProfile,
+      gender: existingProfile.gender || 'male',
+      goal: existingProfile.goal || USER_GOALS.HEALING,
       trial_start_date: trialStartDate,
       subscription_status: 'trial',
     };
@@ -174,62 +160,28 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     // プロフィール更新をAppContextに通知
     window.dispatchEvent(new CustomEvent('userProfileUpdated'));
 
-    // 決済モーダルを表示
-    setShowPaymentModal(true);
-  };
-
-  const handleStartTrial = () => {
-    setShowPaymentModal(false);
+    // サブスクはPaywallScreenで既に表示済み。オンボーディング完了後は即ホームへ
     onComplete();
   };
 
-  const handleSubscribeNow = async () => {
-    try {
-      // Stripe Checkoutセッションを作成してリダイレクト
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      if (!supabaseUrl) {
-        alert('Supabase URLが設定されていません');
-        return;
-      }
-
-      const origin = window.location.origin;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      const response = await fetch(`${supabaseUrl}/functions/v1/create-checkout-session`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseKey}`,
-        },
-        body: JSON.stringify({
-          priceId: selectedPlan === 'monthly'
-            ? 'price_1Sv4nR06Z0q3rla2GBp7jQop' // 月額 (Test)
-            : 'price_1Sv4n606Z0q3rla28iMGLD9O', // 年額 (Test)
-          successUrl: `${origin}/?payment=success`,
-          cancelUrl: `${origin}/?payment=canceled`,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.url) {
-        // Stripe Checkoutにリダイレクト
-        window.location.href = data.url;
-      } else {
-        console.error('No URL in response:', data);
-        throw new Error(data.error || 'Checkout URLの取得に失敗しました');
-      }
-    } catch (error) {
-      console.error('Subscription error:', error);
-      alert('決済画面への遷移に失敗しました。後で設定画面から登録できます。');
-      handleStartTrial();
-    }
-  };
-
   const step = onboardingSteps[currentStep];
+  const totalSteps = onboardingSteps.length;
 
   return (
     <div className="onboarding-screen-container">
       <div className="onboarding-screen-content">
+        {/* 進捗表示（離脱率低減のため 1/3 形式） */}
+        <div className="onboarding-screen-progress-wrap" aria-label={`${t('onboarding.stepLabel')} ${currentStep + 1} / ${totalSteps}`}>
+          <span className="onboarding-screen-progress-text">{currentStep + 1} / {totalSteps}</span>
+          <div className="onboarding-screen-progress">
+            {onboardingSteps.map((_, i) => (
+              <div
+                key={i}
+                className={`onboarding-screen-progress-dot ${i === currentStep ? 'active' : ''} ${i < currentStep ? 'completed' : ''}`}
+              />
+            ))}
+          </div>
+        </div>
         <div className="onboarding-screen-icon">{step.icon}</div>
         <h1 className="onboarding-screen-title">{step.title}</h1>
         <p className="onboarding-screen-description">{step.description}</p>
@@ -258,26 +210,26 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
           <div className="onboarding-profile-section">
             {/* 性別 */}
             <div className="onboarding-profile-group">
-              <label className="onboarding-profile-label">性別</label>
+              <label className="onboarding-profile-label">{t('onboarding.gender')}</label>
               <div className="onboarding-gender-buttons">
                 <button
                   className={`onboarding-gender-button ${gender === 'male' ? 'active' : ''}`}
                   onClick={() => setGender('male')}
                 >
-                  👨 男性
+                  {t('onboarding.male')}
                 </button>
                 <button
                   className={`onboarding-gender-button ${gender === 'female' ? 'active' : ''}`}
                   onClick={() => setGender('female')}
                 >
-                  👩 女性
+                  {t('onboarding.female')}
                 </button>
               </div>
             </div>
 
             {/* 体重 */}
             <div className="onboarding-profile-group">
-              <label className="onboarding-profile-label">体重 (kg)</label>
+              <label className="onboarding-profile-label">{t('onboarding.weight')}</label>
               <input
                 type="number"
                 className="onboarding-weight-input"
@@ -291,7 +243,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
             {/* 目標 */}
             <div className="onboarding-profile-group">
-              <label className="onboarding-profile-label">目標</label>
+              <label className="onboarding-profile-label">{t('onboarding.goal')}</label>
               <div className="onboarding-goal-grid">
                 {goals.map((g) => (
                   <button
@@ -308,7 +260,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
             {/* 代謝状態 */}
             <div className="onboarding-profile-group">
-              <label className="onboarding-profile-label">カーニボア歴</label>
+              <label className="onboarding-profile-label">{t('onboarding.carnivoreHistory')}</label>
               <div className="onboarding-metabolic-buttons">
                 {metabolicStages.map((stage) => (
                   <button
@@ -325,10 +277,10 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
             {/* 糖質目標の説明 */}
             <div className="onboarding-carb-notice">
-              <div className="onboarding-carb-notice-icon">🥩</div>
+              <div className="onboarding-carb-notice-icon"></div>
               <div className="onboarding-carb-notice-text">
-                <strong>糖質目標: 0g</strong>
-                <p>CarnivOSは厳格カーニボア専用。糖質ゼロを推奨します。</p>
+                <strong>{t('onboarding.carbNoticeTitle')}</strong>
+                <p>{t('onboarding.carbNoticeDesc')}</p>
               </div>
             </div>
           </div>
@@ -339,15 +291,15 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
           <div className="onboarding-notification-info">
             <div className="onboarding-notification-item">
               <span className="onboarding-notification-icon">⚡</span>
-              <span>電解質（ナトリウム/マグネシウム）不足アラート</span>
+              <span>{t('onboarding.notify1')}</span>
             </div>
             <div className="onboarding-notification-item">
-              <span className="onboarding-notification-icon">🧈</span>
-              <span>脂質不足リマインダー</span>
+              <span className="onboarding-notification-icon"></span>
+              <span>{t('onboarding.notify2')}</span>
             </div>
             <div className="onboarding-notification-item">
-              <span className="onboarding-notification-icon">🧊</span>
-              <span>解凍リマインダー</span>
+              <span className="onboarding-notification-icon"></span>
+              <span>{t('onboarding.notify3')}</span>
             </div>
           </div>
         )}
@@ -368,74 +320,27 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
               className="onboarding-screen-button onboarding-screen-button-back"
               onClick={handleBack}
             >
-              戻る
+              {t('onboarding.back')}
             </button>
           )}
           <button
             className="onboarding-screen-button onboarding-screen-button-secondary"
             onClick={handleSkip}
           >
-            スキップ
+            {t('onboarding.skip')}
           </button>
           <button
             className="onboarding-screen-button onboarding-screen-button-primary"
             onClick={handleNext}
           >
             {currentStep < onboardingSteps.length - 1
-              ? '次へ'
+              ? t('onboarding.next')
               : step.isNotificationStep
-                ? '通知を有効にする'
-                : '始める'}
+                ? t('onboarding.enableNotifications')
+                : t('onboarding.start')}
           </button>
         </div>
       </div>
-
-      {/* 決済モーダル */}
-      {showPaymentModal && (
-        <div className="onboarding-payment-modal-overlay">
-          <div className="onboarding-payment-modal">
-            <h2 className="onboarding-payment-modal-title">🎉 ようこそ！</h2>
-            <p className="onboarding-payment-modal-description">
-              CarnivOSをご利用いただきありがとうございます。
-            </p>
-
-            {/* プラン選択 */}
-            <div className="onboarding-payment-modal-plan-selection">
-              <button
-                className={`onboarding-payment-modal-plan ${selectedPlan === 'yearly' ? 'active' : ''}`}
-                onClick={() => setSelectedPlan('yearly')}
-              >
-                <div className="plan-badge">🏆 おすすめ</div>
-                <div className="plan-name">年額プラン</div>
-                <div className="plan-price">¥9,999/年</div>
-                <div className="plan-detail">月額換算 ¥833/月</div>
-                <div className="plan-savings">月額より58%お得</div>
-              </button>
-              <button
-                className={`onboarding-payment-modal-plan ${selectedPlan === 'monthly' ? 'active' : ''}`}
-                onClick={() => setSelectedPlan('monthly')}
-              >
-                <div className="plan-name">月額プラン</div>
-                <div className="plan-price">¥1,999/月</div>
-                <div className="plan-detail">いつでもキャンセル可能</div>
-              </button>
-            </div>
-
-            <p className="onboarding-payment-modal-note">
-              7日間無料トライアル。トライアル期間中はいつでもキャンセル可能です。
-            </p>
-            <div className="onboarding-payment-modal-buttons">
-              <button
-                className="onboarding-payment-modal-button onboarding-payment-modal-button-primary"
-                onClick={handleSubscribeNow}
-              >
-                今すぐ登録（7日間無料）
-              </button>
-
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

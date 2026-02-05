@@ -4,7 +4,6 @@
  * ユーザーのログデータから実践データを分析
  */
 
-import type { DailyLog } from '../types';
 import { getDailyLogs } from './storage';
 
 export interface CommunityStats {
@@ -233,8 +232,7 @@ export async function analyzePatterns(): Promise<PatternAnalysis> {
     }
   });
 
-  // 違反からの回復パターン
-  const violationLogs = logs.filter((log) => log.calculatedMetrics?.hasViolation);
+  const _violationLogs = logs.filter((log) => log.calculatedMetrics?.hasViolation);
   const recoveryDays: number[] = [];
 
   // 違反からの回復パターンを分析（24-48時間の遅延反応を考慮）

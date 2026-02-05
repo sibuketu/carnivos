@@ -15,7 +15,94 @@ import { useSettings } from '../../hooks/useSettings';
 import { logError, getUserFriendlyErrorMessage } from '../../utils/errorHandler';
 import FoodEditModal from './FoodEditModal';
 import BarcodeScannerModal from '../BarcodeScannerModal';
+import { searchFoods } from '../../data/foodsDatabase';
+import { getFastingDefaultHours, FASTING_TEMPLATES } from '../../utils/fastingDefaults';
 import '../../styles/ai-chat.css';
+
+/** 体調・症状からプロンプトを選ぶチップ（Prompt Chips） */
+const PROMPT_CHIPS = [
+  '頭痛がする',
+  '便秘になった',
+  'だるい・眠い',
+  '眠れない',
+  '筋肉がつりやすい',
+  '塩分は足りてる？',
+  '脂質はどのくらい？',
+  '今日は何を食べる？',
+];
+
+/** 写真解析フォローアップ: 手動で重量を入力するUI */
+function WeightManualInput({
+  foodName,
+  initialWeight,
+  onConfirm,
+  onCancel,
+}: {
+  foodName: string;
+  initialWeight: number;
+  onConfirm: (newAmount: number) => void;
+  onCancel: () => void;
+}) {
+  const [value, setValue] = useState(String(initialWeight));
+  const num = parseInt(value, 10);
+  const valid = !Number.isNaN(num) && num > 0 && num <= 10000;
+
+  return (
+    <div>
+      <p style={{ margin: '0 0 0.5rem 0', fontSize: '14px', color: '#374151' }}>
+        {foodName}の重量（g）を入力
+      </p>
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        min={1}
+        max={10000}
+        step={10}
+        style={{
+          width: '100%',
+          padding: '0.75rem',
+          border: '2px solid #e5e7eb',
+          borderRadius: '8px',
+          fontSize: '16px',
+          marginBottom: '1rem',
+        }}
+        placeholder="例: 250"
+      />
+      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+        <button
+          onClick={onCancel}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: '#f3f4f6',
+            color: '#374151',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+            fontSize: '14px',
+            cursor: 'pointer',
+          }}
+        >
+          戻る
+        </button>
+        <button
+          onClick={() => valid && onConfirm(Math.round(num / 10) * 10)}
+          disabled={!valid}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: valid ? '#f43f5e' : '#9ca3af',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '14px',
+            cursor: valid ? 'pointer' : 'not-allowed',
+          }}
+        >
+          OK（{valid ? `${Math.round(num / 10) * 10}g` : '—'}）
+        </button>
+      </div>
+    </div>
+  );
+}
 
 interface AISpeedDialProps {
   onOpenFatTab?: () => void;
@@ -23,11 +110,11 @@ interface AISpeedDialProps {
 }
 
 export default function AISpeedDial({
-  onOpenFatTab,
+  onOpenFatTab: _onOpenFatTab,
   onAddFood
 }: AISpeedDialProps = {}) {
   const { addFood, userProfile } = useApp();
-  const { aiMode, setAiMode } = useSettings();
+  const { aiMode } = useSettings();
   const [chatUIMode, setChatUIMode] = useState<'modal' | 'bubble' | 'browse'>(() => {
     // localStorageからUIモードを読み込む（デフォルトはbubble）
     const saved = localStorage.getItem('ai_chat_ui_mode');
@@ -90,9 +177,13 @@ export default function AISpeedDial({
   const [fabDragStartPos, setFabDragStartPos] = useState({ x: 0, y: 0 }); // ドラッグ開始位置を記録
   const fabHasMovedRef = useRef(false); // ドラッグで移動したかどうか（最新値を保持）
   const fabButtonRef = useRef<HTMLButtonElement>(null);
+  const [showSpeedDial, setShowSpeedDial] = useState(false); // Speed Dial expansion state
   const [showImageConfirm, setShowImageConfirm] = useState(false);
-  const [pendingFoodItem, setPendingFoodItem] = useState<any>(null);
-  const [showButterConfirm, setShowButterConfirm] = useState(false);
+  const [pendingFoodItem, setPendingFoodItem] = useState<FoodItem | null>(null);
+  const [showWeightConfirm, setShowWeightConfirm] = useState(false);
+  const [showWeightManualInput, setShowWeightManualInput] = useState(false);
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  // const [showButterConfirm, setShowButterConfirm] = useState(false);
   const [showAIConcierge, setShowAIConcierge] = useState(false);
   const [conciergeData, setConciergeData] = useState<{
     saltUsed: boolean;
@@ -112,152 +203,44 @@ export default function AISpeedDial({
     additionalFoods: [],
   });
 
-  const [showAdditionalFoodModal, setShowAdditionalFoodModal] = useState(false);
-  const [additionalFoodName, setAdditionalFoodName] = useState<string>('');
-  const [additionalFoodAmount, setAdditionalFoodAmount] = useState<number>(0);
-  const [additionalFoodUnit, setAdditionalFoodUnit] = useState<'g' | '個'>('g');
+
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
   const [imageAnalysisError, setImageAnalysisError] = useState<string | null>(null);
+  const [imageAnalysisTip, setImageAnalysisTip] = useState<Tip | null>(null);
 
-  // Gemini-style UI: "+"ボタンのドロップダウン
-  const [showPlusMenu, setShowPlusMenu] = useState(false);
-  const plusMenuRef = useRef<HTMLDivElement>(null);
 
-  // Gemini-style UI: "ツール"ボタンのドロップダウン
-  const [showToolsMenu, setShowToolsMenu] = useState(false);
-  const toolsMenuRef = useRef<HTMLDivElement>(null);
+  // Spotlight Tutorial State
+  const [showSpotlight, setShowSpotlight] = useState(false);
 
-  // バーコードスキャナー
-  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
-
-  // AI Mode selection (Fast / Auto / Deep)
-  const [thinkingMode, setThinkingMode] = useState<'fast' | 'auto' | 'deep'>('auto');
-  const [showThinkingModeMenu, setShowThinkingModeMenu] = useState(false);
-  const thinkingModeMenuRef = useRef<HTMLDivElement>(null);
-
-  // メニュー外クリックで閉じる
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (plusMenuRef.current && !plusMenuRef.current.contains(e.target as Node)) {
-        setShowPlusMenu(false);
-      }
-      if (toolsMenuRef.current && !toolsMenuRef.current.contains(e.target as Node)) {
-        setShowToolsMenu(false);
-      }
-      if (thinkingModeMenuRef.current && !thinkingModeMenuRef.current.contains(e.target as Node)) {
-        setShowThinkingModeMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    // 初回起動時のみスポットライトを表示
+    const hasSeen = localStorage.getItem('has_seen_ai_spotlight');
+    if (!hasSeen) {
+      // 少し遅延させて表示（レンダリング安定後）
+      setTimeout(() => setShowSpotlight(true), 1000);
+    }
   }, []);
 
-  // アルバムから選択
-  const handleAlbumPicker = async () => {
-    setShowPlusMenu(false);
-    try {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      // カメラではなくアルバムを優先（captureを設定しない）
-
-      input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (file) {
-          // 写真解析と同じ処理を実行
-          await processImageFile(file);
-        }
-      };
-
-      input.click();
-    } catch (error) {
-      logError(error, { component: 'AISpeedDial', action: 'handleAlbumPicker' });
-      alert('アルバムの選択に失敗しました。');
-    }
+  const dismissSpotlight = () => {
+    setShowSpotlight(false);
+    localStorage.setItem('has_seen_ai_spotlight', 'true');
   };
 
-  // ファイルアップロード（CSV、テキストなど）
-  const handleFileUpload = async () => {
-    setShowPlusMenu(false);
-    try {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.csv,.txt,.json';
 
-      input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (file) {
-          // ファイル処理（将来実装：血液検査結果CSV等）
-          alert(`ファイルアップロード機能は今後実装予定です。\n選択されたファイル: ${file.name}`);
-        }
-      };
 
-      input.click();
-    } catch (error) {
-      logError(error, { component: 'AISpeedDial', action: 'handleFileUpload' });
-      alert('ファイルの選択に失敗しました。');
-    }
-  };
 
-  // バーコード読み取り
-  const handleBarcodeScanner = () => {
-    setShowPlusMenu(false);
-    setShowBarcodeScanner(true);
-  };
 
-  // ツールメニュー: Deep Research
-  const handleDeepResearch = () => {
-    setShowToolsMenu(false);
-    setChatInput('カーニボアについて深く調べてください。');
-    // モーダルまたはバブルを開く
-    if (chatUIMode === 'modal') {
-      setShowChatModal(true);
-    } else {
-      setBubbleSize({ width: 400, height: 600 });
-    }
-  };
 
-  // ツールメニュー: ガイド付き学習
-  const handleGuidedLearning = () => {
-    setShowToolsMenu(false);
-    setChatInput('カーニボアダイエットの移行ガイドを教えてください。');
-    // モーダルまたはバブルを開く
-    if (chatUIMode === 'modal') {
-      setShowChatModal(true);
-    } else {
-      setBubbleSize({ width: 400, height: 600 });
-    }
-  };
-
-  // ツールメニュー: 症状推論
-  const handleSymptomInference = () => {
-    setShowToolsMenu(false);
-    setChatInput('最近の記録から、私の症状の原因を推論してください。');
-    // モーダルまたはバブルを開く
-    if (chatUIMode === 'modal') {
-      setShowChatModal(true);
-    } else {
-      setBubbleSize({ width: 400, height: 600 });
-    }
-  };
-
-  // ツールメニュー: 誠実さスコア確認
-  const handleHonestyScore = () => {
-    setShowToolsMenu(false);
-    setChatInput('私の記録の誠実さスコアを確認してください。');
-    // モーダルまたはバブルを開く
-    if (chatUIMode === 'modal') {
-      setShowChatModal(true);
-    } else {
-      setBubbleSize({ width: 400, height: 600 });
-    }
-  };
 
   // 画像ファイル処理（写真・アルバム共通）
   const processImageFile = async (file: File) => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setImageAnalysisError('オンライン接続が必要です。インターネットに接続してから再度お試しください。');
+      return;
+    }
     setIsAnalyzingImage(true);
     setImageAnalysisError(null);
+    setImageAnalysisTip(getRandomTip());
 
     try {
       // Gemini Vision APIで画像解析
@@ -392,15 +375,17 @@ export default function AISpeedDial({
       // onAddFoodが存在しない場合はエラー
       if (!onAddFood) {
         alert('エラー: 食品追加機能が利用できません。ページを再読み込みしてください。');
-      return;
-    }
+        return;
+      }
 
-      // AI Conciergeインタビューを表示（Master Specification準拠）
+      // 写真解析フォローアップ: 重量確認モーダルを先に表示
       setPendingFoodItem(foodItem);
-      setShowAIConcierge(true);
+      setShowWeightConfirm(true);
       setIsAnalyzingImage(false);
+      setImageAnalysisTip(null);
     } catch (error) {
       setIsAnalyzingImage(false);
+      setImageAnalysisTip(null);
       logError(error, { component: 'AISpeedDial', action: 'processImageFile' });
       const errorMessage = getUserFriendlyErrorMessage(error) || '画像解析に失敗しました。';
       setImageAnalysisError(errorMessage);
@@ -523,6 +508,7 @@ export default function AISpeedDial({
   const [displayedTip, setDisplayedTip] = useState<Tip | null>(null); // AI回答後も保持するTips
   const [previousTips, setPreviousTips] = useState<Tip[]>([]); // 表示したTipsの履歴（戻るボタン用）
   const [isTipSavedState, setIsTipSavedState] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   // チャット画面が開いたときに初期Tipsを表示
   useEffect(() => {
@@ -533,41 +519,41 @@ export default function AISpeedDial({
     }
   }, [showChatUI]); // displayedTipを依存配列から削除（無限ループ防止）
 
-  // シェア機能
-  const handleShareTip = async (tip: Tip) => {
-    const shareText = `Did you know? ${tip.title}\n\n${tip.content} #PrimalLogic`;
+  // シェア用テキスト生成
+  const getShareText = (tip: Tip) =>
+    `Did you know? ${tip.title}\n\n${tip.content} #PrimalLogic`;
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Primal Logic Tip',
-          text: shareText,
-        });
-      } catch (err) {
-        if (import.meta.env.DEV) {
+  // シェア先URL（YouTube風：矢印で一覧→各SNSへ直接）
+  const getShareUrls = (tip: Tip) => {
+    const text = encodeURIComponent(getShareText(tip));
+    return {
+      x: `https://twitter.com/intent/tweet?text=${text}`,
+      line: `https://line.me/R/msg/text/?${text}`,
+    };
+  };
 
-        }
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareText);
-        alert('クリップボードにコピーしました！');
-      } catch (err) {
-        logError(err, { component: 'AISpeedDial', action: 'copyToClipboard' });
-        alert('クリップボードへのコピーに失敗しました。');
-      }
+  const handleCopyShareTip = async (tip: Tip) => {
+    try {
+      await navigator.clipboard.writeText(getShareText(tip));
+      alert('クリップボードにコピーしました！');
+    } catch (err) {
+      logError(err, { component: 'AISpeedDial', action: 'copyToClipboard' });
+      alert('クリップボードへのコピーに失敗しました。');
     }
   };
 
   // TipCardコンポーネント（内部定義）
-  const TipCard = ({ tip, onNextTip, onPrevTip, onToggleSave, isSaved, canGoBack }: {
+  const TipCard = ({ tip, onNextTip, onPrevTip, onToggleSave, isSaved, canGoBack, shareOpen, onShareToggle }: {
     tip: Tip;
     onNextTip: () => void;
     onPrevTip: () => void;
     onToggleSave: (tipId: string, isSaved: boolean) => void;
     isSaved: boolean;
     canGoBack: boolean;
+    shareOpen: boolean;
+    onShareToggle: () => void;
   }) => {
+    const urls = getShareUrls(tip);
     const tipIndex = TIPS_DATA.findIndex(t => t.id === tip.id);
     const tipNumber = tipIndex >= 0 ? tipIndex + 1 : 0;
 
@@ -615,22 +601,94 @@ export default function AISpeedDial({
           >
             次のTipsを見る →
           </button>
-          <button
-            onClick={() => handleShareTip(tip)}
-            style={{
-              padding: '6px 12px',
-              backgroundColor: '#fee2e2',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '12px',
-              cursor: 'pointer',
-              color: '#dc2626',
-              marginLeft: '0.5rem',
-            }}
-            title="SNSでシェア"
-          >
-            📤 Share
-          </button>
+          <div style={{ position: 'relative', marginLeft: '0.5rem' }}>
+            <button
+              onClick={onShareToggle}
+              style={{
+                padding: '6px 10px 6px 12px',
+                backgroundColor: '#fee2e2',
+                border: 'none',
+                borderRadius: '4px',
+                fontSize: '12px',
+                cursor: 'pointer',
+                color: '#dc2626',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+              title="SNSでシェア"
+            >
+              📤 シェア
+              <span style={{ fontSize: '10px', opacity: 0.9 }}>▼</span>
+            </button>
+            {shareOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: 0,
+                  marginBottom: '4px',
+                  background: '#fff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  minWidth: '140px',
+                  zIndex: 50,
+                }}
+              >
+                <a
+                  href={urls.x}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'block',
+                    padding: '10px 12px',
+                    fontSize: '13px',
+                    color: '#374151',
+                    textDecoration: 'none',
+                    borderBottom: '1px solid #f3f4f6',
+                  }}
+                >
+                  X (Twitter)
+                </a>
+                <a
+                  href={urls.line}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'block',
+                    padding: '10px 12px',
+                    fontSize: '13px',
+                    color: '#374151',
+                    textDecoration: 'none',
+                    borderBottom: '1px solid #f3f4f6',
+                  }}
+                >
+                  Line
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleCopyShareTip(tip);
+                    onShareToggle();
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '13px',
+                    color: '#374151',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                  }}
+                >
+                  コピー
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -642,6 +700,15 @@ export default function AISpeedDial({
     const userMessage = chatInput.trim();
     setChatInput('');
     setChatMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: '📡 オンライン接続が必要です。インターネットに接続してから再度お試しください。',
+      }]);
+      return;
+    }
+
     setIsChatLoading(true);
 
     // ローディング中のTipsを表示
@@ -652,7 +719,7 @@ export default function AISpeedDial({
 
     try {
       if (import.meta.env.DEV) {
-
+        void 0;
       }
 
       // AIチャットにユーザープロファイル、日記、過去の食事記録を常に渡す
@@ -672,16 +739,15 @@ export default function AISpeedDial({
       // Gemini APIを使用してAI応答を取得（構造化レスポンス版を使用）
       // ユーザープロファイルと過去の食事記録を常に渡す
       const { chatWithAIStructured } = await import('../../services/aiService');
-      const aiResponse = await chatWithAIStructured(userMessage, chatMessages, false, true, aiMode, thinkingMode, diaryAndFoodData, userProfile ? {
+      const aiResponse = await chatWithAIStructured(userMessage, chatMessages, false, true, aiMode, 'auto', diaryAndFoodData, userProfile ? {
         height: userProfile.height,
         weight: userProfile.weight,
         age: userProfile.age,
         gender: userProfile.gender,
       } : undefined);
       if (import.meta.env.DEV) {
-
         if (aiResponse.todos && aiResponse.todos.length > 0) {
-
+          void 0;
         }
       }
 
@@ -698,7 +764,7 @@ export default function AISpeedDial({
       }
 
       // Tips履歴に保存（症状に関する回答の場合）
-      const { getRemedyBySymptom } = await import('../../data/remedyLogic');
+      // const { getRemedyBySymptom } = await import('../../data/remedyLogic');
       const symptomKeywords = ['頭痛', 'こむら返り', '便秘', '関節痛', 'ケトフル', '疲労'];
       const hasSymptomKeyword = symptomKeywords.some(keyword => userMessage.includes(keyword));
 
@@ -824,7 +890,7 @@ export default function AISpeedDial({
       const deltaX = Math.abs(clientX - fabDragStartPos.x);
       const deltaY = Math.abs(clientY - fabDragStartPos.y);
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      
+
       // 5px以上移動した場合はドラッグと判定
       if (distance > 5) {
         fabHasMovedRef.current = true;
@@ -1023,145 +1089,9 @@ export default function AISpeedDial({
                       title="Switch to bubble UI"
                     >
                       💬
-        </button>
+                    </button>
 
-                    {/* AI Mode selection */}
-                    <div ref={thinkingModeMenuRef} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                      <button
-                        onClick={() => setShowThinkingModeMenu(!showThinkingModeMenu)}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: showThinkingModeMenu ? '#e5e7eb' : 'transparent',
-                          border: '1px solid #d1d5db',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          fontSize: '13px',
-                          transition: 'background-color 0.2s',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                        }}
-                        title="Select AI Mode"
-                      >
-                        {thinkingMode === 'fast' && '⚡ Fast'}
-                        {thinkingMode === 'auto' && '🔷 Auto'}
-                        {thinkingMode === 'deep' && '💎 Deep'}
-                        <span style={{ marginLeft: '4px' }}>▼</span>
-                      </button>
-                      {showThinkingModeMenu && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            top: '100%',
-                            right: 0,
-                            marginTop: '8px',
-                            backgroundColor: 'white',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                            minWidth: '200px',
-                            zIndex: 1000,
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <button
-                            onClick={() => {
-                              setThinkingMode('fast');
-                              setShowThinkingModeMenu(false);
-                            }}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: thinkingMode === 'fast' ? '#f3f4f6' : 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '4px',
-                            }}
-                            onMouseOver={(e) => {
-                              if (thinkingMode !== 'fast') {
-                                e.currentTarget.style.backgroundColor = '#f9fafb';
-                              }
-                            }}
-                            onMouseOut={(e) => {
-                              if (thinkingMode !== 'fast') {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }
-                            }}
-                          >
-                            <div style={{ fontWeight: 'bold' }}>⚡ Fast</div>
-                            <div style={{ fontSize: '12px', color: '#6b7280' }}>Quick, concise answers</div>
-                          </button>
-                          <button
-                            onClick={() => {
-                              setThinkingMode('auto');
-                              setShowThinkingModeMenu(false);
-                            }}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: thinkingMode === 'auto' ? '#f3f4f6' : 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '4px',
-                            }}
-                            onMouseOver={(e) => {
-                              if (thinkingMode !== 'auto') {
-                                e.currentTarget.style.backgroundColor = '#f9fafb';
-                              }
-                            }}
-                            onMouseOut={(e) => {
-                              if (thinkingMode !== 'auto') {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }
-                            }}
-                          >
-                            <div style={{ fontWeight: 'bold' }}>🔷 Auto</div>
-                            <div style={{ fontSize: '12px', color: '#6b7280' }}>Smart detection (default)</div>
-                          </button>
-                          <button
-                            onClick={() => {
-                              setThinkingMode('deep');
-                              setShowThinkingModeMenu(false);
-                            }}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: thinkingMode === 'deep' ? '#f3f4f6' : 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '4px',
-                            }}
-                            onMouseOver={(e) => {
-                              if (thinkingMode !== 'deep') {
-                                e.currentTarget.style.backgroundColor = '#f9fafb';
-                              }
-                            }}
-                            onMouseOut={(e) => {
-                              if (thinkingMode !== 'deep') {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }
-                            }}
-                          >
-                            <div style={{ fontWeight: 'bold' }}>💎 Deep</div>
-                            <div style={{ fontSize: '12px', color: '#6b7280' }}>Detailed analysis with evidence</div>
-                          </button>
-          </div>
-        )}
-      </div>
+
 
                     <button
                       onClick={() => setShowChatUI(false)}
@@ -1169,7 +1099,7 @@ export default function AISpeedDial({
                     >
                       ×
                     </button>
-            </div>
+                  </div>
                 </div>
                 <div className="ai-chat-messages">
                   {chatMessages.length === 0 ? (
@@ -1181,7 +1111,7 @@ export default function AISpeedDial({
                         アプリの使い方についても質問できます
                       </p>
                       {/* 初期表示時にもTipsを表示 */}
-              {displayedTip && (
+                      {displayedTip && (
                         <TipCard
                           tip={displayedTip}
                           onNextTip={() => {
@@ -1210,6 +1140,8 @@ export default function AISpeedDial({
                           }}
                           isSaved={isTipSavedState}
                           canGoBack={previousTips.length > 0}
+                          shareOpen={shareOpen}
+                          onShareToggle={() => setShareOpen((o) => !o)}
                         />
                       )}
                     </div>
@@ -1217,7 +1149,7 @@ export default function AISpeedDial({
                     <div className="ai-chat-message-list">
                       {chatMessages.map((msg, idx) => {
                         // このメッセージに対応するTodoを取得
-                        const messageTodos = currentTodos.find(t => t.id === `todos_${idx}`)?.todos || [];
+                        const _messageTodos = currentTodos.find(t => t.id === `todos_${idx}`)?.todos || [];
                         const isLastAssistant = idx === chatMessages.length - 1 && msg.role === 'assistant';
                         const todosForThisMessage = isLastAssistant ? currentTodos[currentTodos.length - 1]?.todos || [] : [];
 
@@ -1243,46 +1175,57 @@ export default function AISpeedDial({
                                       </div>
                                     )}
                                     {todo.action && (
-                    <button
-                                        onClick={() => {
-                                          // Todoアクションを実行
-                                          if (todo.action?.type === 'add_food' && todo.action.params) {
-                                            const { item, amount, unit } = todo.action.params;
-                                            if (addFood && item && amount) {
-                                              addFood({
-                                                item,
-                                                amount: Number(amount),
-                                                unit: unit || 'g',
-                                                type: 'animal',
-                                              });
-                                              alert(`${item} ${amount}${unit || 'g'}を追加しました`);
+                                      <>
+                                        {todo.action?.type === 'suggest_target' && (
+                                          <p className="ai-chat-todo-description" style={{ marginBottom: '0.5rem' }}>
+                                            変更を推奨します。変更しますか？
+                                          </p>
+                                        )}
+                                        <button
+                                          onClick={() => {
+                                            if (todo.action?.type === 'suggest_target' && todo.action.params) {
+                                              const { nutrientKey, value, unit, reason } = todo.action.params;
+                                              try {
+                                                sessionStorage.setItem('ai_suggest_target', JSON.stringify({ nutrientKey, value, unit, reason }));
+                                              } catch { /* ignore */ }
+                                              window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'nutrientCustom' }));
+                                            } else if (todo.action?.type === 'add_food' && todo.action.params) {
+                                              const { item, amount, unit } = todo.action.params;
+                                              if (addFood && item && amount) {
+                                                addFood({
+                                                  item,
+                                                  amount: Number(amount),
+                                                  unit: unit || 'g',
+                                                  type: 'animal',
+                                                });
+                                                alert(`${item} ${amount}${unit || 'g'}を追加しました`);
+                                              }
+                                            } else if (todo.action?.type === 'timer' && todo.action.params) {
+                                              const { hours } = todo.action.params;
+                                              const hoursNum = typeof hours === 'number' ? hours : Number(hours) || getFastingDefaultHours();
+                                              const endAt = new Date(Date.now() + hoursNum * 60 * 60 * 1000).toISOString();
+                                              localStorage.setItem('primal_logic_fasting_timer_end', endAt);
+                                              (window as unknown as { showToast?: (msg: string) => void }).showToast?.(`${hoursNum}時間の断食タイマーを開始しました`);
+                                            } else if (todo.action?.type === 'set_protocol') {
+                                              localStorage.setItem('primal_logic_open_recovery_protocol', '1');
+                                              window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'home' }));
+                                              (window as unknown as { showToast?: (msg: string) => void }).showToast?.('ホームの「リカバリー」からプロトコルを設定できます');
+                                            } else if (todo.action?.type === 'open_screen' && todo.action.params) {
+                                              const { screen } = todo.action.params;
+                                              if (screen) {
+                                                window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: screen }));
+                                              }
                                             }
-                                          } else if (todo.action?.type === 'timer' && todo.action.params) {
-                                            const { hours } = todo.action.params;
-                                            // タイマー機能は将来実装予定（通知APIを使用）
-                                            alert(`${hours}時間の断食タイマーを開始しました（通知機能は今後実装予定）`);
-                                          } else if (todo.action?.type === 'set_protocol') {
-                                            // リカバリープロトコル画面に遷移
-                                            window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'labs' }));
-                                            // リカバリープロトコル画面で自動的にプロトコルを設定する機能は今後実装予定
-                                            alert('リカバリープロトコル画面に遷移しました。手動でプロトコルを設定してください。');
-                                          } else if (todo.action?.type === 'open_screen' && todo.action.params) {
-                                            const { screen } = todo.action.params;
-                                            if (screen) {
-                                              window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: screen }));
-                                            } else {
-                                              alert('画面を開きます（実装予定）');
-                                            }
-                                          }
-                                        }}
-                                        className="ai-chat-todo-action-button"
-                                      >
-                                        実行
-                    </button>
+                                          }}
+                                          className="ai-chat-todo-action-button"
+                                        >
+                                          {todo.action?.type === 'suggest_target' ? '変更する' : '実行'}
+                                        </button>
+                                      </>
                                     )}
-                  </div>
+                                  </div>
                                 ))}
-                  </div>
+                              </div>
                             )}
                             {/* AI回答後もTipsを表示 */}
                             {!isChatLoading && displayedTip && isLastAssistant && (
@@ -1315,9 +1258,11 @@ export default function AISpeedDial({
                                   }}
                                   isSaved={isTipSavedState}
                                   canGoBack={previousTips.length > 0}
+                                  shareOpen={shareOpen}
+                                  onShareToggle={() => setShareOpen((o) => !o)}
                                 />
-                </div>
-              )}
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -1356,6 +1301,8 @@ export default function AISpeedDial({
                               }}
                               isSaved={isTipSavedState}
                               canGoBack={previousTips.length > 0}
+                              shareOpen={shareOpen}
+                              onShareToggle={() => setShareOpen((o) => !o)}
                             />
                           )}
                         </div>
@@ -1364,241 +1311,28 @@ export default function AISpeedDial({
                   )}
                 </div>
                 <div className="ai-chat-input-container">
+                  {/* Prompt Chips: 体調・症状からプロンプトを選ぶ */}
+                  <div className="ai-chat-prompt-chips" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                    {PROMPT_CHIPS.map((label) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => setChatInput((prev) => (prev ? `${prev} ${label}` : label))}
+                        style={{
+                          padding: '6px 10px',
+                          fontSize: '12px',
+                          borderRadius: '9999px',
+                          border: '1px solid #e5e7eb',
+                          background: '#fff',
+                          color: '#374151',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                   <div className="ai-chat-input-wrapper" style={{ position: 'relative' }}>
-                    {/* Gemini-style + button with dropdown */}
-                    <div ref={plusMenuRef} style={{ position: 'relative', display: 'flex', alignItems: 'flex-end' }}>
-                      <button
-                        onClick={() => setShowPlusMenu(!showPlusMenu)}
-                        style={{
-                          padding: '8px 12px',
-                          backgroundColor: showPlusMenu ? '#e5e7eb' : 'transparent',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          fontSize: '20px',
-                          transition: 'background-color 0.2s',
-                          marginRight: '4px',
-                        }}
-                        title="ファイルアップロード"
-                      >
-                        +
-                      </button>
-                      {showPlusMenu && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            bottom: '100%',
-                            left: 0,
-                            marginBottom: '8px',
-                            backgroundColor: 'white',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                            minWidth: '220px',
-                            zIndex: 1000,
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <button
-                            onClick={handlePhoto}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>📸</span> 写真から追加
-                          </button>
-                          <button
-                            onClick={handleAlbumPicker}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>🖼️</span> アルバムから選択
-                          </button>
-                          <button
-                            onClick={handleFileUpload}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>📄</span> ファイルアップロード
-                          </button>
-                          <button
-                            onClick={handleBarcodeScanner}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>📷</span> バーコード読み取り
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Gemini-style ツール button with dropdown */}
-                    <div ref={toolsMenuRef} style={{ position: 'relative', display: 'flex', alignItems: 'flex-end' }}>
-                      <button
-                        onClick={() => setShowToolsMenu(!showToolsMenu)}
-                        style={{
-                          padding: '8px 12px',
-                          backgroundColor: showToolsMenu ? '#e5e7eb' : 'transparent',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          fontSize: '14px',
-                          transition: 'background-color 0.2s',
-                          marginRight: '8px',
-                        }}
-                        title="ツール"
-                      >
-                        🔧
-                      </button>
-                      {showToolsMenu && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            bottom: '100%',
-                            left: 0,
-                            marginBottom: '8px',
-                            backgroundColor: 'white',
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                            minWidth: '240px',
-                            zIndex: 1000,
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <button
-                            onClick={handleDeepResearch}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>🔍</span> Deep Research
-                          </button>
-                          <button
-                            onClick={handleGuidedLearning}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>📚</span> ガイド付き学習
-                          </button>
-                          <button
-                            onClick={handleSymptomInference}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>🩺</span> 症状推論
-                          </button>
-                          <button
-                            onClick={handleHonestyScore}
-                            style={{
-                              width: '100%',
-                              padding: '12px 16px',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'background-color 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                          >
-                            <span>✅</span> 誠実さスコア
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
                     <textarea
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
@@ -1971,20 +1705,22 @@ export default function AISpeedDial({
                         }}
                         isSaved={isTipSavedState}
                         canGoBack={previousTips.length > 0}
+                        shareOpen={shareOpen}
+                        onShareToggle={() => setShareOpen((o) => !o)}
                       />
                     )}
                   </div>
                 ) : (
                   <div className="ai-chat-message-list">
                     {chatMessages.map((msg, idx) => {
-                      const messageTodos = currentTodos.find(t => t.id === `todos_${idx}`)?.todos || [];
+                      const _messageTodos = currentTodos.find(t => t.id === `todos_${idx}`)?.todos || [];
                       const isLastAssistant = idx === chatMessages.length - 1 && msg.role === 'assistant';
                       const todosForThisMessage = isLastAssistant ? currentTodos[currentTodos.length - 1]?.todos || [] : [];
 
                       return (
                         <div key={idx} className={`ai-chat-message ${msg.role === 'user' ? 'ai-chat-message-user' : 'ai-chat-message-assistant'}`}>
                           <div className="ai-chat-message-bubble">
-                    {msg.content}
+                            {msg.content}
                           </div>
                           {isLastAssistant && todosForThisMessage.length > 0 && (
                             <div className="ai-chat-message ai-chat-message-assistant">
@@ -2002,36 +1738,54 @@ export default function AISpeedDial({
                                     </div>
                                   )}
                                   {todo.action && (
-                                    <button
-                                      onClick={() => {
-                                        if (todo.action?.type === 'add_food' && todo.action.params) {
-                                          const { item, amount, unit } = todo.action.params;
-                                          if (addFood && item && amount) {
-                                            addFood({
-                                              item,
-                                              amount: Number(amount),
-                                              unit: unit || 'g',
-                                              type: 'animal',
-                                            });
-                                            alert(`${item} ${amount}${unit || 'g'}を追加しました`);
+                                    <>
+                                      {todo.action?.type === 'suggest_target' && (
+                                        <p className="ai-chat-todo-description" style={{ marginBottom: '0.5rem' }}>
+                                          変更を推奨します。変更しますか？
+                                        </p>
+                                      )}
+                                      <button
+                                        onClick={() => {
+                                          if (todo.action?.type === 'suggest_target' && todo.action.params) {
+                                            const { nutrientKey, value, unit, reason } = todo.action.params;
+                                            try {
+                                              sessionStorage.setItem('ai_suggest_target', JSON.stringify({ nutrientKey, value, unit, reason }));
+                                            } catch { /* ignore */ }
+                                            window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'nutrientCustom' }));
+                                          } else if (todo.action?.type === 'add_food' && todo.action.params) {
+                                            const { item, amount, unit } = todo.action.params;
+                                            if (addFood && item && amount) {
+                                              addFood({
+                                                item,
+                                                amount: Number(amount),
+                                                unit: unit || 'g',
+                                                type: 'animal',
+                                              });
+                                              alert(`${item} ${amount}${unit || 'g'}を追加しました`);
+                                            }
+                                          } else if (todo.action?.type === 'timer' && todo.action.params) {
+                                            const { hours } = todo.action.params;
+                                            const hoursNum = typeof hours === 'number' ? hours : Number(hours) || getFastingDefaultHours();
+                                            const endAt = new Date(Date.now() + hoursNum * 60 * 60 * 1000).toISOString();
+                                            localStorage.setItem('primal_logic_fasting_timer_end', endAt);
+                                            (window as unknown as { showToast?: (msg: string) => void }).showToast?.(`${hoursNum}時間の断食タイマーを開始しました`);
+                                          } else if (todo.action?.type === 'set_protocol') {
+                                            localStorage.setItem('primal_logic_open_recovery_protocol', '1');
+                                            window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'home' }));
+                                            (window as unknown as { showToast?: (msg: string) => void }).showToast?.('ホームの「リカバリー」からプロトコルを設定できます');
+                                          } else if (todo.action?.type === 'open_screen' && todo.action.params?.screen) {
+                                            window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: todo.action.params.screen }));
                                           }
-                                        } else if (todo.action?.type === 'timer' && todo.action.params) {
-                                          const { hours } = todo.action.params;
-                                          alert(`${hours}時間タイマーを開始しました（実装予定）`);
-                                        } else if (todo.action?.type === 'set_protocol') {
-                                          alert('リカバリープロトコルを設定しました（実装予定）');
-                                        } else if (todo.action?.type === 'open_screen') {
-                                          alert('画面を開きます（実装予定）');
-                                        }
-                                      }}
-                                      className="ai-chat-todo-action-button"
-                                    >
-                                      実行
-                                    </button>
+                                        }}
+                                        className="ai-chat-todo-action-button"
+                                      >
+                                        {todo.action?.type === 'suggest_target' ? '変更する' : '実行'}
+                                      </button>
+                                    </>
                                   )}
-                  </div>
-                ))}
-              </div>
+                                </div>
+                              ))}
+                            </div>
                           )}
                         </div>
                       );
@@ -2073,6 +1827,8 @@ export default function AISpeedDial({
                             }}
                             isSaved={isTipSavedState}
                             canGoBack={previousTips.length > 0}
+                            shareOpen={shareOpen}
+                            onShareToggle={() => setShareOpen((o) => !o)}
                           />
                         )}
                       </div>
@@ -2081,244 +1837,30 @@ export default function AISpeedDial({
                 )}
               </div>
               <div className="ai-chat-input-container">
+                <div className="ai-chat-prompt-chips" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                  {PROMPT_CHIPS.map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setChatInput((prev) => (prev ? `${prev} ${label}` : label))}
+                      style={{
+                        padding: '6px 10px',
+                        fontSize: '12px',
+                        borderRadius: '9999px',
+                        border: '1px solid #e5e7eb',
+                        background: '#fff',
+                        color: '#374151',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
                 <div className="ai-chat-input-wrapper" style={{ position: 'relative' }}>
-                  {/* Gemini-style + button with dropdown */}
-                  <div ref={plusMenuRef} style={{ position: 'relative', display: 'flex', alignItems: 'flex-end' }}>
-                    <button
-                      onClick={() => setShowPlusMenu(!showPlusMenu)}
-                      style={{
-                        padding: '8px 12px',
-                        backgroundColor: showPlusMenu ? '#e5e7eb' : 'transparent',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '20px',
-                        transition: 'background-color 0.2s',
-                        marginRight: '4px',
-                      }}
-                      title="ファイルアップロード"
-                    >
-                      +
-                    </button>
-                    {showPlusMenu && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          bottom: '100%',
-                          left: 0,
-                          marginBottom: '8px',
-                          backgroundColor: 'white',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                          minWidth: '220px',
-                          zIndex: 1000,
-                          overflow: 'hidden',
-                        }}
-                      >
-                        <button
-                          onClick={handlePhoto}
-                          style={{
-                            width: '100%',
-                            padding: '12px 16px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'background-color 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        >
-                          <span>📸</span> 写真から追加
-                        </button>
-                        <button
-                          onClick={handleAlbumPicker}
-                          style={{
-                            width: '100%',
-                            padding: '12px 16px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'background-color 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        >
-                          <span>🖼️</span> アルバムから選択
-                        </button>
-                        <button
-                          onClick={handleFileUpload}
-                          style={{
-                            width: '100%',
-                            padding: '12px 16px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'background-color 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        >
-                          <span>📄</span> ファイルアップロード
-                        </button>
-                        <button
-                          onClick={handleBarcodeScanner}
-                          style={{
-                            width: '100%',
-                            padding: '12px 16px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'background-color 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        >
-                          <span>📷</span> バーコード読み取り
-                        </button>
-                      </div>
-                    )}
-            </div>
-
-                  {/* Gemini-style ツール button with dropdown */}
-                  <div ref={toolsMenuRef} style={{ position: 'relative', display: 'flex', alignItems: 'flex-end' }}>
-                    <button
-                      onClick={() => setShowToolsMenu(!showToolsMenu)}
-                      style={{
-                        padding: '8px 12px',
-                        backgroundColor: showToolsMenu ? '#e5e7eb' : 'transparent',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        transition: 'background-color 0.2s',
-                        marginRight: '8px',
-                      }}
-                      title="ツール"
-                    >
-                      🔧
-                    </button>
-                    {showToolsMenu && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          bottom: '100%',
-                          left: 0,
-                          marginBottom: '8px',
-                          backgroundColor: 'white',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                          minWidth: '240px',
-                          zIndex: 1000,
-                          overflow: 'hidden',
-                        }}
-                      >
-                        <button
-                          onClick={handleDeepResearch}
-                          style={{
-                            width: '100%',
-                            padding: '12px 16px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'background-color 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        >
-                          <span>🔍</span> Deep Research
-                        </button>
-                        <button
-                          onClick={handleGuidedLearning}
-                          style={{
-                            width: '100%',
-                            padding: '12px 16px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'background-color 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        >
-                          <span>📚</span> ガイド付き学習
-                        </button>
-                        <button
-                          onClick={handleSymptomInference}
-                          style={{
-                            width: '100%',
-                            padding: '12px 16px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'background-color 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        >
-                          <span>🩺</span> 症状推論
-                        </button>
-                        <button
-                          onClick={handleHonestyScore}
-                          style={{
-                            width: '100%',
-                            padding: '12px 16px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'background-color 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        >
-                          <span>✅</span> 誠実さスコア
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
                   <textarea
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
                     placeholder="質問を入力..."
                     className="ai-chat-textarea"
                     rows={1}
@@ -2342,7 +1884,7 @@ export default function AISpeedDial({
                       title={isVoiceInputActive ? '音声入力を停止' : '音声入力を開始'}
                     >
                       {isVoiceInputActive ? '⏹️' : '🎤'}
-              </button>
+                    </button>
                   )}
                   <button
                     onClick={handleSendChatMessage}
@@ -2350,9 +1892,9 @@ export default function AISpeedDial({
                     className="ai-chat-send-button"
                   >
                     送信
-              </button>
-            </div>
-          </div>
+                  </button>
+                </div>
+              </div>
               {/* リサイズハンドル（4つの角） */}
               <div
                 className="ai-chat-bubble-resize-handle ai-chat-bubble-resize-handle-top-left"
@@ -2379,7 +1921,7 @@ export default function AISpeedDial({
                 onTouchStart={handleBubbleResizeStart('bottom-right')}
                 title="サイズを変更（右下）"
               />
-        </div>
+            </div>
           )}
         </>
       )}
@@ -2429,6 +1971,12 @@ export default function AISpeedDial({
             <p style={{ margin: '0.5rem 0 0 0', fontSize: '14px', color: '#6b7280' }}>
               しばらくお待ちください
             </p>
+            {imageAnalysisTip && (
+              <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#f9fafb', borderRadius: '8px', textAlign: 'left', fontSize: '13px', color: '#374151' }}>
+                <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>💡 {imageAnalysisTip.title}</div>
+                <div style={{ color: '#6b7280', lineHeight: 1.4 }}>{imageAnalysisTip.content}</div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -2503,6 +2051,193 @@ export default function AISpeedDial({
                 リトライ
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 写真解析フォローアップ: 重量確認モーダル */}
+      {showWeightConfirm && pendingFoodItem && !showAIConcierge && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10002,
+            padding: '1rem',
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !showWeightManualInput) {
+              setShowWeightConfirm(false);
+              setShowWeightManualInput(false);
+              setPendingFoodItem(null);
+            }
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '1.5rem',
+              maxWidth: '400px',
+              width: '100%',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ margin: '0 0 1rem 0', fontSize: '18px', fontWeight: '600' }}>
+              重量の確認
+            </h3>
+            <p style={{ margin: '0 0 1rem 0', fontSize: '14px', color: '#666' }}>
+              この{pendingFoodItem.item}は約{pendingFoodItem.amount}gと推定しました。正しいですか？
+            </p>
+            {!showWeightManualInput ? (
+              <>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <button
+                    onClick={() => {
+                      setShowWeightConfirm(false);
+                      setShowAIConcierge(true);
+                    }}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      backgroundColor: '#f43f5e',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      textAlign: 'left',
+                    }}
+                  >
+                    そのまま（{pendingFoodItem.amount}g）
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newAmount = Math.round((pendingFoodItem.amount + 50) / 10) * 10;
+                      const ratio = newAmount / pendingFoodItem.amount;
+                      const updated: FoodItem = {
+                        ...pendingFoodItem,
+                        amount: newAmount,
+                        nutrients: pendingFoodItem.nutrients
+                          ? Object.fromEntries(
+                            Object.entries(pendingFoodItem.nutrients).map(([k, v]) => [k, typeof v === 'number' ? v * ratio : v])
+                          ) as FoodItem['nutrients']
+                          : pendingFoodItem.nutrients,
+                      };
+                      setPendingFoodItem(updated);
+                      setShowWeightConfirm(false);
+                      setShowAIConcierge(true);
+                    }}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      backgroundColor: '#f3f4f6',
+                      color: '#374151',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      textAlign: 'left',
+                    }}
+                  >
+                    少し多い（{Math.round((pendingFoodItem.amount + 50) / 10) * 10}g）
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newAmount = Math.max(10, Math.round((pendingFoodItem.amount - 50) / 10) * 10);
+                      const ratio = newAmount / pendingFoodItem.amount;
+                      const updated: FoodItem = {
+                        ...pendingFoodItem,
+                        amount: newAmount,
+                        nutrients: pendingFoodItem.nutrients
+                          ? Object.fromEntries(
+                            Object.entries(pendingFoodItem.nutrients).map(([k, v]) => [k, typeof v === 'number' ? v * ratio : v])
+                          ) as FoodItem['nutrients']
+                          : pendingFoodItem.nutrients,
+                      };
+                      setPendingFoodItem(updated);
+                      setShowWeightConfirm(false);
+                      setShowAIConcierge(true);
+                    }}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      backgroundColor: '#f3f4f6',
+                      color: '#374151',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      textAlign: 'left',
+                    }}
+                  >
+                    少し少ない（{Math.max(10, Math.round((pendingFoodItem.amount - 50) / 10) * 10)}g）
+                  </button>
+                  <button
+                    onClick={() => setShowWeightManualInput(true)}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      backgroundColor: '#f3f4f6',
+                      color: '#374151',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      textAlign: 'left',
+                    }}
+                  >
+                    手動で入力
+                  </button>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowWeightConfirm(false);
+                    setShowWeightManualInput(false);
+                    setPendingFoodItem(null);
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: 'transparent',
+                    color: '#6b7280',
+                    border: 'none',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  キャンセル
+                </button>
+              </>
+            ) : (
+              <WeightManualInput
+                foodName={pendingFoodItem.item}
+                initialWeight={pendingFoodItem.amount}
+                onConfirm={(newAmount) => {
+                  const ratio = newAmount / pendingFoodItem.amount;
+                  const updated: FoodItem = {
+                    ...pendingFoodItem,
+                    amount: newAmount,
+                    nutrients: pendingFoodItem.nutrients
+                      ? Object.fromEntries(
+                        Object.entries(pendingFoodItem.nutrients).map(([k, v]) => [k, typeof v === 'number' ? v * ratio : v])
+                      ) as FoodItem['nutrients']
+                      : pendingFoodItem.nutrients,
+                  };
+                  setPendingFoodItem(updated);
+                  setShowWeightManualInput(false);
+                  setShowWeightConfirm(false);
+                  setShowAIConcierge(true);
+                }}
+                onCancel={() => setShowWeightManualInput(false)}
+              />
+            )}
           </div>
         </div>
       )}
@@ -2697,213 +2432,157 @@ export default function AISpeedDial({
                 </select>
               </div>
 
-              {/* 写真で認識不可能な食品を追加（自由入力） */}
-              <div style={{ marginBottom: '0.75rem', padding: '0.75rem', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
-                  写真で認識不可能な食品を追加
-                </label>
-                <button
-                  onClick={() => {
-                    setAdditionalFoodName('');
-                    setAdditionalFoodAmount(0);
-                    setAdditionalFoodUnit('g');
-                    setShowAdditionalFoodModal(true);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    backgroundColor: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <span>➕</span>
-                  <span>食品を追加</span>
-                </button>
-                {conciergeData.additionalFoods.length > 0 && (
-                  <div style={{ marginTop: '0.5rem', fontSize: '12px', color: '#6b7280' }}>
-                    {conciergeData.additionalFoods.map((food, idx) => (
-                      <div key={idx} style={{ marginTop: '0.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span>{food.name}: {food.amount}{food.unit === 'g' ? 'g' : '個'}</span>
-                        <button
-                          onClick={() => {
-                            setConciergeData({
-                              ...conciergeData,
-                              additionalFoods: conciergeData.additionalFoods.filter((_, i) => i !== idx),
-                            });
-                          }}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#dc2626',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            padding: '0.25rem',
-                          }}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
+          </div>
 
 
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-              <button
-                onClick={() => {
-                  setShowAIConcierge(false);
-                  setPendingFoodItem(null);
-                }}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: '#e5e7eb',
-                  color: '#374151',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                }}
-              >
-                スキップ
-              </button>
-              <button
-                onClick={() => {
-                  // インタビュー結果を食品情報に反映
-                  const finalFoodItem = {
-                    ...pendingFoodItem,
-                    metadata: {
-                      saltUsed: conciergeData.saltUsed,
-                      saltType: conciergeData.saltType,
-                      saltAmount: conciergeData.saltAmount,
-                      fatTrimmed: conciergeData.fatTrimmed, // 0-100%の範囲
-                      cookingMethod: conciergeData.cookingMethod,
-                      additionalFoods: conciergeData.additionalFoods,
-                    },
-                  };
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+            <button
+              onClick={() => {
+                setShowAIConcierge(false);
+                setPendingFoodItem(null);
+              }}
+              style={{
+                padding: '0.75rem 1.5rem',
+                backgroundColor: '#e5e7eb',
+                color: '#374151',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                fontWeight: '500',
+              }}
+            >
+              スキップ
+            </button>
+            <button
+              onClick={() => {
+                // インタビュー結果を食品情報に反映
+                const finalFoodItem = {
+                  ...pendingFoodItem,
+                  metadata: {
+                    saltUsed: conciergeData.saltUsed,
+                    saltType: conciergeData.saltType,
+                    saltAmount: conciergeData.saltAmount,
+                    fatTrimmed: conciergeData.fatTrimmed, // 0-100%の範囲
+                    cookingMethod: conciergeData.cookingMethod,
+                    additionalFoods: conciergeData.additionalFoods,
+                  },
+                };
 
-                  setPendingFoodItem(finalFoodItem);
-                  setShowAIConcierge(false);
-                  setShowImageConfirm(true);
+                setPendingFoodItem(finalFoodItem);
+                setShowAIConcierge(false);
+                setShowImageConfirm(true);
 
-                  // 追加食品（自由入力）を個別に追加
-                  if (conciergeData.additionalFoods.length > 0 && onAddFood) {
-                    conciergeData.additionalFoods.forEach((food, index) => {
-                      // 食品名から食品データベースを検索
-                      const { searchFoods } = require('../../data/foodsDatabase');
-                      const foodResults = searchFoods(food.name);
-                      const foodData = foodResults.length > 0 ? foodResults[0] : null;
+                // 追加食品（自由入力）を個別に追加
+                if (conciergeData.additionalFoods.length > 0 && onAddFood) {
+                  conciergeData.additionalFoods.forEach((food, index) => {
+                    // 食品名から食品データベースを検索
+                    const foodResults = searchFoods(food.name);
+                    const foodData = foodResults.length > 0 ? foodResults[0] : null;
 
-                      const foodItem: FoodItem = {
-                        item: food.name,
-                        amount: food.amount,
-                        unit: food.unit,
-                        type: foodData?.type || 'animal' as const,
-                        nutrients: {},
+                    const foodItem: FoodItem = {
+                      item: food.name,
+                      amount: food.amount,
+                      unit: food.unit,
+                      type: foodData?.type || 'animal' as const,
+                      nutrients: {},
+                    };
+
+                    // 食品データベースから栄養素を補完
+                    if (foodData) {
+                      const ratio = food.unit === '個' && foodData.pieceWeight
+                        ? (food.amount * foodData.pieceWeight) / 100
+                        : food.amount / 100;
+
+                      foodItem.nutrients = {
+                        protein: (foodData.nutrientsRaw.protein || 0) * ratio,
+                        fat: (foodData.nutrientsRaw.fat || 0) * ratio,
+                        carbs: (foodData.nutrientsRaw.carbs || 0) * ratio,
+                        netCarbs: (foodData.nutrientsRaw.carbs || 0) * ratio,
+                        fiber: (foodData.nutrientsRaw.fiber || 0) * ratio,
+                        hemeIron: (foodData.nutrientsRaw.hemeIron || 0) * ratio,
+                        nonHemeIron: (foodData.nutrientsRaw.nonHemeIron || 0) * ratio,
+                        zinc: (foodData.nutrientsRaw.zinc || 0) * ratio,
+                        sodium: (foodData.nutrientsRaw.sodium || 0) * ratio,
+                        magnesium: (foodData.nutrientsRaw.magnesium || 0) * ratio,
+                        vitaminC: (foodData.nutrientsRaw.vitaminC || 0) * ratio,
+                        vitaminK: (foodData.nutrientsRaw.vitaminK || 0) * ratio,
+                        vitaminB12: (foodData.nutrientsRaw.vitaminB12 || 0) * ratio,
                       };
+                    } else {
+                      // 食品データベースにない場合は、栄養素を0に設定（ユーザーが手動で入力した食品）
+                      foodItem.nutrients = {
+                        protein: 0,
+                        fat: 0,
+                        carbs: 0,
+                        netCarbs: 0,
+                        fiber: 0,
+                        hemeIron: 0,
+                        nonHemeIron: 0,
+                        zinc: 0,
+                        sodium: 0,
+                        magnesium: 0,
+                        vitaminC: 0,
+                        vitaminK: 0,
+                        vitaminB12: 0,
+                      };
+                    }
 
-                      // 食品データベースから栄養素を補完
-                      if (foodData) {
-                        const ratio = food.unit === '個' && foodData.pieceWeight
-                          ? (food.amount * foodData.pieceWeight) / 100
-                          : food.amount / 100;
-
-                        foodItem.nutrients = {
-                          protein: (foodData.nutrientsRaw.protein || 0) * ratio,
-                          fat: (foodData.nutrientsRaw.fat || 0) * ratio,
-                          carbs: (foodData.nutrientsRaw.carbs || 0) * ratio,
-                          netCarbs: (foodData.nutrientsRaw.carbs || 0) * ratio,
-                          fiber: (foodData.nutrientsRaw.fiber || 0) * ratio,
-                          hemeIron: (foodData.nutrientsRaw.hemeIron || 0) * ratio,
-                          nonHemeIron: (foodData.nutrientsRaw.nonHemeIron || 0) * ratio,
-                          zinc: (foodData.nutrientsRaw.zinc || 0) * ratio,
-                          sodium: (foodData.nutrientsRaw.sodium || 0) * ratio,
-                          magnesium: (foodData.nutrientsRaw.magnesium || 0) * ratio,
-                          vitaminC: (foodData.nutrientsRaw.vitaminC || 0) * ratio,
-                          vitaminK: (foodData.nutrientsRaw.vitaminK || 0) * ratio,
-                          vitaminB12: (foodData.nutrientsRaw.vitaminB12 || 0) * ratio,
-                        };
-                      } else {
-                        // 食品データベースにない場合は、栄養素を0に設定（ユーザーが手動で入力した食品）
-                        foodItem.nutrients = {
-                          protein: 0,
-                          fat: 0,
-                          carbs: 0,
-                          netCarbs: 0,
-                          fiber: 0,
-                          hemeIron: 0,
-                          nonHemeIron: 0,
-                          zinc: 0,
-                          sodium: 0,
-                          magnesium: 0,
-                          vitaminC: 0,
-                          vitaminK: 0,
-                          vitaminB12: 0,
-                        };
+                    // 少し遅延させて追加（UIの更新を待つ）
+                    setTimeout(() => {
+                      if (onAddFood) {
+                        onAddFood(foodItem);
                       }
-
-                      // 少し遅延させて追加（UIの更新を待つ）
-                      setTimeout(() => {
-                        if (onAddFood) {
-                          onAddFood(foodItem);
-                        }
-                      }, 200 * (index + 1));
-                    });
-                  }
-                }}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: '#dc2626',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                }}
-              >
-                保存
-              </button>
-            </div>
+                    }, 200 * (index + 1));
+                  });
+                }
+              }}
+              style={{
+                padding: '0.75rem 1.5rem',
+                backgroundColor: '#dc2626',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                fontWeight: '500',
+              }}
+            >
+              保存
+            </button>
           </div>
         </div>
       )}
 
       {/* 統一された食品編集モーダル（画像解析・チャット共通） */}
-      {showImageConfirm && pendingFoodItem && (
-        <FoodEditModal
-          isOpen={showImageConfirm}
-          initialFood={pendingFoodItem}
-          onClose={() => {
-            setShowImageConfirm(false);
-            setPendingFoodItem(null);
-          }}
-          onSave={async (finalFood) => {
-            if (onAddFood) {
-              // ログ追加
-              await onAddFood(finalFood);
-
-              // チャットUIにメッセージを追加（もしチャット経由なら）
-              setChatMessages(prev => [...prev, {
-                role: 'assistant',
-                content: `記録しました: ${finalFood.item} (${finalFood.amount}g)\nP:Fバランスを記録しました。`,
-              }]);
-
+      {
+        showImageConfirm && pendingFoodItem && (
+          <FoodEditModal
+            isOpen={showImageConfirm}
+            initialFood={pendingFoodItem}
+            onClose={() => {
               setShowImageConfirm(false);
               setPendingFoodItem(null);
-            }
-          }}
-        />
-      )}
+            }}
+            onSave={async (finalFood) => {
+              if (onAddFood) {
+                // ログ追加
+                await onAddFood(finalFood);
+
+                // チャットUIにメッセージを追加（もしチャット経由なら）
+                setChatMessages(prev => [...prev, {
+                  role: 'assistant',
+                  content: `記録しました: ${finalFood.item} (${finalFood.amount}g)\nP:Fバランスを記録しました。`,
+                }]);
+
+                setShowImageConfirm(false);
+                setPendingFoodItem(null);
+              }
+            }}
+          />
+        )
+      }
 
       {/* バーコードスキャナーモーダル */}
       <BarcodeScannerModal
@@ -2926,37 +2605,207 @@ export default function AISpeedDial({
       />
 
       {/* AIチャットボタン - 直接開く（チャットが開いている時は非表示、移動可能） */}
-      {!showChatUI && (
-        <button
-          ref={fabButtonRef}
-          className="ai-chat-fab-button"
-          onClick={(e) => {
-            // ドラッグで移動した場合はクリックを無視
-            if (fabHasMovedRef.current) {
-              e.preventDefault();
-              e.stopPropagation();
-              fabHasMovedRef.current = false; // リセット
-              return;
+      {
+        !showChatUI && (
+          <div
+            style={{
+              position: 'fixed',
+              left: `${fabButtonPosition.x}px`,
+              top: `${fabButtonPosition.y}px`, // Base position (main button)
+              zIndex: showSpotlight ? 9999 : 10001,
+            }}
+          >
+            {/* Speed Dial Menu Items (Expand Upwards) */}
+            {showSpeedDial && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '70px',
+                  right: '0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                  alignItems: 'flex-end',
+                  marginBottom: '8px',
+                }}
+              >
+                {/* Fasting Button */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>Fasting</span>
+                  <button
+                    onClick={() => {
+                      const hours = getFastingDefaultHours();
+                      const endAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+                      localStorage.setItem('primal_logic_fasting_timer_end', endAt);
+                      alert(`${hours}時間の断食タイマーを開始しました`);
+                      setShowSpeedDial(false);
+                    }}
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      backgroundColor: '#f59e0b',
+                      color: 'white',
+                      border: 'none',
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
+                      cursor: 'pointer',
+                      fontSize: '20px',
+                    }}
+                  >
+                    ⚡
+                  </button>
+                </div>
+
+                {/* Photo Button */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>Photo</span>
+                  <button
+                    onClick={() => {
+                      handlePhoto();
+                      setShowSpeedDial(false);
+                    }}
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      backgroundColor: '#f43f5e',
+                      color: 'white',
+                      border: 'none',
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
+                      cursor: 'pointer',
+                      fontSize: '20px',
+                    }}
+                  >
+                    📷
+                  </button>
+                </div>
+
+                {/* Chat Button */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>Chat</span>
+                  <button
+                    onClick={() => {
+                      handleChat();
+                      setShowSpeedDial(false);
+                    }}
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      backgroundColor: '#f43f5e',
+                      color: 'white',
+                      border: 'none',
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
+                      cursor: 'pointer',
+                      fontSize: '20px',
+                    }}
+                  >
+                    💬
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Main Toggle Button */}
+            <button
+              ref={fabButtonRef}
+              className="ai-chat-fab-button"
+              onClick={(e) => {
+                if (fabHasMovedRef.current) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  fabHasMovedRef.current = false;
+                  return;
+                }
+                setShowSpeedDial(!showSpeedDial);
+                fabHasMovedRef.current = false;
+                if (showSpotlight) dismissSpotlight();
+              }}
+              onMouseDown={handleFabButtonMouseDown}
+              onTouchStart={handleFabButtonMouseDown}
+              title="AI Speed Dial"
+              style={{
+                cursor: isDraggingFab ? 'grabbing' : 'grab',
+                backgroundColor: showSpeedDial ? '#4b5563' : undefined,
+                transform: showSpeedDial ? 'rotate(45deg)' : 'none',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {showSpeedDial ? '＋' : '✨'}
+            </button>
+          </div>
+        )
+      }
+
+      {/* Spotlight Overlay & Bubble */}
+      {
+        showSpotlight && !showChatUI && (
+          <>
+            {/* Dark Backdrop */}
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                zIndex: 9998,
+                cursor: 'pointer',
+              }}
+              onClick={dismissSpotlight}
+            />
+
+            {/* Speech Bubble */}
+            <div
+              style={{
+                position: 'fixed',
+                top: `${fabButtonPosition.y - 180}px`, // FABの上に配置
+                left: `${Math.min(window.innerWidth - 300, Math.max(20, fabButtonPosition.x - 250))}px`, // 画面内に収まるように調整
+                width: '280px',
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                padding: '1.25rem',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+                zIndex: 9999,
+                animation: 'bounce 2s infinite',
+              }}
+              onClick={dismissSpotlight}
+            >
+              <div style={{ position: 'relative' }}>
+                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '16px', fontWeight: 'bold', color: '#dc2626' }}>
+                  専属トレーナーAI『Veritas』です。
+                </h3>
+                <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6', color: '#374151', whiteSpace: 'pre-line' }}>
+                  1. アプリの操作・記録
+                  2. 栄養・食事の相談
+                  3. アプリの使い方
+                  すべて、私に話しかけてください。
+                </p>
+                {/* Triangle pointing down */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '-30px',
+                    right: '20px',
+                    width: 0,
+                    height: 0,
+                    borderLeft: '10px solid transparent',
+                    borderRight: '10px solid transparent',
+                    borderTop: '12px solid white',
+                    filter: 'drop-shadow(0 4px 2px rgba(0,0,0,0.1))',
+                  }}
+                />
+              </div>
+            </div>
+            <style>{`
+            @keyframes bounce {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-10px); }
             }
-            // 通常のクリックの場合は処理
-            handleChat();
-            fabHasMovedRef.current = false; // リセット
-          }}
-          onMouseDown={handleFabButtonMouseDown}
-          onTouchStart={handleFabButtonMouseDown}
-          title="AIチャット（ドラッグで移動）"
-          style={{
-            position: 'fixed',
-            left: `${fabButtonPosition.x}px`,
-            top: `${fabButtonPosition.y}px`,
-            cursor: isDraggingFab ? 'grabbing' : 'grab',
-            transition: isDraggingFab ? 'none' : 'left 0.2s ease, top 0.2s ease',
-          }}
-        >
-          💬
-        </button>
-      )}
+          `}</style>
+          </>
+        )}
     </>
   );
 }
-

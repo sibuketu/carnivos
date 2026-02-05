@@ -1,4 +1,4 @@
-﻿# CarnivOS: Project Structure Map
+# CarnivOS: Project Structure Map
 
 > **目的**: Claude Codeがプロジェクト全体を即座に把握できるように、ファイル構造と重要な場所をマップ化する。
 > **更新日**: 2026-01-11
@@ -55,7 +55,7 @@ primal-logic-web/
 #### マスター仕様書
 - **場所**: `Carnivore_Logic_Master_Spec.md`
 - **内容**: アプリの全体仕様、UI/UX、Logic Matrix、AI Concierge
-- **更新**: 2025-12-18 → **要更新**（実装済み機能を反映）
+- **更新**: 2025-12-18 → **要更新**（完了機能を反映）
 
 #### 決定ログ
 - **場所**: `DECISION_LOG.md`
@@ -67,9 +67,9 @@ primal-logic-web/
 - **場所**: `FEATURE_INTENTS.md`
 - **内容**: 各機能の意図と目的、実装の根拠
 
-#### 実装済み機能リスト
+#### 完了機能リスト
 - **場所**: `CURRENT_FEATURES_ACCURATE.md`
-- **内容**: 実装済み機能の正確なリスト、未実装機能の記録
+- **内容**: 完了機能の正確なリスト、未対応機能の記録
 - **更新**: 2026-01-03
 
 #### 差別化ポイント
@@ -186,7 +186,7 @@ primal-logic-web/
 ### 外部API統合
 - **Google Gemini API**: AI機能（写真解析、チャット）
 - **Supabase**: バックアップ・クラウド同期（オプション）
-- **OpenWeatherMap**: 天気情報（オプション、未実装）
+- **OpenWeatherMap**: 天気情報（オプション、未対応）
 
 ### テスト・品質管理
 - **E2E Testing**: Playwright 1.57.0

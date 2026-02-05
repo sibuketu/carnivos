@@ -383,9 +383,9 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
         protein: '#ef4444',
         fat: '#f97316',
         iron: '#dc2626',
-        magnesium: '#3b82f6',
+        magnesium: '#f43f5e',
         vitamin_d: '#fbbf24',
-        sodium: '#10b981',
+        sodium: '#f43f5e',
         potassium: '#8b5cf6',
         zinc: '#6366f1',
       };
@@ -548,7 +548,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                       padding: '0.75rem',
                       backgroundColor: '#eff6ff',
                       borderRadius: '8px',
-                      border: '1px solid #3b82f6',
+                      border: '1px solid #f43f5e',
                     }}
                   >
                     <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '0.5rem' }}>
@@ -615,7 +615,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                           }
                           style={{
                             padding: '0.75rem 1.5rem',
-                            backgroundColor: currentIngredient.isAnalyzing ? '#9ca3af' : '#3b82f6',
+                            backgroundColor: currentIngredient.isAnalyzing ? '#9ca3af' : '#f43f5e',
                             color: 'white',
                             border: 'none',
                             borderRadius: '8px',
@@ -850,7 +850,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                     >
                       <span
                         style={{
-                          backgroundColor: '#3b82f6',
+                          backgroundColor: '#f43f5e',
                           color: 'white',
                           borderRadius: '50%',
                           width: '24px',
@@ -883,7 +883,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                           style={{
                             padding: '0.5rem 1rem',
                             backgroundColor:
-                              currentIngredient.type === foodType ? '#3b82f6' : '#f3f4f6',
+                              currentIngredient.type === foodType ? '#f43f5e' : '#f3f4f6',
                             color: currentIngredient.type === foodType ? 'white' : '#374151',
                             border: 'none',
                             borderRadius: '8px',
@@ -919,7 +919,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                     >
                       <span
                         style={{
-                          backgroundColor: '#3b82f6',
+                          backgroundColor: '#f43f5e',
                           color: 'white',
                           borderRadius: '50%',
                           width: '24px',
@@ -1070,7 +1070,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span
                           style={{
-                            backgroundColor: '#3b82f6',
+                            backgroundColor: '#f43f5e',
                             color: 'white',
                             borderRadius: '50%',
                             width: '24px',
@@ -1098,7 +1098,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                         style={{
                           padding: '0.5rem 1rem',
                           backgroundColor: currentIngredient.showAdvancedNutrients
-                            ? '#3b82f6'
+                            ? '#f43f5e'
                             : '#f3f4f6',
                           color: currentIngredient.showAdvancedNutrients ? 'white' : '#374151',
                           border: 'none',
@@ -1648,7 +1648,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                       >
                         <span
                           style={{
-                            backgroundColor: '#3b82f6',
+                            backgroundColor: '#f43f5e',
                             color: 'white',
                             borderRadius: '50%',
                             width: '24px',
@@ -1792,7 +1792,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <span
                             style={{
-                              backgroundColor: '#3b82f6',
+                              backgroundColor: '#f43f5e',
                               color: 'white',
                               borderRadius: '50%',
                               width: '24px',
@@ -1812,7 +1812,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                           onClick={() => setShowAdvancedAntiNutrients(!showAdvancedAntiNutrients)}
                           style={{
                             padding: '0.5rem 1rem',
-                            backgroundColor: showAdvancedAntiNutrients ? '#3b82f6' : '#f3f4f6',
+                            backgroundColor: showAdvancedAntiNutrients ? '#f43f5e' : '#f3f4f6',
                             color: showAdvancedAntiNutrients ? 'white' : '#374151',
                             border: 'none',
                             borderRadius: '8px',
@@ -2030,7 +2030,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                       disabled={!currentIngredient.foodName.trim()}
                       style={{
                         padding: '0.75rem 1.5rem',
-                        backgroundColor: !currentIngredient.foodName.trim() ? '#9ca3af' : '#3b82f6',
+                        backgroundColor: !currentIngredient.foodName.trim() ? '#9ca3af' : '#f43f5e',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -2045,7 +2045,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                       disabled={recipeFoods.length === 0}
                       style={{
                         padding: '0.75rem 1.5rem',
-                        backgroundColor: recipeFoods.length === 0 ? '#9ca3af' : '#10b981',
+                        backgroundColor: recipeFoods.length === 0 ? '#9ca3af' : '#f43f5e',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -2066,7 +2066,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                       padding: '0.75rem',
                       backgroundColor: '#f0fdf4',
                       borderRadius: '8px',
-                      border: '1px solid #10b981',
+                      border: '1px solid #f43f5e',
                     }}
                   >
                     <p style={{ fontSize: '14px', fontWeight: '600', marginBottom: '0.5rem' }}>

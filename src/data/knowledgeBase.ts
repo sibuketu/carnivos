@@ -1,11 +1,10 @@
 /**
- * Primal Logic - Knowledge Base (理論武装データ)
+ * Primal Logic - Knowledge Base (Tips用データ)
  *
  * カーニボアダイエットに関する一般的な誤解（Myth）と科学的真実（Truth）を定義します。
  * これにより、ユーザーは「なぜカーニボアが正しいのか」を論理的に説明できるようになります。
  *
  * A robust collection of scientific arguments to debunk common Carnivore Diet criticisms.
- * Focuses on "Logic Armor": High specificity, mechanism of action, and statistical significance.
  */
 
 export interface KnowledgeItem {

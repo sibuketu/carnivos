@@ -71,8 +71,8 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
         ? (currentProtein / currentFat).toFixed(2)
         : '∞';
 
-    // エネルギー比率 (カロリーベース) - 参考用
-    const energyRatio = currentFat > 0
+    // エネルギー比率 (カロリーベース) - 参考用（将来表示用に計算のみ保持）
+    const _energyRatio = currentFat > 0
         ? ((currentFat * 9) / ((currentProtein * 4) + (currentFat * 9)) * 100).toFixed(0)
         : '0';
 

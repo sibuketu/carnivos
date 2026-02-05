@@ -175,7 +175,7 @@ export default function NutrientTrendChart({
             <Line
               type="monotone"
               dataKey="target"
-              stroke="#bef264" /* Neon Lime/ish */
+              stroke="#f43f5e" /* Neon Red */
               strokeWidth={2}
               strokeDasharray="5 5"
               name="目標値"

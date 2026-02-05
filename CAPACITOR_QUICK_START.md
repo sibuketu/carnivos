@@ -1,103 +1,84 @@
 # Capacitorクイックスタート（2026-01-03）
 
-> Webアプリをネイティブアプリ化する簡単な手順
+> Webアプリをネイティブアプリ化する手順。コピペするものはすべてコードブロック。パスは絶対パス（CarnivOS）。
 
 ---
 
-## ✅ 完了した作業
+## 完了した作業
 
-1. **Capacitorのインストール**: 完了 ✅
-2. **Capacitorの初期化**: 完了 ✅
+1. **Capacitorのインストール**: 完了
+2. **Capacitorの初期化**: 完了
 
 ---
 
-## 🚀 次のステップ（簡単な方法）
+## 次のステップ
 
 ### 方法1: バッチファイルを使用（推奨）
 
-**Windows:**
-1. `setup-capacitor.bat` をダブルクリック
-2. 自動的にビルド、Androidプラットフォーム追加、同期が実行されます
+1. エクスプローラーで次のパスを開く（アドレスバーに貼る）:
 
-### 方法2: 手動で実行
-
-**1. Webアプリをビルド**
-```bash
-npm run build
+```
+C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web
 ```
 
-**2. Androidプラットフォームを追加**
-```bash
-npx cap add android
+2. `setup-capacitor.bat` をダブルクリック
+
+### 方法2: PowerShell で実行（コピペ1ブロック）
+
+ビルド → Android 同期 → Android Studio で開く、まで一括:
+
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npm run build; npx cap sync android; npx cap open android
 ```
 
-**3. Capacitorに同期**
-```bash
-npx cap sync
+**Android Studio で開くだけ（コピペ1ブロック）:**
+
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npx cap open android
 ```
 
-**4. Android Studioで開く**
-```bash
-npx cap open android
+**コードを変えたあと（ビルドと同期のみ・コピペ1ブロック）:**
+
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npm run build; npx cap sync android
 ```
 
 ---
 
-## 📱 iOS対応について
+## iOS対応について
 
-**注意**: WindowsではiOSプラットフォームの追加はできません。
-
-**iOS対応が必要な場合:**
-1. macOSが必要です
-2. Xcodeが必要です
-3. 以下のコマンドを実行:
-   ```bash
-   npx cap add ios
-   npx cap sync
-   npx cap open ios
-   ```
+**注意**: WindowsではiOSプラットフォームの追加・sync はできません（pod が無いため）。macOS が必要です。
 
 ---
 
-## 🎯 実機でテスト
+## 実機でテスト
 
 ### Android
 
-1. Android Studioで開く: `npx cap open android`
+1. 上記ブロックで Android Studio を開く
 2. 実機をUSBで接続
-3. Android Studioで「Run」ボタンをクリック
-4. 実機でアプリが起動します
+3. 「Run」ボタンをクリック
+4. 実機でアプリが起動する
 
 ### iOS（macOSが必要）
 
-1. Xcodeで開く: `npx cap open ios`
-2. 実機をUSBで接続
-3. Xcodeで「Run」ボタンをクリック
-4. 実機でアプリが起動します
+1. macOS で `npx cap open ios` を実行
+2. 実機を接続して Xcode で Run
 
 ---
 
-## 🔍 Recovery Protocolの確認
+## Recovery Protocolの確認
 
-**Webアプリ版に実装されている機能:**
-- ✅ Recovery Protocol表示
-- ✅ Recovery Protocol生成
-- ✅ Recovery Protocol設定
-- ✅ 「明日のログに追加」機能
-
-**Capacitorでネイティブ化した場合:**
-- ✅ 全ての機能がそのまま動作します
-- ✅ Recovery Protocolも動作します（心配なし）
+表示・生成・設定・「明日のログに追加」はネイティブ化後もそのまま動作する。
 
 ---
 
-## 📝 注意事項
+## 注意事項
 
-1. **ビルド**: ネイティブアプリを実行する前に、必ず`npm run build`を実行してください
-2. **同期**: コードを変更したら、`npx cap sync`を実行してください
-3. **iOS**: WindowsではiOS開発はできません（macOSが必要）
+- **ビルド**: 実行前にビルドと同期を行う（上記ブロック参照）。
+- **同期**: コードを変更したら上記「コードを変えたあと」ブロックを実行。
+- **iOS**: WindowsではiOS開発はできません。
 
 ---
 
-最終更新: 2026-01-03
-
+最終更新: 2026-02-03

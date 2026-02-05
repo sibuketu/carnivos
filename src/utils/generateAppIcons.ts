@@ -15,8 +15,7 @@ import { logError } from './errorHandler';
 async function main() {
   try {
     const results = await generateMultipleAppIcons();
-    results.forEach((result, index) => {
-    });
+    results.forEach((_result, _index) => {});
   } catch (error) {
     logError(error, { component: 'generateAppIcons', action: 'main' });
     process.exit(1);

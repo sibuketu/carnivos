@@ -12,14 +12,16 @@
  */
 
 import { logError } from './errorHandler';
+import { getNutrientDisplaySettings, type NutrientKey } from './nutrientDisplaySettings';
 
 /**
  * 栄養素の表示モード（debugモード削除：detailedと重複のため）
- * - simple: シンプルモード（電解質+脂質のみ）- カーニボア実践者向け
+ * - simple: シンプルモード（電解質+脂質のみ、タンパク質は非表示）- カーニボア実践者向け
  * - standard: 標準モード（重要な栄養素10項目）- 初心者向け
  * - detailed: 詳細モード（全栄養素60項目以上）- データ重視ユーザー向け
+ * - custom: カスタム（ユーザーが栄養素表示設定で選択したもののみ）
  */
-export type NutrientDisplayMode = 'simple' | 'standard' | 'detailed';
+export type NutrientDisplayMode = 'simple' | 'standard' | 'detailed' | 'custom';
 
 /**
  * 栄養素のTier分類（アプリ表示順）
@@ -139,17 +141,22 @@ export const TIER1_CATEGORIES = {
 
 /**
  * 栄養素の表示モードに応じて表示する栄養素を取得
+ * simple = 電解質と脂質のみ（タンパク質は表示しない）
  */
 export function getNutrientsForMode(mode: NutrientDisplayMode): readonly string[] {
   switch (mode) {
     case 'simple':
-      return NUTRIENT_TIERS.tier1;
+      return [...TIER1_CATEGORIES.electrolytes, 'fat'];
     case 'standard':
       return [...NUTRIENT_TIERS.tier1, ...NUTRIENT_TIERS.tier2];
     case 'detailed':
       return [...NUTRIENT_TIERS.tier1, ...NUTRIENT_TIERS.tier2, ...NUTRIENT_TIERS.tier3];
+    case 'custom': {
+      const settings = getNutrientDisplaySettings();
+      return (Object.keys(settings) as NutrientKey[]).filter((k) => settings[k]);
+    }
     default:
-      return NUTRIENT_TIERS.tier1;
+      return [...TIER1_CATEGORIES.electrolytes, 'fat'];
   }
 }
 
@@ -157,9 +164,9 @@ export function getNutrientsForMode(mode: NutrientDisplayMode): readonly string[
  * 栄養素のTierを取得
  */
 export function getNutrientTier(nutrientKey: string): 1 | 2 | 3 | null {
-  if (NUTRIENT_TIERS.tier1.includes(nutrientKey as any)) return 1;
-  if (NUTRIENT_TIERS.tier2.includes(nutrientKey as any)) return 2;
-  if (NUTRIENT_TIERS.tier3.includes(nutrientKey as any)) return 3;
+  if (NUTRIENT_TIERS.tier1.includes(nutrientKey as (typeof NUTRIENT_TIERS.tier1)[number])) return 1;
+  if (NUTRIENT_TIERS.tier2.includes(nutrientKey as (typeof NUTRIENT_TIERS.tier2)[number])) return 2;
+  if (NUTRIENT_TIERS.tier3.includes(nutrientKey as (typeof NUTRIENT_TIERS.tier3)[number])) return 3;
   return null;
 }
 
@@ -185,15 +192,13 @@ const STORAGE_KEY = 'primal_logic_nutrient_display_mode';
 export function getNutrientDisplayMode(): NutrientDisplayMode {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    // debugモードは削除済み（detailedに統合）
     if (saved === 'debug') return 'detailed';
-    if (saved && ['simple', 'standard', 'detailed'].includes(saved)) {
+    if (saved && ['simple', 'standard', 'detailed', 'custom'].includes(saved)) {
       return saved as NutrientDisplayMode;
     }
   } catch (error) {
     logError(error, { component: 'nutrientPriority', action: 'getNutrientDisplayMode' });
   }
-  // デフォルトは標準モード（初心者に優しい）
   return 'standard';
 }
 
@@ -214,11 +219,13 @@ export function saveNutrientDisplayMode(mode: NutrientDisplayMode): void {
 export function getNutrientDisplayModeDescription(mode: NutrientDisplayMode): string {
   switch (mode) {
     case 'simple':
-      return 'カーニボア実践者向け。電解質と脂質のみ表示。「数値管理」から「身体感覚」への回帰。';
+      return '電解質と脂質のみ。タンパク質は表示しません。';
     case 'standard':
-      return '初心者向け。重要な栄養素10項目を表示。安心感のある情報量。';
+      return '重要な栄養素10項目を表示。';
     case 'detailed':
-      return 'データ重視ユーザー向け。全ての栄養素（60項目以上）を表示。';
+      return '全ての栄養素（60項目以上）を表示。';
+    case 'custom':
+      return '設定で選択した栄養素のみ表示。';
     default:
       return '';
   }

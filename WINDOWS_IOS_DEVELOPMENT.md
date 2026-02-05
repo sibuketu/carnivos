@@ -85,7 +85,7 @@
 - WebアプリをPWA対応にすることで、iOSでも「ホーム画面に追加」可能
 - App Store審査不要
 - すぐに利用可能
-- **既に実装済み**（`manifest.json`、Service Worker等）
+- **既に完了**（`manifest.json`、Service Worker等）
 
 ### 制限事項
 - App Storeには出せない

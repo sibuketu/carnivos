@@ -140,7 +140,7 @@ function getCursorTodos(): TodoItem[] {
       if (Array.isArray(todos)) {
         return todos;
       }
-    } catch (error) {
+    } catch {
       console.warn('コマンドライン引数のパースに失敗しました。デフォルトのTODOリストを使用します。');
     }
   }

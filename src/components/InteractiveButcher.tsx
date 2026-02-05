@@ -94,9 +94,11 @@ export default function InteractiveButcher({
   useEffect(() => {
     if (portion !== null && unit === 'g') {
       const calculatedAmount = Math.round(packSize * portion);
-      setAmount(calculatedAmount);
+      if (amount !== calculatedAmount) {
+        setAmount(calculatedAmount);
+      }
     }
-  }, [packSize, portion, unit]);
+  }, [packSize, portion, unit, amount]);
 
   // 動物タイプに応じたSVGをレンダリング
   const renderSVG = () => {

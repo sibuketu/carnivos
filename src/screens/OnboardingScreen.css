@@ -38,11 +38,25 @@
   margin: 0;
 }
 
+.onboarding-screen-progress-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.onboarding-screen-progress-text {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
 .onboarding-screen-progress {
   display: flex;
   gap: 0.5rem;
   justify-content: center;
-  margin-top: 0.5rem;
 }
 
 .onboarding-screen-progress-dot {

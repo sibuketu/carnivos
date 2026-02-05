@@ -148,7 +148,7 @@ export default function StreakTrackerScreen({ onBack }: StreakTrackerScreenProps
         >
           <StreakCalendar
             logs={logs}
-            onDayClick={(date) => {
+            onDayClick={(_date) => {
               // 履歴画面に遷移
               const event = new CustomEvent('navigateToScreen', { detail: 'history' });
               window.dispatchEvent(event);

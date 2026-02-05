@@ -605,7 +605,7 @@ function getSavedTipIds(): string[] {
   try {
     const saved = localStorage.getItem('@primal_logic:saved_tips');
     return saved ? JSON.parse(saved) : [];
-  } catch (e) {
+  } catch {
     return [];
   }
 }

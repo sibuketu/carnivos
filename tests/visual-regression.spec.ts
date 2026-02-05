@@ -1,15 +1,7 @@
-import { test, expect } from '@playwright/test';
-
-/**
- * Visual Regression Tests - UIの見た目をテスト
- * 
- * スクリーンショットを比較して、UIの変更を検出します
- */
+import { test, expect, type Page } from '@playwright/test';
 
 test.describe('Visual Regression Tests - UI見た目テスト', () => {
-  
-  // 同意・オンボーディングをスキップするヘルパー関数
-  async function skipConsentAndOnboarding(page: any) {
+  async function skipConsentAndOnboarding(page: Page) {
     await page.evaluate(() => {
       localStorage.setItem('primal_logic_consent_accepted', 'true');
       localStorage.setItem('primal_logic_onboarding_completed', 'true');

@@ -8,7 +8,6 @@
 import {
   BIOAVAILABILITY_COEFFICIENTS,
   DYNAMIC_REQUIREMENTS,
-  FIBER_TARGET,
   FIBER_WARNING_THRESHOLD,
   ELECTROLYTE_THRESHOLDS,
 } from '../constants/carnivore_constants';
@@ -29,7 +28,7 @@ import type { FoodItem, CalculatedMetrics, UserProfile } from '../types';
  * - Otherwise: 10 + (carbs * 0.4)（炭水化物摂取量に応じて増加）
  */
 export function calculateVitaminCRequirement(netCarbs: number): number {
-  const { base, carbPenalty, highCarbThreshold, highCarbRequirement } =
+  const { base, carbPenalty, highCarbRequirement } =
     DYNAMIC_REQUIREMENTS.vitaminC;
 
   // Gemini提案: Glucose-Ascorbate Antagonism理論
@@ -602,4 +601,27 @@ export function calculateEffectiveCalcium(calcium: number, vitaminD: number): nu
     return calcium * 0.5; // ビタミンD不足時は吸収率50%
   }
   return calcium; // ビタミンD充足時は100%
+}
+
+/** 肉・魚・卵などからの水分量（ml）。重量の約65% */
+export const WATER_FROM_FOOD_RATIO = 0.65;
+
+/**
+ * 食品重量から水分量（ml）を計算
+ * 肉・魚・卵などは約65%が水分
+ */
+export function calculateWaterFromFood(foods: Array<{ amount: number; unit: string; type?: string }>): number {
+  return foods.reduce((sum, f) => {
+    if (f.unit === '個' || f.unit === 'piece') {
+      return sum + Math.round(50 * WATER_FROM_FOOD_RATIO); // 卵1個≈50g
+    }
+    return sum + Math.round(f.amount * WATER_FROM_FOOD_RATIO);
+  }, 0);
+}
+
+/** 水分目標値（ml/日）。基本2.5L、体重で補正 */
+export function getWaterTargetMl(weightKg?: number): number {
+  const base = 2500;
+  if (!weightKg || weightKg <= 0) return base;
+  return Math.round(base * (weightKg / 70)); // 70kg基準
 }

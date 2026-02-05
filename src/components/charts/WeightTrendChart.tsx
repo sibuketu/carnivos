@@ -140,18 +140,18 @@ export default function WeightTrendChart({ logs, period = 'daily' }: WeightTrend
               borderRadius: '8px',
               color: '#e4e4e7',
             }}
-            itemStyle={{ color: '#06b6d4' }}
+            itemStyle={{ color: '#f43f5e' }}
             labelStyle={{ color: '#a1a1aa' }}
           />
           <Legend wrapperStyle={{ color: '#a1a1aa' }} />
           <Line
             type="monotone"
             dataKey="weight"
-            stroke="#06b6d4" /* Neon Cyan */
+            stroke="#f43f5e" /* Neon Red */
             strokeWidth={3}
             name="体重"
-            dot={{ r: 4, fill: '#09090b', stroke: '#06b6d4', strokeWidth: 2 }}
-            activeDot={{ r: 6, fill: '#06b6d4', stroke: '#fff' }}
+            dot={{ r: 4, fill: '#09090b', stroke: '#f43f5e', strokeWidth: 2 }}
+            activeDot={{ r: 6, fill: '#f43f5e', stroke: '#fff' }}
           />
         </LineChart>
       </ResponsiveContainer>

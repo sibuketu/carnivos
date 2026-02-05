@@ -5,12 +5,15 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from '../utils/i18n';
 import { logError } from '../utils/errorHandler';
+import { setFeedbackContributor } from '../utils/featureDisplaySettings';
 import './FeedbackScreen.css';
 
 type FeedbackType = 'bug' | 'feature' | 'general';
 
 export default function FeedbackScreen() {
+  const { t } = useTranslation();
   const [type, setType] = useState<FeedbackType>('general');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
@@ -22,7 +25,7 @@ export default function FeedbackScreen() {
     e.preventDefault();
 
     if (!message.trim()) {
-      alert('メッセージを入力してください');
+      alert(t('feedback.pleaseEnterMessage'));
       return;
     }
 
@@ -32,7 +35,7 @@ export default function FeedbackScreen() {
       // メール送信用の件名を先に作成
       const emailSubject = subject || '（件名なし）';
       const encodedSubject = encodeURIComponent(
-        `[Primal Logic ${type === 'bug' ? 'Bug Report' : type === 'feature' ? 'Feature Request' : 'Feedback'}] ${emailSubject}`
+        `[CarnivOS ${type === 'bug' ? 'Bug Report' : type === 'feature' ? 'Feature Request' : 'Feedback'}] ${emailSubject}`
       );
 
       // フィードバックデータを構築
@@ -62,12 +65,13 @@ export default function FeedbackScreen() {
           `User Agent: ${feedbackData.userAgent}\n` +
           `URL: ${feedbackData.url}`
       );
+      // #35: バグ報告・機能提案はフィードバックご褒美対象
+      if (type === 'bug' || type === 'feature') {
+        setFeedbackContributor();
+      }
+
       const mailtoLink = `mailto:sibuketu12345@gmail.com?subject=${encodedSubject}&body=${body}`;
       window.location.href = mailtoLink;
-
-      // 開発環境ではコンソールに出力
-      if (import.meta.env.DEV) {
-      }
 
       setSubmitted(true);
       setSubject('');
@@ -80,7 +84,7 @@ export default function FeedbackScreen() {
       }, 3000);
     } catch (error) {
       logError(error, { component: 'FeedbackScreen', action: 'handleSubmit', type });
-      alert('フィードバックの送信に失敗しました');
+      alert(t('feedback.sendFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -95,15 +99,15 @@ export default function FeedbackScreen() {
           }}
           className="feedback-back-button"
         >
-          ← 設定に戻る
+          {t('feedback.backToSettings')}
         </button>
-        <h1 className="feedback-title">フィードバック</h1>
-        <p className="feedback-description">バグ報告、機能リクエスト、ご意見をお聞かせください。</p>
+        <h1 className="feedback-title">{t('feedback.title')}</h1>
+        <p className="feedback-description">{t('feedback.description')}</p>
 
         <form onSubmit={handleSubmit} className="feedback-form">
           <div className="feedback-form-group">
             <label htmlFor="feedback-type" className="feedback-label">
-              種類
+              {t('feedback.type')}
             </label>
             <select
               id="feedback-type"
@@ -111,15 +115,15 @@ export default function FeedbackScreen() {
               onChange={(e) => setType(e.target.value as FeedbackType)}
               className="feedback-select"
             >
-              <option value="general">一般的なフィードバック</option>
-              <option value="bug">バグ報告</option>
-              <option value="feature">機能リクエスト</option>
+              <option value="general">{t('feedback.typeGeneral')}</option>
+              <option value="bug">{t('feedback.typeBug')}</option>
+              <option value="feature">{t('feedback.typeFeature')}</option>
             </select>
           </div>
 
           <div className="feedback-form-group">
             <label htmlFor="feedback-subject" className="feedback-label">
-              件名（任意）
+              {t('feedback.subject')}
             </label>
             <input
               id="feedback-subject"
@@ -127,13 +131,13 @@ export default function FeedbackScreen() {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               className="feedback-input"
-              placeholder="例：栄養素の計算が正しくない"
+              placeholder={t('feedback.subjectPlaceholder')}
             />
           </div>
 
           <div className="feedback-form-group">
             <label htmlFor="feedback-message" className="feedback-label">
-              メッセージ <span className="feedback-required">*</span>
+              {t('feedback.message')} <span className="feedback-required">*</span>
             </label>
             <textarea
               id="feedback-message"
@@ -142,13 +146,13 @@ export default function FeedbackScreen() {
               required
               className="feedback-textarea"
               rows={8}
-              placeholder="詳細を入力してください..."
+              placeholder={t('feedback.messagePlaceholder')}
             />
           </div>
 
           <div className="feedback-form-group">
             <label htmlFor="feedback-email" className="feedback-label">
-              メールアドレス（任意・返信が必要な場合）
+              {t('feedback.email')}
             </label>
             <input
               id="feedback-email"
@@ -156,7 +160,7 @@ export default function FeedbackScreen() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="feedback-input"
-              placeholder="example@email.com"
+              placeholder={t('feedback.emailPlaceholder')}
             />
           </div>
 
@@ -165,13 +169,18 @@ export default function FeedbackScreen() {
             disabled={submitting || !message.trim()}
             className="feedback-button"
           >
-            {submitting ? '送信中...' : '送信'}
+            {submitting ? t('feedback.sending') : t('feedback.send')}
           </button>
         </form>
 
         {submitted && (
           <div className="feedback-success">
-            ✅ フィードバックを送信しました。ありがとうございます！
+            {t('feedback.success')}
+            {(type === 'bug' || type === 'feature') && (
+              <div className="feedback-reward" style={{ marginTop: '0.5rem', fontSize: '0.9em', opacity: 0.9 }}>
+                {t('feedback.reward')}
+              </div>
+            )}
           </div>
         )}
       </div>

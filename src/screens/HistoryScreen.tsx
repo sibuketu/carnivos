@@ -46,8 +46,7 @@ export default function HistoryScreen() {
 
   useEffect(() => {
     loadLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 初回のみ実行
+  }, []);
 
   // デバッグモード変更と食品追加を監視
   const loadLogsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,13 +89,11 @@ export default function HistoryScreen() {
       window.removeEventListener('debugModeChanged', handleDebugModeChange);
       window.removeEventListener('dailyLogUpdated', handleDailyLogUpdated);
       window.removeEventListener('foodAdded', handleFoodAdded);
-      // タイムアウトをクリア
       if (loadLogsTimeoutRef.current) {
         clearTimeout(loadLogsTimeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // loadLogsはuseCallbackでメモ化されているため、依存配列から除外
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -134,13 +131,6 @@ export default function HistoryScreen() {
       logError(error, { action: 'deleteDailyLog', date });
       const errorMessage = getUserFriendlyErrorMessage(error);
       alert(`${t('history.deleteFailed')}: ${errorMessage}`);
-    }
-  };
-
-  const handleNutrientClick = (nutrient: string) => {
-    const card = getArgumentCardByNutrient(nutrient);
-    if (card) {
-      setSelectedArgumentCard(nutrient);
     }
   };
 
@@ -777,7 +767,7 @@ export default function HistoryScreen() {
                                         style={{
                                           padding: '0.25rem 0.5rem',
                                           fontSize: '12px',
-                                          backgroundColor: '#3b82f6',
+                                          backgroundColor: '#f43f5e',
                                           color: 'white',
                                           border: 'none',
                                           borderRadius: '4px',
@@ -879,8 +869,8 @@ export default function HistoryScreen() {
                                   const tier1Keys = NUTRIENT_GROUPS.electrolytes.nutrients;
                                   const tier2Keys = NUTRIENT_GROUPS.macros.nutrients;
                                   const otherKeys = Object.keys(nutrientConfigs).filter(k =>
-                                    !tier1Keys.includes(k as any) &&
-                                    !tier2Keys.includes(k as any)
+                                    !tier1Keys.includes(k as (typeof tier1Keys)[number]) &&
+                                    !tier2Keys.includes(k as (typeof tier2Keys)[number])
                                   );
 
                                   return (
@@ -895,8 +885,11 @@ export default function HistoryScreen() {
                             </div>
                           )}
 
-                          {/* その他タブで展開時はステータス・日記を表示 */}
-                          {false && (
+                          {/* その他タブで展開時はステータス・日記を表示（将来用） */}
+                          {(() => {
+                            const showDetailSection = false;
+                            return showDetailSection;
+                          })() && (
                             <div className="history-screen-detail">
                               <div className="history-screen-detail-section">
                                 <div className="history-screen-detail-label">

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { getDailyLogs, getDailyLogByDate, saveDailyLog } from '../utils/storage';
+import { getDailyLogByDate, saveDailyLog } from '../utils/storage';
 import { calculateAllMetrics } from '../utils/nutrientCalculator';
 import { useTranslation } from '../utils/i18n';
-import { logError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
+import { logError } from '../utils/errorHandler';
 import type { DailyLog, DailyStatus } from '../types';
 import './DiaryScreen.css';
 
@@ -28,45 +28,58 @@ interface MetricDefinition {
 
 const METRICS: MetricDefinition[] = [
   // Physical
-  { id: 'weight', label: '体重', type: 'number', unit: 'kg', category: 'physical', connectable: true },
-  { id: 'bodyFatPercentage', label: '体脂肪率', type: 'number', unit: '%', category: 'physical', connectable: true },
-  { id: 'bodyTemperature', label: '体温', type: 'number', unit: '℃', category: 'physical', step: 0.1, connectable: true },
-  { id: 'heartRate', label: '安静時心拍数', type: 'number', unit: 'bpm', category: 'physical', connectable: true },
-  { id: 'energyLevel', label: 'エネルギーレベル', type: 'slider', min: 1, max: 10, category: 'physical' },
-  { id: 'physicalFatigue', label: '身体的疲労感', type: 'slider', min: 1, max: 10, category: 'physical' },
-  { id: 'muscleSoreness', label: '筋肉痛', type: 'slider', min: 1, max: 10, category: 'physical' },
-  { id: 'bowelMovement.status', label: '便通', type: 'select', options: ['normal', 'constipated', 'loose', 'watery'], category: 'physical' },
-  { id: 'libido', label: '性欲', type: 'slider', min: 1, max: 10, category: 'physical' },
+  { id: 'weight', label: 'Weight', labelKey: 'diary.metric.weight', type: 'number', unit: 'kg', category: 'physical', connectable: true },
+  { id: 'bodyFatPercentage', label: 'Body fat %', type: 'number', unit: '%', category: 'physical', connectable: true },
+  { id: 'bodyTemperature', label: 'Body temp', type: 'number', unit: '℃', category: 'physical', step: 0.1, connectable: true },
+  { id: 'heartRate', label: 'Resting HR', type: 'number', unit: 'bpm', category: 'physical', connectable: true },
+  { id: 'systolicBloodPressure', label: 'Blood pressure (systolic)', type: 'number', unit: 'mmHg', category: 'physical', connectable: true },
+  { id: 'diastolicBloodPressure', label: 'Blood pressure (diastolic)', type: 'number', unit: 'mmHg', category: 'physical', connectable: true },
+  { id: 'energyLevel', label: 'Energy level', type: 'slider', min: 1, max: 10, category: 'physical' },
+  { id: 'physicalFatigue', label: 'Physical fatigue', type: 'slider', min: 1, max: 10, category: 'physical' },
+  { id: 'muscleSoreness', label: 'Muscle soreness', type: 'slider', min: 1, max: 10, category: 'physical' },
+  { id: 'jointPain', label: 'Joint pain', type: 'slider', min: 1, max: 10, category: 'physical' },
+  { id: 'headache', label: 'Headache', type: 'slider', min: 1, max: 10, category: 'physical' },
+  { id: 'bowelMovement.status', label: 'Bowel movement', type: 'select', options: ['normal', 'constipated', 'loose', 'watery'], category: 'physical' },
+  { id: 'skinCondition', label: 'Skin condition', type: 'select', options: ['good', 'dry', 'oily', 'acne', 'rash'], category: 'physical' },
+  { id: 'libido', label: 'Libido', type: 'slider', min: 1, max: 10, category: 'physical' },
 
   // Mental
-  { id: 'mood', label: '気分', type: 'select', options: ['great', 'good', 'neutral', 'bad', 'terrible'], category: 'mental' },
-  { id: 'focus', label: '集中力', type: 'slider', min: 1, max: 10, category: 'mental' },
-  { id: 'anxiety', label: '不安', type: 'slider', min: 1, max: 10, category: 'mental' },
-  { id: 'motivation', label: 'やる気', type: 'slider', min: 1, max: 10, category: 'mental' },
-  { id: 'brainFog', label: 'ブレインフォグ', type: 'slider', min: 1, max: 10, category: 'mental' },
-  { id: 'stressLevel', label: 'ストレスレベル', type: 'select', options: ['low', 'medium', 'high'], category: 'mental', connectable: true },
+  { id: 'mood', label: 'Mood', type: 'select', options: ['great', 'good', 'neutral', 'bad', 'terrible'], category: 'mental' },
+  { id: 'focus', label: 'Focus', type: 'slider', min: 1, max: 10, category: 'mental' },
+  { id: 'anxiety', label: 'Anxiety', type: 'slider', min: 1, max: 10, category: 'mental' },
+  { id: 'motivation', label: 'Motivation', type: 'slider', min: 1, max: 10, category: 'mental' },
+  { id: 'brainFog', label: 'Brain fog', type: 'slider', min: 1, max: 10, category: 'mental' },
+  { id: 'stressLevel', label: 'Stress level', type: 'select', options: ['low', 'medium', 'high'], category: 'mental', connectable: true },
 
   // Sleep
-  { id: 'sleepScore', label: '睡眠スコア', type: 'slider', min: 0, max: 100, category: 'sleep', connectable: true },
-  { id: 'sleepHours', label: '睡眠時間', type: 'number', unit: 'h', category: 'sleep', step: 0.5, connectable: true },
-  { id: 'bedTime', label: '就床時刻', type: 'time', category: 'sleep', connectable: true },
-  { id: 'wakeTime', label: '起床時刻', type: 'time', category: 'sleep', connectable: true },
-  { id: 'deepSleep', label: '深い睡眠', type: 'number', unit: 'min', category: 'sleep', connectable: true },
-  { id: 'snoring', label: 'いびき', type: 'boolean', category: 'sleep', connectable: true },
+  { id: 'sleepScore', label: 'Sleep score', type: 'slider', min: 0, max: 100, category: 'sleep', connectable: true },
+  { id: 'sleepHours', label: 'Sleep hours', type: 'number', unit: 'h', category: 'sleep', step: 0.5, connectable: true },
+  { id: 'bedTime', label: 'Bedtime', type: 'time', category: 'sleep', connectable: true },
+  { id: 'wakeTime', label: 'Wake time', type: 'time', category: 'sleep', connectable: true },
+  { id: 'deepSleep', label: 'Deep sleep', type: 'number', unit: 'min', category: 'sleep', connectable: true },
+  { id: 'sleepLatency', label: 'Sleep latency', type: 'number', unit: 'min', category: 'sleep', connectable: true },
+  { id: 'awakeCount', label: 'Night awakenings', type: 'number', unit: 'times', category: 'sleep', connectable: true },
+  { id: 'snoring', label: 'Snoring', type: 'boolean', category: 'sleep', connectable: true },
 
   // Social
-  { id: 'socialInteractions', label: '社交頻度', type: 'slider', min: 0, max: 10, category: 'social' },
-  { id: 'loneliness', label: '孤独感', type: 'slider', min: 1, max: 10, category: 'social' },
-  { id: 'socialSatisfaction', label: '社交満足度', type: 'slider', min: 1, max: 10, category: 'social' },
-  { id: 'sharedMeal', label: '誰かと食事', type: 'boolean', category: 'social' },
-  { id: 'partnerIntimacy', label: 'パートナーとの時間', type: 'boolean', category: 'social' },
+  { id: 'socialInteractions', label: 'Social interactions', type: 'slider', min: 0, max: 10, category: 'social' },
+  { id: 'loneliness', label: 'Loneliness', type: 'slider', min: 1, max: 10, category: 'social' },
+  { id: 'socialSatisfaction', label: 'Social satisfaction', type: 'slider', min: 1, max: 10, category: 'social' },
+  { id: 'sharedMeal', label: 'Shared meal', type: 'boolean', category: 'social' },
+  { id: 'partnerIntimacy', label: 'Partner intimacy', type: 'boolean', category: 'social' },
 
   // Environment
-  { id: 'weather', label: '天気', type: 'select', options: ['sunny', 'cloudy', 'rainy', 'snowy'], category: 'environment', connectable: true },
-  { id: 'sunMinutes', label: '日光浴', type: 'number', unit: 'min', category: 'environment' },
-  { id: 'coldExposureMinutes', label: '寒冷暴露', type: 'number', unit: 'min', category: 'environment' },
-  { id: 'saunaMinutes', label: 'サウナ', type: 'number', unit: 'min', category: 'environment' },
-  { id: 'meditationMinutes', label: '瞑想', type: 'number', unit: 'min', category: 'environment' },
+  { id: 'weather', label: 'Weather', type: 'select', options: ['sunny', 'cloudy', 'rainy', 'snowy'], category: 'environment', connectable: true },
+  { id: 'sunMinutes', label: 'Sun exposure', type: 'number', unit: 'min', category: 'environment' },
+  { id: 'temperature', label: 'Room temp', type: 'number', unit: '℃', category: 'environment', step: 0.5 },
+  { id: 'humidity', label: 'Humidity', type: 'number', unit: '%', category: 'environment' },
+  { id: 'coldExposureMinutes', label: 'Cold exposure', type: 'number', unit: 'min', category: 'environment' },
+  { id: 'saunaMinutes', label: 'Sauna', type: 'number', unit: 'min', category: 'environment' },
+  { id: 'meditationMinutes', label: 'Meditation', type: 'number', unit: 'min', category: 'environment' },
+
+  // Other
+  { id: 'fastingHours', label: 'Fasting hours', type: 'number', unit: 'h', category: 'physical', step: 0.5 },
+  { id: 'glucose', label: 'Blood glucose', type: 'number', unit: 'mg/dL', category: 'physical', connectable: true },
 ];
 
 export default function DiaryScreen({ onBack }: DiaryScreenProps) {
@@ -109,14 +122,16 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
     loadDateLog();
   }, [selectedDate]);
 
-  const handleMetricChange = (id: string, value: any) => {
+  const handleMetricChange = (id: string, value: number | string | boolean) => {
     setMetrics((prev) => {
       if (id.includes('.')) {
         const [parent, child] = id.split('.');
+        const parentObj = prev[parent as keyof DailyStatus];
+        const base = (parentObj && typeof parentObj === 'object' ? parentObj as Record<string, unknown> : {}) as Record<string, unknown>;
         return {
           ...prev,
           [parent]: {
-            ...(prev[parent as keyof DailyStatus] as any || {}),
+            ...base,
             [child]: value,
           },
         };
@@ -179,7 +194,10 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
   const getMetricValue = (id: string) => {
     if (id.includes('.')) {
       const [parent, child] = id.split('.');
-      return (metrics[parent as keyof DailyStatus] as any)?.[child];
+      const parentVal = metrics[parent as keyof DailyStatus];
+      return (parentVal && typeof parentVal === 'object' && parentVal !== null && child in parentVal)
+        ? (parentVal as Record<string, unknown>)[child]
+        : undefined;
     }
     return metrics[id as keyof DailyStatus];
   };
@@ -192,9 +210,14 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
       <div key={metric.id} className="metric-item">
         <div className="metric-row">
           <div className="metric-label-group">
-            <span className="metric-label">{metric.label}</span>
+            <span className="metric-label">{t('diary.metric.' + String(metric.id).split('.')[0])}</span>
             {metric.connectable && (
-              <button className="connect-button" title="デバイス連携 (未実装)">
+              <button
+                type="button"
+                className="connect-button"
+                title="デバイス連携"
+                onClick={() => window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'healthDevice' }))}
+              >
                 🔗
               </button>
             )}
@@ -242,7 +265,7 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
               onChange={(e) => handleMetricChange(metric.id, e.target.value)}
               className="metric-select"
             >
-              <option value="">選択</option>
+              <option value="">{t('diary.selectPlaceholder')}</option>
               {metric.options?.map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
@@ -283,7 +306,7 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
     <div className="diary-screen-container">
       <div className="diary-screen-header">
         <button onClick={onBack} className="back-button">←</button>
-        <h1 className="diary-screen-title">Daily Log</h1>
+        <h1 className="diary-screen-title">{t('diary.screenTitle')}</h1>
         <div className="date-selector">
           <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
         </div>
@@ -305,24 +328,24 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
             displayedMetrics.map(renderMetricInput)
           ) : (
             <div className="empty-state">
-              {activeTab === 'favorites' ? 'お気に入りが登録されていません。★を押して追加してください。' : '項目がありません'}
+              {activeTab === 'favorites' ? t('diary.emptyFavorites') : t('diary.emptyItems')}
             </div>
           )}
         </div>
 
         <div className="diary-text-section">
-          <h3>自由記述日記</h3>
+          <h3>{t('diary.freeFormTitle')}</h3>
           <textarea
             value={diary}
             onChange={(e) => setDiary(e.target.value)}
-            placeholder="今日の出来事、体調詳細、食べたものの感想など..."
+            placeholder={t('diary.freeFormPlaceholder')}
             rows={6}
             className="diary-textarea"
           />
         </div>
 
         <button onClick={handleSave} className="save-log-button" disabled={isSaving}>
-          {isSaving ? '保存中...' : '記録を保存'}
+          {isSaving ? t('diary.saving') : t('diary.saveRecord')}
         </button>
       </div>
     </div>

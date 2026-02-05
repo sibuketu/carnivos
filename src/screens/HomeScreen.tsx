@@ -8,10 +8,9 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import { useTranslation } from '../utils/i18n';
 import MiniNutrientGauge from '../components/MiniNutrientGauge';
-import OmegaRatioGauge from '../components/OmegaRatioGauge';
-import CalciumPhosphorusRatioGauge from '../components/CalciumPhosphorusRatioGauge';
 import ArgumentCard from '../components/ArgumentCard';
 import RecoveryProtocolScreen from './RecoveryProtocolScreen';
+// QuestLog, BodyMap3D, LogicShield imports removed
 import ButcherSelect from '../components/butcher/ButcherSelect';
 import PFRatioGauge from '../components/gauge/PFRatioGauge';
 import StorageNutrientGauge from '../components/StorageNutrientGauge';
@@ -19,27 +18,36 @@ import StorageNutrientGauge from '../components/StorageNutrientGauge';
 import { useNutrition, type PreviewData } from '../hooks/useNutrition';
 import { useSettings } from '../hooks/useSettings';
 import { getArgumentCardByNutrient } from '../data/argumentCards';
-import { getNutrientDisplaySettings, type NutrientKey } from '../utils/nutrientDisplaySettings';
+import { type NutrientKey } from '../utils/nutrientDisplaySettings';
 import { getFeatureDisplaySettings } from '../utils/featureDisplaySettings';
 import { getAllFoodHistory } from '../utils/foodHistory';
 import { getMyFoods, addMyFood, removeMyFood, type MyFoodItem } from '../utils/myFoodsStorage';
-import { searchFoods, getFoodById } from '../data/foodsDatabase';
-import { getTodayLog, getDailyLogs } from '../utils/storage';
-import { calculateAllMetrics } from '../utils/nutrientCalculator';
+import { searchFoods } from '../data/foodsDatabase';
+import { getDailyLogs } from '../utils/storage';
 import { getCarnivoreTargets } from '../data/carnivoreTargets';
+import {
+  calculateWaterFromFood,
+  getWaterTargetMl,
+} from '../utils/nutrientCalculator';
+import { generateRecoveryProtocol } from '../utils/recoveryAlgorithm';
+import { VIOLATION_TYPES } from '../constants/carnivore_constants';
+import type { RecoveryProtocol } from '../types';
 import { getNutrientColor, NUTRIENT_GROUPS } from '../utils/gaugeUtils';
-import { isNutrientVisibleInMode, getNutrientDisplayMode } from '../utils/nutrientPriority';
+import {
+  isNutrientVisibleInMode,
+  getNutrientDisplayMode,
+  saveNutrientDisplayMode,
+  type NutrientDisplayMode,
+} from '../utils/nutrientPriority';
 import { calculateStreak, type StreakData } from '../utils/streakCalculator';
-import { calculateTransitionProgress } from '../data/transitionGuide';
-import TransitionBanner from '../components/TransitionBanner';
-import TransitionGuideModal from '../components/TransitionGuideModal';
+// Removed TransitionBanner and TransitionGuideModal imports
 import BarcodeScannerModal from '../components/BarcodeScannerModal';
 import type { AnimalType } from '../data/deepNutritionData';
 import type { FoodItem } from '../types';
-import { logError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
+import { logError } from '../utils/errorHandler';
 import PhotoAnalysisModal from '../components/PhotoAnalysisModal';
 import FoodEditModal from '../components/dashboard/FoodEditModal';
-// import './HomeScreen.css';
+import './HomeScreen.css';
 
 interface HomeScreenProps {
   onOpenFatTabReady?: (callback: () => void) => void;
@@ -48,7 +56,7 @@ interface HomeScreenProps {
 
 export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeScreenProps = {}) {
   const { t } = useTranslation();
-  const { dailyLog, setRecoveryProtocol, addFood, userProfile } = useApp();
+  const { dailyLog, setRecoveryProtocol, addFood, updateWaterIntake, userProfile } = useApp();
   const { previewData, setPreview, clearPreview } = useNutrition();
   const { showNutrientPreview } = useSettings();
   const featureDisplaySettings = getFeatureDisplaySettings();
@@ -76,9 +84,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       userProfile?.supplementIodine,
       userProfile?.alcoholFrequency,
       userProfile?.caffeineIntake,
-      userProfile?.daysOnCarnivore, // Phase 1: 移行期間判定用
-      userProfile?.carnivoreStartDate, // Phase 1: 移行期間判定用
-      userProfile?.forceAdaptationMode, // Phase 1: 手動オーバーライド
+      // Phase 1 related params removed (daysOnCarnivore, start, mode)
       userProfile?.bodyComposition, // Phase 3: 体組成設定
       userProfile?.weight, // Phase 3: 体重（LBM計算用）
       userProfile?.metabolicStressIndicators, // Phase 4: 代謝ストレス指標
@@ -94,17 +100,18 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
   }, [userProfile]);
   const [selectedArgumentCard, setSelectedArgumentCard] = useState<string | null>(null);
   const [showRecoveryProtocol, setShowRecoveryProtocol] = useState(false);
+  const [recoveryProtocolForModal, setRecoveryProtocolForModal] = useState<RecoveryProtocol | null>(null);
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState<AnimalType | null>(null);
-  const [showSecondaryMenu, setShowSecondaryMenu] = useState(false);
+  const [_showSecondaryMenu, _setShowSecondaryMenu] = useState(false);
   const [showMyFoods, setShowMyFoods] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [myFoodsList, setMyFoodsList] = useState<MyFoodItem[]>([]);
   const [historyList, setHistoryList] = useState<
     Array<{ foodName: string; amount: number; unit: 'g' | '個'; date: string }>
   >([]);
-  const [streakData, setStreakData] = useState<StreakData | null>(null);
-  const [showTransitionGuide, setShowTransitionGuide] = useState(false);
+  const [_streakData, setStreakData] = useState<StreakData | null>(null);
+  // Removed showTransitionGuide state
   const [showAmountModal, setShowAmountModal] = useState(false);
   const [selectedHistoryFood, setSelectedHistoryFood] = useState<{
     foodName: string;
@@ -119,6 +126,9 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
   const [myFoodsSearchQuery, setMyFoodsSearchQuery] = useState<string>('');
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const [showPhotoOrBarcodeModal, setShowPhotoOrBarcodeModal] = useState(false);
+  const [feedbackBannerHidden, setFeedbackBannerHidden] = useState(false);
+  // 栄養素表示モード切替時に useMemo を再計算させるため
+  const [nutrientDisplayModeVersion, setNutrientDisplayModeVersion] = useState(0);
 
   // AI写真解析確認モーダル用ステート
   const [showPhotoConfirmation, setShowPhotoConfirmation] = useState(false);
@@ -129,8 +139,8 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
     nutrients?: Record<string, number>;
     followupQuestions?: string[];
   } | null>(null);
-  const [followupAnswers, setFollowupAnswers] = useState<Record<string, string>>({});
-  const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [_followupAnswers, setFollowupAnswers] = useState<Record<string, string>>({});
+  const [_isAIProcessing, _setIsAIProcessing] = useState(false);
 
   // Storage Gauge State
   const [storageLevels, setStorageLevels] = useState<{ [key: string]: number }>({
@@ -141,6 +151,41 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
   });
 
   // Storage Decay Logic
+  const handleStorageRefill = useCallback((food: FoodItem) => {
+    if (!food.nutrients) return;
+
+    const nutrientKeys = ['vitamin_a', 'vitamin_d', 'vitamin_b12', 'iron'] as const;
+    const newLevels = { ...storageLevels };
+    let hasChanges = false;
+
+    nutrientKeys.forEach((key) => {
+      const amount = food.nutrients![key] || 0;
+      // dynamicTargets keys match the storage keys
+      const target = (dynamicTargets as Record<string, number>)[key] || 0;
+
+      if (amount > 0 && target > 0) {
+        const weeklyTarget = target * 7;
+        const refillPercentage = (amount / weeklyTarget) * 100;
+
+        // Add to current level, cap at 100
+        const currentLevel = newLevels[key] || 0;
+        newLevels[key] = Math.min(100, currentLevel + refillPercentage);
+        hasChanges = true;
+      }
+    });
+
+    if (hasChanges) {
+      setStorageLevels(newLevels);
+      localStorage.setItem('nutrient_storage_levels', JSON.stringify(newLevels));
+    }
+  }, [storageLevels, dynamicTargets]);
+
+  const handleAddFoodWrapper = async (food: FoodItem) => {
+    await addFood(food);
+    handleStorageRefill(food);
+  };
+
+  // Storage Decay Logic
   useEffect(() => {
     const STORAGE_KEY = 'nutrient_storage_levels';
     const LAST_UPDATE_KEY = 'nutrient_storage_last_update';
@@ -149,7 +194,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
     const lastUpdate = localStorage.getItem(LAST_UPDATE_KEY);
     const today = new Date().toISOString().split('T')[0];
 
-    let currentLevels = savedStorage
+    const currentLevels = savedStorage
       ? JSON.parse(savedStorage)
       : { vitamin_a: 70, vitamin_d: 70, vitamin_b12: 70, iron: 70 };
 
@@ -180,12 +225,8 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
   // 統一確認画面 (FoodEditModal) 用ステート
   const [showFoodEditModal, setShowFoodEditModal] = useState(false);
   const [editingFood, setEditingFood] = useState<FoodItem | null>(null);
-  const transitionProgress = useMemo(() => {
-    return calculateTransitionProgress(
-      userProfile?.daysOnCarnivore,
-      userProfile?.carnivoreStartDate
-    );
-  }, [userProfile?.daysOnCarnivore, userProfile?.carnivoreStartDate]);
+
+  // Transition Progress Logic Removed
 
   // ストリークデータを読み込み
   useEffect(() => {
@@ -222,7 +263,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
     }
     if (onAddFoodReady) {
       onAddFoodReady((foodItem) => {
-        addFood(foodItem); // 食品を追加
+        handleAddFoodWrapper(foodItem); // 食品を追加
       });
     }
     hasRegisteredCallbacks.current = true;
@@ -241,6 +282,26 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       loadHistory();
     }
   }, [showHistory]);
+
+  // AIチャットから「リカバリープロトコルを設定」でホームに遷移したとき、リカバリー画面を開く
+  const defaultRecoveryProtocol = useMemo(
+    () => generateRecoveryProtocol(VIOLATION_TYPES.SUGAR_CARBS),
+    []
+  );
+  useEffect(() => {
+    if (localStorage.getItem('primal_logic_open_recovery_protocol') === '1') {
+      localStorage.removeItem('primal_logic_open_recovery_protocol');
+      setRecoveryProtocolForModal(defaultRecoveryProtocol);
+      setShowRecoveryProtocol(true);
+    }
+  }, [defaultRecoveryProtocol]);
+
+  // 電解質の食品表示（リカバリー画面から）
+  useEffect(() => {
+    const handler = () => setSelectedAnimal('ruminant');
+    window.addEventListener('openButcherSelect', handler);
+    return () => window.removeEventListener('openButcherSelect', handler);
+  }, []);
 
   const loadMyFoods = async () => {
     // ユーザーが明示的に登録した「いつもの食品」のみを表示
@@ -367,7 +428,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           ])
         ) as FoodItem['nutrients'],
       };
-      addFood(foodItem);
+      handleAddFoodWrapper(foodItem);
       // 履歴更新を確実にするため、少し遅延させてからイベントを発火
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('dailyLogUpdated'));
@@ -389,7 +450,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
         type: 'animal', // デフォルト
         nutrients: {},
       };
-      addFood(foodItem);
+      handleAddFoodWrapper(foodItem);
       // 履歴更新を確実にするため、少し遅延させてからイベントを発火
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('dailyLogUpdated'));
@@ -422,7 +483,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       },
     };
 
-    addFood(foodItem);
+    handleAddFoodWrapper(foodItem);
     // 履歴更新を確実にするため、少し遅延させてからイベントを発火
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent('dailyLogUpdated'));
@@ -471,7 +532,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           ])
         ) as FoodItem['nutrients'],
       };
-      addFood(foodItem);
+      handleAddFoodWrapper(foodItem);
       // 履歴更新を確実にするため、少し遅延させてからイベントを発火
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('dailyLogUpdated'));
@@ -493,7 +554,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
         type: 'animal', // デフォルト
         nutrients: {},
       };
-      addFood(foodItem);
+      handleAddFoodWrapper(foodItem);
       // 履歴更新を確実にするため、少し遅延させてからイベントを発火
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('dailyLogUpdated'));
@@ -526,7 +587,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       },
     };
 
-    addFood(foodItem);
+    handleAddFoodWrapper(foodItem);
     // 履歴更新を確実にするため、少し遅延させてからイベントを発火
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent('dailyLogUpdated'));
@@ -534,8 +595,8 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
     setShowMyFoods(false);
   };
 
-  // プレビューゲージを生成（既に食べたもの + プレビューを分けて表示）
-  const previewGauges = useMemo(() => {
+  // プレビューゲージを生成（既に食べたもの + プレビューを分けて表示）（将来表示用に保持）
+  const _previewGauges = useMemo(() => {
     if (!previewData) return [];
 
     // dailyLogがない場合のデフォルト値
@@ -647,8 +708,29 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       },
     };
 
-    // 現在の表示モードを取得（Simple/Standard/Detailed）
+    // 現在の表示モードを取得（Simple/Standard/Detailed/Custom）
     const displayMode = getNutrientDisplayMode();
+
+    const modeLabel: Record<NutrientDisplayMode, string> = {
+      simple: 'シンプル',
+      standard: '標準',
+      detailed: '詳細',
+      custom: 'カスタム',
+    };
+
+    const handleCycleNutrientMode = () => {
+      const m = getNutrientDisplayMode();
+      const next: NutrientDisplayMode =
+        m === 'simple'
+          ? 'standard'
+          : m === 'standard'
+            ? 'detailed'
+            : m === 'detailed'
+              ? 'custom'
+              : 'simple';
+      saveNutrientDisplayMode(next);
+      setNutrientDisplayModeVersion((v) => v + 1);
+    };
 
     // Tierごとのグループ定義
     // Tierごとのグループ定義 (gaugeUtilsから取得)
@@ -700,6 +782,19 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
 
     return (
       <div className="space-y-6">
+        {/* 表示モード切替: シンプル→もっと見る→標準→詳細→簡略表示 */}
+        <div className="flex items-center justify-between gap-2 mb-1 text-sm text-gray-500">
+          <span>表示: {modeLabel[displayMode]}</span>
+          {displayMode !== 'custom' && (
+            <button
+              type="button"
+              onClick={handleCycleNutrientMode}
+              className="text-amber-600 hover:underline font-medium"
+            >
+              {displayMode === 'detailed' ? '簡略表示' : 'もっと見る'}
+            </button>
+          )}
+        </div>
         {/* Tier 1: Essentials (Electrolytes) */}
         {visibleTier1.length > 0 && (
           <div className="tier-section">
@@ -746,27 +841,35 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
               label="Vitamin A"
               currentStorage={storageLevels.vitamin_a}
               nutrientKey="vitamin_a"
+              dailyTarget={dynamicTargets.vitamin_a}
+              unit="IU"
             />
             <StorageNutrientGauge
               label="Vitamin D"
               currentStorage={storageLevels.vitamin_d}
               nutrientKey="vitamin_d"
+              dailyTarget={dynamicTargets.vitamin_d}
+              unit="IU"
             />
             <StorageNutrientGauge
               label="Vitamin B12"
               currentStorage={storageLevels.vitamin_b12}
               nutrientKey="vitamin_b12"
+              dailyTarget={dynamicTargets.vitamin_b12}
+              unit="μg"
             />
             <StorageNutrientGauge
               label="Iron"
               currentStorage={storageLevels.iron}
               nutrientKey="iron"
+              dailyTarget={dynamicTargets.iron}
+              unit="mg"
             />
           </div>
         </div>
       </div >
     );
-  }, [previewData, dailyLog]);
+  }, [previewData, dailyLog, nutrientDisplayModeVersion]);
 
   // 動物タイプのマッピング（AnimalType -> ButcherSelectのAnimalType）
   const mapAnimalType = (animal: AnimalType): 'ruminant' | 'pork_poultry' | 'seafood' | 'eggs_fats' | 'organs' | null => {
@@ -786,30 +889,148 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       {/* PとFの充分な摂取量ゲージ（Master Specification準拠: ホーム画面の最上部に常時表示） */}
       <PFRatioGauge previewData={previewData} showPreview={showNutrientPreview} />
 
+      {/* 水分ゲージ（飲んだ水 + 食品由来） */}
+      {(() => {
+        const waterDrunk = dailyLog?.waterIntake ?? 0;
+        const waterFromFood = dailyLog?.fuel?.length
+          ? calculateWaterFromFood(
+            dailyLog.fuel.map((f) => ({ amount: f.amount, unit: f.unit, type: f.type }))
+          )
+          : 0;
+        const waterTotal = waterDrunk + waterFromFood;
+        const waterTarget = getWaterTargetMl(userProfile?.weight);
+        const waterPercent = waterTarget > 0 ? Math.min(100, (waterTotal / waterTarget) * 100) : 0;
+        return (
+          <div
+            style={{
+              margin: '0.5rem 1rem',
+              padding: '0.5rem 0.75rem',
+              backgroundColor: waterPercent >= 100 ? '#dcfce7' : waterPercent >= 50 ? '#fef9c3' : '#fee2e2',
+              borderRadius: '8px',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
+            }}
+          >
+            <span>
+              💧 {waterTotal}ml / {waterTarget}ml
+              {waterFromFood > 0 && (
+                <span style={{ fontSize: '12px', color: '#78716c', marginLeft: '0.25rem' }}>
+                  （食品由来+{waterFromFood}ml）
+                </span>
+              )}
+            </span>
+            <div style={{ display: 'flex', gap: '0.25rem' }}>
+              {[200, 500].map((ml) => (
+                <button
+                  key={ml}
+                  onClick={() => updateWaterIntake(ml)}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '6px',
+                    border: '1px solid #a3a3a3',
+                    backgroundColor: '#fafaf9',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  +{ml}ml
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* コンテンツエリア */}
       <div className="home-screen-content" style={{ paddingTop: '100px' }}>
-        {/* Phase 1: 移行期間バナー（移行期間中のみ表示） */}
-        {transitionProgress && (
-          <TransitionBanner
-            daysInTransition={transitionProgress.daysInTransition}
-            totalDays={transitionProgress.totalDays}
-            onPress={() => setShowTransitionGuide(true)}
-          />
-        )}
+        {/* フィードバック促進バナー（オンボ後など最初のうち表示。品質満足で「今後表示しない」可能） */}
+        {(() => {
+          const DISABLED_KEY = 'primal_logic_feedback_prompt_disabled';
+          const DISMISSED_KEY = 'primal_logic_feedback_prompt_dismissed_at';
+          const disabled = localStorage.getItem(DISABLED_KEY) === 'true';
+          const dismissedAt = localStorage.getItem(DISMISSED_KEY);
+          const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+          const showBanner = !feedbackBannerHidden && !disabled && (!dismissedAt || (Date.now() - parseInt(dismissedAt, 10)) > threeDaysMs);
+          if (!showBanner) return null;
+          return (
+            <div
+              style={{
+                padding: '0.75rem',
+                marginBottom: '0.75rem',
+                backgroundColor: '#eff6ff',
+                border: '1px solid #f43f5e',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '0.25rem' }}>{t('feedback.promptTitle')}</div>
+                <div style={{ fontSize: '12px', color: '#1e40af' }}>{t('feedback.promptDesc')}</div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nav = (window as unknown as { __navigateToScreen?: (s: string) => void }).__navigateToScreen;
+                    if (nav) nav('feedback');
+                    else window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'feedback', bubbles: true }));
+                  }}
+                  style={{
+                    padding: '0.4rem 0.75rem',
+                    backgroundColor: '#f43f5e',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t('feedback.promptCta')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.setItem(DISMISSED_KEY, String(Date.now()));
+                    setFeedbackBannerHidden(true);
+                  }}
+                  style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: '#64748b' }}
+                >
+                  {t('feedback.promptDismiss')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.setItem(DISABLED_KEY, 'true');
+                    setFeedbackBannerHidden(true);
+                  }}
+                  style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', color: '#94a3b8' }}
+                >
+                  {t('feedback.promptDisable')}
+                </button>
+              </div>
+            </div>
+          );
+        })()}
 
-        {/* Phase 1: 移行期間ガイド画面（モーダル） */}
-        {showTransitionGuide && transitionProgress && (
-          <TransitionGuideModal
-            progress={transitionProgress}
-            onClose={() => setShowTransitionGuide(false)}
-          />
-        )}
+        {/* Phase 1: Transition Banner & Guide removed */}
 
-
+        {/* Phase 5 & 6: Gamification & Bio-Vis Elements */}
+        {/* Gamification Elements Removed */}
 
         {/* Symptom Checker removed - replaced with AI Prompt Chips in Magic Input */}
 
-        {/* 通知設定（常に表示） */}
+        {/* 通知設定（未設定の場合のみ表示） */}
+        {!(typeof localStorage !== 'undefined' && localStorage.getItem('settings_notification_enabled') === 'true') &&
+         !(typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') && (
         <div
           style={{
             padding: '0.75rem',
@@ -835,6 +1056,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             </div>
           </div>
           <button
+            data-testid="enable-notifications"
             onClick={async () => {
               const notificationPermission = 'Notification' in window ? Notification.permission : 'default';
               if (notificationPermission === 'denied') {
@@ -864,6 +1086,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             有効にする
           </button>
         </div>
+        )}
 
         {/* 食品追加ボタン */}
         <div className="home-screen-section" style={{ position: 'relative', zIndex: 10 }}>
@@ -879,6 +1102,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             }}
           >
             <button
+              data-testid="add-food"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -1325,15 +1549,15 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             <div className="flex items-center justify-between mb-3">
               <h2 className="home-screen-section-title">
                 {selectedAnimal === 'ruminant' || selectedAnimal === 'beef' || selectedAnimal === 'lamb'
-                  ? 'Ruminant Meat'
+                  ? '反芻・牛・羊'
                   : selectedAnimal === 'pork_poultry' || selectedAnimal === 'pork' || selectedAnimal === 'chicken'
-                    ? 'Pork & Poultry'
+                    ? '豚・鶏'
                     : selectedAnimal === 'seafood' || selectedAnimal === 'fish'
-                      ? 'Seafood'
+                      ? '魚介'
                       : selectedAnimal === 'eggs_fats' || selectedAnimal === 'egg'
-                        ? 'Eggs & Fats'
+                        ? '卵・脂'
                         : selectedAnimal === 'organs'
-                          ? 'Organs'
+                          ? '内臓'
                           : t('home.food')}{' '}
                 {t('home.select')}
               </h2>
@@ -1346,9 +1570,9 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             </div>
             <ButcherSelect
               initialAnimal={mapAnimalType(selectedAnimal)!}
-              onSelect={(animal, part) => {
+              onSelect={(_animal, _part) => {
                 if (import.meta.env.DEV) {
-
+                  // 開発時のみログ等に利用可能
                 }
               }}
               onPreviewChange={handlePreviewChange}
@@ -1423,16 +1647,20 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           />
         )}
 
-        {/* Recovery Protocol Screen */}
+        {/* Recovery Protocol Screen（AIから開いた場合は recoveryProtocolForModal、既存ログの場合は dailyLog.recoveryProtocol） */}
         {featureDisplaySettings.recoveryProtocol &&
           showRecoveryProtocol &&
-          dailyLog?.recoveryProtocol && (
+          (recoveryProtocolForModal ?? dailyLog?.recoveryProtocol ?? defaultRecoveryProtocol) && (
             <RecoveryProtocolScreen
-              protocol={dailyLog.recoveryProtocol}
-              onClose={() => setShowRecoveryProtocol(false)}
+              protocol={recoveryProtocolForModal ?? dailyLog?.recoveryProtocol ?? defaultRecoveryProtocol}
+              onClose={() => {
+                setShowRecoveryProtocol(false);
+                setRecoveryProtocolForModal(null);
+              }}
               onSetProtocol={(protocol) => {
                 setRecoveryProtocol(protocol);
                 setShowRecoveryProtocol(false);
+                setRecoveryProtocolForModal(null);
               }}
             />
           )}
@@ -1822,418 +2050,144 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
         onClose={() => setShowPhotoConfirmation(false)}
         analysisResult={photoAnalysisResult!}
         onConfirm={(foodItem) => {
-          addFood(foodItem);
+          handleAddFoodWrapper(foodItem);
           setShowPhotoConfirmation(false);
           setPhotoAnalysisResult(null);
         }}
         dynamicTargets={dynamicTargets}
       />
-      {/* 旧コード（無効化） */}
-      {false && showPhotoConfirmation && photoAnalysisResult && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-          }}
-          onClick={() => setShowPhotoConfirmation(false)}
-        >
-          <div
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '16px',
-              padding: '1.5rem',
-              width: '90%',
-              maxWidth: '500px',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2
-              style={{
-                fontSize: '20px',
-                fontWeight: 'bold',
-                marginBottom: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              📸 解析結果の確認
-            </h2>
 
-            <div
-              style={{
-                marginBottom: '1.5rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem',
-              }}
-            >
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    color: '#374151',
-                  }}
-                >
-                  食品名
-                </label>
-                <input
-                  type="text"
-                  value={photoAnalysisResult.foodName}
-                  onChange={(e) =>
-                    setPhotoAnalysisResult({ ...photoAnalysisResult, foodName: e.target.value })
-                  }
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                  }}
-                />
-              </div>
-
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontWeight: '600',
-                    fontSize: '14px',
-                    color: '#374151',
-                  }}
-                >
-                  量 (g)
-                </label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <input
-                    type="number"
-                    value={photoAnalysisResult.estimatedWeight}
-                    onChange={(e) =>
-                      setPhotoAnalysisResult({
-                        ...photoAnalysisResult,
-                        estimatedWeight: Number(e.target.value),
-                      })
-                    }
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      fontSize: '16px',
-                    }}
-                  />
-                  <span style={{ fontWeight: '600' }}>g</span>
-                </div>
-              </div>
-
-              {/* フォローアップ質問（詳細確認） */}
-              {photoAnalysisResult.followupQuestions &&
-                photoAnalysisResult.followupQuestions.length > 0 && (
-                  <div
-                    style={{
-                      marginTop: '1rem',
-                      padding: '1rem',
-                      backgroundColor: '#f0f9ff',
-                      borderRadius: '8px',
-                      border: '1px solid #bae6fd',
-                    }}
-                  >
-                    <h3
-                      style={{
-                        fontSize: '15px',
-                        fontWeight: 'bold',
-                        color: '#0369a1',
-                        marginBottom: '0.75rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      🤖 AIからの確認
-                      <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#0c4a6e' }}>
-                        （より正確に計算します）
-                      </span>
-                    </h3>
-                    {photoAnalysisResult.followupQuestions.map((question, index) => (
-                      <div key={index} style={{ marginBottom: '1rem' }}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '0.5rem',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            color: '#0c4a6e',
-                          }}
-                        >
-                          {question}
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="例: はい、10g / いいえ / 目玉焼き2個"
-                          value={followupAnswers[question] || ''}
-                          onChange={(e) =>
-                            setFollowupAnswers({ ...followupAnswers, [question]: e.target.value })
-                          }
-                          style={{
-                            width: '100%',
-                            padding: '0.6rem',
-                            border: '1px solid #bae6fd',
-                            borderRadius: '6px',
-                            fontSize: '14px',
-                          }}
-                        />
-                      </div>
-                    ))}
-
-                    <button
-                      onClick={async () => {
-                        if (isAIProcessing) return;
-                        try {
-                          setIsAIProcessing(true);
-                          const { refineFoodAnalysis } = await import('../services/aiService');
-                          const refined = await refineFoodAnalysis(
-                            photoAnalysisResult,
-                            followupAnswers
-                          );
-                          setPhotoAnalysisResult({ ...refined, followupQuestions: [] }); // 質問完了とする
-                          // followupAnswersはクリアしない（何と答えたか残してもいいが、今回はクリアせずそのまま次へ）
-                        } catch (e) {
-                          alert('再計算に失敗しました');
-                        } finally {
-                          setIsAIProcessing(false);
-                        }
-                      }}
-                      disabled={isAIProcessing || Object.keys(followupAnswers).length === 0}
-                      style={{
-                        width: '100%',
-                        padding: '0.6rem',
-                        backgroundColor: isAIProcessing ? '#cbd5e1' : '#0ea5e9',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontWeight: '600',
-                        cursor: isAIProcessing ? 'not-allowed' : 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      {isAIProcessing ? '計算中...' : '🔄 回答を反映して再計算'}
-                    </button>
-                  </div>
-                )}
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                gap: '1rem',
-                justifyContent: 'flex-end',
-                marginTop: '1rem',
-              }}
-            >
-              <button
-                onClick={() => setShowPhotoConfirmation(false)}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: '#f3f4f6',
-                  color: '#374151',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                }}
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={() => {
-                  // 最終的に追加 -> FoodEditModalへ
-                  const ratio = photoAnalysisResult.estimatedWeight / 100;
-                  const nutrients: Record<string, number> = {};
-
-                  if (photoAnalysisResult.nutrients) {
-                    Object.entries(photoAnalysisResult.nutrients).forEach(([key, value]) => {
-                      nutrients[key] = (value as number) * ratio;
-                    });
-                  }
-
-                  const foodItem: FoodItem = {
-                    item: photoAnalysisResult.foodName,
-                    amount: photoAnalysisResult.estimatedWeight,
-                    unit: 'g' as const,
-                    type: (photoAnalysisResult.type as any) || 'animal',
-                    nutrients: Object.keys(nutrients).length > 0 ? nutrients : undefined,
-                  };
-
-                  setEditingFood(foodItem);
-                  setShowFoodEditModal(true);
-                  setShowPhotoConfirmation(false);
-                  setPhotoAnalysisResult(null);
-                }}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: '#dc2626',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  boxShadow: '0 2px 4px rgba(220, 38, 38, 0.3)',
-                }}
-              >
-                追加する
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 写真/バーコード選択モーダル */}
-      {showPhotoOrBarcodeModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10000,
-            padding: '1rem',
-          }}
-          onClick={() => setShowPhotoOrBarcodeModal(false)}
-        >
+      {
+        showPhotoOrBarcodeModal && (
           <div
             style={{
-              backgroundColor: 'white',
-              borderRadius: '16px',
-              padding: '1.5rem',
-              maxWidth: '400px',
-              width: '100%',
-              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000,
+              padding: '1rem',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setShowPhotoOrBarcodeModal(false)}
           >
-            <h3 style={{ margin: '0 0 1rem 0', fontSize: '18px', fontWeight: '600' }}>
-              追加方法を選択
-            </h3>
-            <p style={{ margin: '0 0 1.5rem 0', fontSize: '14px', color: '#6b7280' }}>
-              写真から追加するか、バーコードを読み取りますか？
-            </p>
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => {
-                  setShowPhotoOrBarcodeModal(false);
-                  setShowBarcodeScanner(true);
-                }}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: '#e5e7eb',
-                  color: '#374151',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                }}
-              >
-                バーコード読み取り
-              </button>
-              <button
-                onClick={async () => {
-                  setShowPhotoOrBarcodeModal(false);
-                  // 写真から追加
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.capture = 'environment';
-                  input.style.display = 'none';
-                  document.body.appendChild(input);
+            <div
+              style={{
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                padding: '1.5rem',
+                maxWidth: '400px',
+                width: '100%',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 style={{ margin: '0 0 1rem 0', fontSize: '18px', fontWeight: '600' }}>
+                追加方法を選択
+              </h3>
+              <p style={{ margin: '0 0 1.5rem 0', fontSize: '14px', color: '#6b7280' }}>
+                写真から追加するか、バーコードを読み取りますか？
+              </p>
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => {
+                    setShowPhotoOrBarcodeModal(false);
+                    setShowBarcodeScanner(true);
+                  }}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: '#e5e7eb',
+                    color: '#374151',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                  }}
+                >
+                  {t('home.barcodeScan')}
+                </button>
+                <button
+                  onClick={async () => {
+                    setShowPhotoOrBarcodeModal(false);
+                    // 写真から追加
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.capture = 'environment';
+                    input.style.display = 'none';
+                    document.body.appendChild(input);
 
-                  input.onchange = async (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (!file) {
-                      document.body.removeChild(input);
-                      return;
-                    }
-
-                    try {
-                      // ローディング表示
-                      const loadingMessage = document.createElement('div');
-                      loadingMessage.textContent = '写真を解析中...';
-                      loadingMessage.style.cssText =
-                        'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 1rem 2rem; border-radius: 8px; z-index: 10000;';
-                      document.body.appendChild(loadingMessage);
-
-                      const { analyzeFoodImage } = await import('../services/aiService');
-                      const result = await analyzeFoodImage(file);
-
-                      // ローディング表示を削除
-                      document.body.removeChild(loadingMessage);
-
-                      // 結果をセットして確認モーダルを表示
-                      setPhotoAnalysisResult(result);
-                      setFollowupAnswers({});
-                      setShowPhotoConfirmation(true);
-
-                      document.body.removeChild(input);
-                    } catch (error) {
-                      // ローディング表示を削除
-                      const loadingMessage = document.querySelector('div[style*="写真を解析中"]');
-                      if (loadingMessage) {
-                        document.body.removeChild(loadingMessage);
+                    input.onchange = async (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (!file) {
+                        document.body.removeChild(input);
+                        return;
                       }
 
-                      logError(error, { component: 'HomeScreen', action: 'handlePhotoUpload' });
-                      const { getUserFriendlyErrorMessage } = await import('../utils/errorHandler');
-                      alert(
-                        getUserFriendlyErrorMessage(error) ||
-                        '写真の解析に失敗しました。もう一度お試しください。'
-                      );
-                      document.body.removeChild(input);
-                    }
-                  };
+                      try {
+                        // ローディング表示
+                        const loadingMessage = document.createElement('div');
+                        loadingMessage.textContent = '写真を解析中...';
+                        loadingMessage.style.cssText =
+                          'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 1rem 2rem; border-radius: 8px; z-index: 10000;';
+                        document.body.appendChild(loadingMessage);
 
-                  input.click();
-                }}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: '#dc2626',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                }}
-              >
-                写真から追加
-              </button>
+                        const { analyzeFoodImage } = await import('../services/aiService');
+                        const result = await analyzeFoodImage(file);
+
+                        // ローディング表示を削除
+                        document.body.removeChild(loadingMessage);
+
+                        // 結果をセットして確認モーダルを表示
+                        setPhotoAnalysisResult(result);
+                        setFollowupAnswers({});
+                        setShowPhotoConfirmation(true);
+
+                        document.body.removeChild(input);
+                      } catch (error) {
+                        // ローディング表示を削除
+                        const loadingMessage = document.querySelector('div[style*="写真を解析中"]');
+                        if (loadingMessage) {
+                          document.body.removeChild(loadingMessage);
+                        }
+
+                        logError(error, { component: 'HomeScreen', action: 'handlePhotoUpload' });
+                        const { getUserFriendlyErrorMessage } = await import('../utils/errorHandler');
+                        alert(
+                          getUserFriendlyErrorMessage(error) ||
+                          '写真の解析に失敗しました。もう一度お試しください。'
+                        );
+                        document.body.removeChild(input);
+                      }
+                    };
+
+                    input.click();
+                  }}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                  }}
+                >
+                  {t('home.addFromPhoto')}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* バーコードスキャナーモーダル */}
       <BarcodeScannerModal
@@ -2254,19 +2208,21 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       />
 
       {/* 統一確認画面 (FoodEditModal) */}
-      {showFoodEditModal && editingFood && (
-        <FoodEditModal
-          isOpen={showFoodEditModal}
-          initialFood={editingFood}
-          onClose={() => setShowFoodEditModal(false)}
-          onSave={async (food) => {
-            await addFood(food);
-            setShowFoodEditModal(false);
-            setEditingFood(null);
-            clearPreview();
-          }}
-        />
-      )}
-    </div>
+      {
+        showFoodEditModal && editingFood && (
+          <FoodEditModal
+            isOpen={showFoodEditModal}
+            initialFood={editingFood}
+            onClose={() => setShowFoodEditModal(false)}
+            onSave={async (food) => {
+              await handleAddFoodWrapper(food);
+              setShowFoodEditModal(false);
+              setEditingFood(null);
+              clearPreview();
+            }}
+          />
+        )
+      }
+    </div >
   );
 }

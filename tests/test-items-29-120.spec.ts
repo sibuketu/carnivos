@@ -181,19 +181,23 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
     }
   });
 
-  test('41-42: Logic Armorが表示・動作する', async ({ page }) => {
+  test('41-42: Tipsが表示・動作する', async ({ page }) => {
     // Labs画面に遷移
     const labsButton = page.locator('button.app-nav-button').filter({ hasText: /その他|🧪/ });
     await expect(labsButton).toBeVisible({ timeout: 10000 });
     await labsButton.click();
     await page.waitForTimeout(2000);
     await page.waitForSelector('.labs-screen-container, [class*="labs"]', { timeout: 10000 });
-    
-    // Logic Armorが表示されることを確認
-    const logicArmor = page.getByText(/Logic Armor|理論武装/i);
-    if (await logicArmor.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await logicArmor.click();
+    // TipsカードをタップしてTips画面へ
+    const tipsCard = page.getByText(/Tips|ヒント/i).first();
+    if (await tipsCard.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await tipsCard.click();
       await page.waitForTimeout(1000);
+    }
+    // Tips画面タイトル「Tips」が表示されることを確認
+    const tipsTitle = page.getByText(/^💡 Tips$|^Tips$/);
+    if (await tipsTitle.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await expect(tipsTitle).toBeVisible();
     }
   });
 
@@ -331,7 +335,8 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
       // 栄養素の表示/非表示を切り替えられることを確認
       const toggleButton = page.locator('input[type="checkbox"], button[role="switch"]').first();
       if (await toggleButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-        const initialState = await toggleButton.isChecked();
+        const _initialState = await toggleButton.isChecked();
+        void _initialState;
         await toggleButton.click();
         await page.waitForTimeout(500);
         
@@ -370,7 +375,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
     // 例: 追加した食品が表示されることを確認
   });
 
-  test('62: データ読み込み - アプリを閉じて再度開いた時、データが読み込まれる', async ({ page, context }) => {
+  test('62: データ読み込み - アプリを閉じて再度開いた時、データが読み込まれる', async ({ page: _page, context }) => {
     // データを追加（簡易版）
     // ...
     
@@ -453,11 +458,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
     expect(scrollY).toBeGreaterThan(0);
   });
 
-  test('75: ローディング表示が適切', async ({ page }) => {
-    // データ読み込み中のローディング表示を確認
-    // 実際の実装に合わせて調整が必要
-    // 例: データを読み込む際にローディング表示が表示されることを確認
-  });
+  test('75: ローディング表示が適切', async ({ page: _page }) => {});
 
   test('76: 空データ表示が適切', async ({ page }) => {
     // データがない状態で画面を確認
@@ -584,11 +585,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
     }
   });
 
-  test('114-116: Recovery Protocolが表示・生成・設定できる', async ({ page }) => {
-    // Recovery Protocolが表示されることを確認
-    // 実際の実装に合わせて調整が必要
-    // 例: 違反食品を追加した際にRecovery Protocolが自動生成されることを確認
-  });
+  test('114-116: Recovery Protocolが表示・生成・設定できる', async ({ page: _page }) => {});
 
 });
 

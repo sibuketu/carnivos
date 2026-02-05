@@ -37,7 +37,7 @@ export default function ArgumentCard({ card, onClose }: ArgumentCardProps) {
     citationPatterns.forEach((pattern) => {
       const matches = cleanedText.match(pattern);
       if (matches) {
-        citations.push(...matches.map((m) => m.replace(/[\[\]]/g, '')));
+        citations.push(...matches.map((m) => m.replace(/[[\]]/g, '')));
         cleanedText = cleanedText.replace(pattern, '');
       }
     });

@@ -43,12 +43,6 @@ export default function OmegaRatioGauge({
 
   const status = getStatus();
 
-  const getStatusColor = () => {
-    if (status === 'optimal') return '#34C759';
-    if (status === 'warning') return '#FF3B30';
-    return '#FF9500';
-  };
-
   // シーソー表示用のパーセンテージ
   const total = totalOmega3 + totalOmega6;
   const omega3Percent = total > 0 ? (totalOmega3 / total) * 100 : 0;
@@ -68,7 +62,7 @@ export default function OmegaRatioGauge({
               <>
                 {ratio.toFixed(2)}:1 (Ω6:Ω3)
                 {(previewOmega3 > 0 || previewOmega6 > 0) && (
-                  <span style={{ color: '#3b82f6', marginLeft: '8px', fontSize: '0.9em' }}>
+                  <span style={{ color: '#f43f5e', marginLeft: '8px', fontSize: '0.9em' }}>
                     ({totalOmega3.toFixed(2)}g / {totalOmega6.toFixed(2)}g)
                   </span>
                 )}
@@ -77,7 +71,7 @@ export default function OmegaRatioGauge({
               <>
                 {totalOmega3.toFixed(2)}g / {totalOmega6.toFixed(2)}g
                 {(previewOmega3 > 0 || previewOmega6 > 0) && (
-                  <span style={{ color: '#3b82f6', marginLeft: '8px', fontSize: '0.9em' }}>
+                  <span style={{ color: '#f43f5e', marginLeft: '8px', fontSize: '0.9em' }}>
                     (+{previewOmega3.toFixed(2)}g / +{previewOmega6.toFixed(2)}g)
                   </span>
                 )}

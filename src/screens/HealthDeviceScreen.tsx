@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { saveHealthData, getHealthData, type HealthData } from '../utils/healthDeviceSync';
+import { getDailyLogByDate, saveDailyLog } from '../utils/storage';
 import { getGoogleFitData, type GoogleFitData } from '../utils/googleFitService';
 import { useTranslation } from '../utils/i18n';
 import { logError } from '../utils/errorHandler';
@@ -18,7 +19,7 @@ interface HealthDeviceScreenProps {
 }
 
 export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) {
-  const { t } = useTranslation();
+  const { t: _t } = useTranslation();
   const today = new Date().toISOString().split('T')[0];
   const [healthData, setHealthData] = useState<HealthData>(() => {
     const todayData = getHealthData(today);
@@ -52,9 +53,10 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
             caloriesBurned: data.caloriesBurned,
           }));
         }
-      } catch (error) {
+      } catch {
         // エラーは無視（手動入力にフォールバック）
         if (import.meta.env.DEV) {
+          // 開発時のみログ可能
         }
       } finally {
         setIsLoadingGoogleFit(false);
@@ -63,9 +65,26 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
     loadGoogleFitData();
   }, [today]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
       saveHealthData(healthData);
+      // 体重・体脂肪があれば今日の日記（DailyLog）にも反映
+      if (healthData.weight != null || healthData.bodyFatPercentage != null) {
+        const dayLog = await getDailyLogByDate(today);
+        const baseStatus = dayLog?.status ?? { sleepScore: 0, sunMinutes: 0, activityLevel: 'moderate' as const };
+        const nextStatus = {
+          ...baseStatus,
+          ...(healthData.weight != null && { weight: healthData.weight }),
+          ...(healthData.bodyFatPercentage != null && { bodyFatPercentage: healthData.bodyFatPercentage }),
+        };
+        await saveDailyLog({
+          date: today,
+          status: nextStatus,
+          fuel: dayLog?.fuel ?? [],
+          weight: healthData.weight,
+          bodyFatPercentage: healthData.bodyFatPercentage,
+        });
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (error) {
@@ -82,8 +101,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
         </button>
         <h1 className="health-device-title">健康デバイス連携</h1>
         <p className="health-device-description">
-          Webアプリでは直接的な連携は難しいため、手動で入力できます。
-          将来的にモバイルアプリ（Expo）でApple Health、Google Fitとの連携を実装予定です。
+          体重・体脂肪・歩数などは手動で入力できます。デバイス連携は審査中に実装予定です。
         </p>
         <div style={{ marginBottom: '1rem' }}>
           <button
@@ -100,7 +118,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
                     caloriesBurned: data.caloriesBurned,
                   });
                 }
-              } catch (error) {
+              } catch {
                 // エラーは無視
               } finally {
                 setIsLoadingGoogleFit(false);
@@ -109,7 +127,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
             disabled={isLoadingGoogleFit}
             style={{
               padding: '0.5rem 1rem',
-              backgroundColor: '#3b82f6',
+              backgroundColor: '#f43f5e',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -204,17 +222,57 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
             </label>
           </div>
 
+          <div className="health-device-input-group">
+            <label className="health-device-label">
+              体重 (kg)
+              <input
+                type="number"
+                value={healthData.weight ?? ''}
+                onChange={(e) =>
+                  setHealthData({
+                    ...healthData,
+                    weight: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+                placeholder="例: 70"
+                min="0"
+                step="0.1"
+                className="health-device-input"
+              />
+            </label>
+          </div>
+
+          <div className="health-device-input-group">
+            <label className="health-device-label">
+              体脂肪率 (%)
+              <input
+                type="number"
+                value={healthData.bodyFatPercentage ?? ''}
+                onChange={(e) =>
+                  setHealthData({
+                    ...healthData,
+                    bodyFatPercentage: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+                placeholder="例: 20"
+                min="0"
+                max="100"
+                step="0.1"
+                className="health-device-input"
+              />
+            </label>
+          </div>
+
           <button onClick={handleSave} className="health-device-save-button">
             {saved ? '✓ 保存しました' : '保存'}
           </button>
         </div>
 
         <div className="health-device-info">
-          <h3>将来実装予定</h3>
+          <h3>連携について</h3>
           <ul>
-            <li>Apple Health連携（iOS）</li>
-            <li>Google Fit連携（Android）</li>
-            <li>自動データ同期</li>
+            <li>体重・体脂肪: 手動入力で保存時に今日の日記にも反映されます。</li>
+            <li>デバイスAPI連携: 審査中に実装予定です。</li>
           </ul>
         </div>
       </div>

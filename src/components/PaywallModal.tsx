@@ -13,7 +13,7 @@ interface PaywallModalProps {
   onSubscribe: () => void;
 }
 
-export default function PaywallModal({ trialStatus, onSubscribe }: PaywallModalProps) {
+export default function PaywallModal({ trialStatus: _trialStatus, onSubscribe }: PaywallModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscribe = async () => {

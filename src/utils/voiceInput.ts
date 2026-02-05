@@ -192,8 +192,8 @@ export class VoiceInputManager {
    */
   static isAvailable(): boolean {
     interface WindowWithSpeechRecognition {
-      SpeechRecognition?: any;
-      webkitSpeechRecognition?: any;
+      SpeechRecognition?: object;
+      webkitSpeechRecognition?: object;
     }
     const win = window as unknown as WindowWithSpeechRecognition;
     const SpeechRecognition = win.SpeechRecognition || win.webkitSpeechRecognition;

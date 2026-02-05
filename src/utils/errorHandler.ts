@@ -8,7 +8,7 @@ export class AppError extends Error {
   constructor(
     message: string,
     public code?: string,
-    public context?: Record<string, any>
+    public context?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'AppError';
@@ -29,7 +29,7 @@ export type ErrorType =
 /**
  * エラーをユーザーフレンドリーなメッセージに変換
  */
-export function getUserFriendlyErrorMessage(error: unknown, context?: Record<string, any>): string {
+export function getUserFriendlyErrorMessage(error: unknown, _context?: Record<string, unknown>): string {
   if (error instanceof AppError) {
     return error.message;
   }
@@ -121,7 +121,7 @@ export function getErrorType(error: unknown): ErrorType {
 /**
  * エラーをログに記録（開発環境のみ）
  */
-export function logError(error: unknown, context?: Record<string, any>): void {
+export function logError(error: unknown, context?: Record<string, unknown>): void {
   if (import.meta.env.DEV) {
     console.error('Error:', error);
     if (context) {
@@ -132,9 +132,10 @@ export function logError(error: unknown, context?: Record<string, any>): void {
   // 本番環境では、エラー追跡サービス（Sentry等）に送信
   // Sentry統合（環境変数が設定されている場合のみ実行）
   const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
-  if (sentryDsn && typeof window !== 'undefined' && (window as any).Sentry) {
+  const win = window as Window & { Sentry?: { captureException: (e: unknown, opts?: object) => void } };
+  if (sentryDsn && typeof window !== 'undefined' && win.Sentry) {
     try {
-      (window as any).Sentry.captureException(error, {
+      win.Sentry.captureException(error, {
         tags: context,
         extra: { timestamp: new Date().toISOString() },
       });

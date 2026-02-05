@@ -5,6 +5,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from '../utils/i18n';
 import './ConsentScreen.css';
 
 interface ConsentScreenProps {
@@ -13,6 +14,7 @@ interface ConsentScreenProps {
 }
 
 export default function ConsentScreen({ onAccept, onDecline }: ConsentScreenProps) {
+  const { t } = useTranslation();
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -35,10 +37,8 @@ export default function ConsentScreen({ onAccept, onDecline }: ConsentScreenProp
   return (
     <div className="consent-screen-container">
       <div className="consent-screen-content">
-        <h1 className="consent-screen-title">Primal Logicへようこそ</h1>
-        <p className="consent-screen-description">
-          サービスをご利用いただくには、プライバシーポリシーと利用規約への同意が必要です。
-        </p>
+        <h1 className="consent-screen-title">{t('consent.title')}</h1>
+        <p className="consent-screen-description">{t('consent.description')}</p>
 
         <div className="consent-screen-checkboxes">
           <label className="consent-screen-checkbox">
@@ -48,6 +48,7 @@ export default function ConsentScreen({ onAccept, onDecline }: ConsentScreenProp
               onChange={(e) => setPrivacyAccepted(e.target.checked)}
             />
             <span>
+              {t('consent.acceptPrivacyBefore')}
               <a
                 href="#"
                 onClick={(e) => {
@@ -55,9 +56,9 @@ export default function ConsentScreen({ onAccept, onDecline }: ConsentScreenProp
                   handleViewPrivacy();
                 }}
               >
-                プライバシーポリシー
+                {t('consent.acceptPrivacyLink')}
               </a>
-              に同意します
+              {t('consent.acceptPrivacyAfter')}
             </span>
           </label>
 
@@ -68,6 +69,7 @@ export default function ConsentScreen({ onAccept, onDecline }: ConsentScreenProp
               onChange={(e) => setTermsAccepted(e.target.checked)}
             />
             <span>
+              {t('consent.acceptTermsBefore')}
               <a
                 href="#"
                 onClick={(e) => {
@@ -75,9 +77,9 @@ export default function ConsentScreen({ onAccept, onDecline }: ConsentScreenProp
                   handleViewTerms();
                 }}
               >
-                利用規約
+                {t('consent.acceptTermsLink')}
               </a>
-              に同意します
+              {t('consent.acceptTermsAfter')}
             </span>
           </label>
         </div>
@@ -87,14 +89,14 @@ export default function ConsentScreen({ onAccept, onDecline }: ConsentScreenProp
             className="consent-screen-button consent-screen-button-decline"
             onClick={onDecline}
           >
-            拒否
+            {t('consent.decline')}
           </button>
           <button
             className="consent-screen-button consent-screen-button-accept"
             onClick={handleAccept}
             disabled={!privacyAccepted || !termsAccepted}
           >
-            同意して続ける
+            {t('consent.accept')}
           </button>
         </div>
       </div>

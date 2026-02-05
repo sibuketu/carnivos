@@ -1,7 +1,6 @@
 
 import puppeteer from 'puppeteer';
-import path from 'path';
-import fs from 'fs';
+
 
 async function run() {
     console.log('Starting UI Verification Flow...');

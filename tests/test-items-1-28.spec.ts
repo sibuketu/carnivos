@@ -19,8 +19,9 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
     // 同意画面が表示されることを確認
     const consentScreen = page.locator('[class*="consent"], [class*="Consent"]');
     const privacyText = page.getByText(/プライバシーポリシー|Privacy/i);
-    const termsText = page.getByText(/利用規約|Terms/i);
-    
+    const _termsText = page.getByText(/利用規約|Terms/i);
+    void _termsText;
+
     await expect(consentScreen.or(privacyText).first()).toBeVisible({ timeout: 5000 });
   });
 
@@ -74,8 +75,9 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
     // ホーム画面が表示されることを確認
     const homeScreen = page.locator('[class*="home"], [class*="Home"]');
     const zone1 = page.getByText(/Zone 1|ゾーン1/i);
-    const zone2 = page.getByText(/Zone 2|ゾーン2/i);
-    
+    const _zone2 = page.getByText(/Zone 2|ゾーン2/i);
+    void _zone2;
+
     await expect(homeScreen.or(zone1).first()).toBeVisible({ timeout: 5000 });
   });
 

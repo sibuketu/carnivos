@@ -11,10 +11,7 @@ import {
   calculateNutrientImpactFactors,
   applySortOrder,
   getCategoryName,
-  type SortOrder,
-  type NutrientImpactFactor,
 } from '../utils/nutrientImpactFactors';
-import { useTranslation } from '../utils/i18n';
 import { getNutrientExplanation } from '../utils/nutrientExplanationHelper';
 import { CARNIVORE_NUTRIENT_TARGETS, getCarnivoreTargets } from '../data/carnivoreTargets';
 
@@ -25,7 +22,7 @@ interface MiniNutrientGaugeProps {
   target: number;
   color: string;
   unit?: string;
-  logic?: string; // Logic Armor: 栄養目標値の根拠を表示するための準備
+  logic?: string; // 栄養目標値の根拠表示用
   hint?: string; // 不足時の提案テキスト
   showLowIsOk?: boolean; // Vitamin Cなど、低くてもOKな場合
   nutrientKey?: string; // 栄養素キー（例: 'protein', 'iron', 'magnesium'）
@@ -46,11 +43,9 @@ export default function MiniNutrientGauge({
   hideTarget = false, // カスタム食品画面用: targetを表示しない
 }: MiniNutrientGaugeProps) {
   const { userProfile } = useApp();
-  const { t } = useTranslation();
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [showModal, setShowModal] = useState(false);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('impact');
   const [explanationMode, setExplanationMode] = useState<'simple' | 'detailed' | 'general'>(
     'simple'
   ); // 簡易/詳細/一般論表示モード
@@ -86,13 +81,13 @@ export default function MiniNutrientGauge({
   const impactFactors = useMemo(() => {
     if (!inferredNutrientKey || !userProfile) return [];
     try {
-      const factors = calculateNutrientImpactFactors(inferredNutrientKey as any, userProfile);
-      return applySortOrder(factors, sortOrder);
+      const factors = calculateNutrientImpactFactors(inferredNutrientKey as keyof typeof CARNIVORE_NUTRIENT_TARGETS, userProfile);
+      return applySortOrder(factors, 'impact');
     } catch (error) {
       console.error('Error calculating impact factors:', error);
       return [];
     }
-  }, [inferredNutrientKey, userProfile, sortOrder]);
+  }, [inferredNutrientKey, userProfile]);
 
   const totalValue = currentDailyTotal + previewAmount;
   const basePercent = target > 0 ? Math.min((currentDailyTotal / target) * 100, 100) : 0;
@@ -147,17 +142,18 @@ export default function MiniNutrientGauge({
     } else if (percent < 100) {
       return '#f97316'; // オレンジ（やや不足）
     } else if (percent < 120) {
-      return '#22c55e'; // 緑（適切）
+      return '#f43f5e'; // 緑（適切）
     } else {
-      return '#a855f7'; // 紫（過剰）
+      return '#f43f5e'; // 紫（過剰）
     }
   };
 
-  const isPastFood = currentDailyTotal > 0; // 過去に追加した食品かどうか
 
-  // Logic Armor: ロジックがある場合はコンソールに出力（将来はツールチップで表示）
+
+  // 根拠がある場合はコンソールに出力（将来はツールチップで表示）
   useEffect(() => {
     if (logic && import.meta.env.DEV) {
+      console.log(`[MiniNutrientGauge] Logic for ${label}:`, logic);
     }
   }, [label, logic]);
 
@@ -202,7 +198,7 @@ export default function MiniNutrientGauge({
       'magnesium',
       'vitamin_d',
     ];
-    if (validKeys.includes(inferredNutrientKey as any)) {
+    if (validKeys.includes(inferredNutrientKey as (typeof validKeys)[number])) {
       try {
         return getNutrientExplanation(
           inferredNutrientKey as 'protein' | 'fat' | 'iron' | 'magnesium' | 'vitamin_d',
@@ -279,9 +275,9 @@ export default function MiniNutrientGauge({
           <span style={{ fontSize: '12px', color: color, fontWeight: '500' }}>
             {hideTarget
               ? // カスタム食品画面用: 100gは食品量なので、目標値として表示しない
-                `${displayValue}${unit}`
+              `${displayValue}${unit}`
               : // 通常の表示: 日次目標値との比較
-                `${displayValue} / ${displayTarget} ${unit}`}
+              `${displayValue} / ${displayTarget} ${unit} (${Math.round(basePercent)}%)`}
           </span>
           {/* ヒントアイコン（ツールチップ表示） - 全てのゲージに常に表示 */}
           <span
@@ -630,7 +626,7 @@ export default function MiniNutrientGauge({
                         padding: '16px',
                         backgroundColor: '#f0f9ff',
                         borderRadius: '8px',
-                        border: '1px solid #3b82f6',
+                        border: '1px solid #f43f5e',
                       }}
                     >
                       <p
@@ -738,7 +734,7 @@ export default function MiniNutrientGauge({
                                       fontWeight: '600',
                                       color:
                                         factor.impact > 0
-                                          ? '#22c55e'
+                                          ? '#f43f5e'
                                           : factor.impact < 0
                                             ? '#ef4444'
                                             : '#78716c',
@@ -771,7 +767,7 @@ export default function MiniNutrientGauge({
                             const base = weight * 1.6;
                             let formula = `【基本値】\n体重(${weight}kg) × 1.6g/kg = ${base.toFixed(1)}g/日`;
                             let current = base;
-                            let adjustments: Array<{
+                            const adjustments: Array<{
                               name: string;
                               target: number;
                               applied: boolean;
@@ -876,7 +872,7 @@ export default function MiniNutrientGauge({
                           } else if (nutrient === 'fat') {
                             let formula = `【基本値】\n150g/日`;
                             let current = 150;
-                            let adjustments: Array<{
+                            const adjustments: Array<{
                               name: string;
                               target: number;
                               applied: boolean;
@@ -920,10 +916,10 @@ export default function MiniNutrientGauge({
                                     ? profile.daysOnCarnivore < 30
                                     : profile?.carnivoreStartDate
                                       ? Math.floor(
-                                          (new Date().getTime() -
-                                            new Date(profile.carnivoreStartDate).getTime()) /
-                                            (1000 * 60 * 60 * 24)
-                                        ) < 30
+                                        (new Date().getTime() -
+                                          new Date(profile.carnivoreStartDate).getTime()) /
+                                        (1000 * 60 * 60 * 24)
+                                      ) < 30
                                       : false;
 
                             // 調整をtarget値の高い順にソート
@@ -1019,7 +1015,7 @@ export default function MiniNutrientGauge({
                           } else if (nutrient === 'magnesium') {
                             let formula = '【基本値】\n600mg/日';
                             let current = 600;
-                            let adjustments: Array<{
+                            const adjustments: Array<{
                               name: string;
                               target: number;
                               increment: number;
@@ -1036,10 +1032,10 @@ export default function MiniNutrientGauge({
                                     ? profile.daysOnCarnivore < 30
                                     : profile?.carnivoreStartDate
                                       ? Math.floor(
-                                          (new Date().getTime() -
-                                            new Date(profile.carnivoreStartDate).getTime()) /
-                                            (1000 * 60 * 60 * 24)
-                                        ) < 30
+                                        (new Date().getTime() -
+                                          new Date(profile.carnivoreStartDate).getTime()) /
+                                        (1000 * 60 * 60 * 24)
+                                      ) < 30
                                       : false;
                             if (isAdaptationPhase) {
                               adjustments.push({
@@ -1202,7 +1198,6 @@ export default function MiniNutrientGauge({
 
                               // 代謝ストレス指標による累積的な増分（最後に適用）
                               if (metabolicIncrement > 0) {
-                                const prevCurrent = current;
                                 current = current + metabolicIncrement;
                                 formula += `\n代謝ストレス（夜間低血糖疑い）: +${metabolicIncrement}mg（累積増分） → ${current}mg`;
                               }
@@ -1212,7 +1207,6 @@ export default function MiniNutrientGauge({
 
                             // サプリメント摂取による調整
                             if (profile?.supplementMagnesium) {
-                              const prevCurrent = current;
                               current = Math.max(0, current - 200);
                               formula += `\n\n【サプリメント調整】`;
                               formula += `\nマグネシウムサプリメント摂取中: -200mg（サプリメント分を考慮） → ${current}mg`;
@@ -1302,7 +1296,7 @@ export default function MiniNutrientGauge({
                           } else if (nutrient === 'vitamin_d') {
                             let formula = `【基本値】\n2000IU/日`;
                             let current = 2000;
-                            let adjustments: Array<{
+                            const adjustments: Array<{
                               name: string;
                               target: number;
                               applied: boolean;
@@ -1359,7 +1353,6 @@ export default function MiniNutrientGauge({
 
                             // サプリメント摂取による調整
                             if (profile?.supplementVitaminD) {
-                              const prevCurrent = current;
                               current = Math.max(0, current - 1000);
                               formula += `\n\n【サプリメント調整】`;
                               formula += `\nビタミンDサプリメント摂取中: -1000IU（サプリメント分を考慮） → ${current.toFixed(0)}IU`;
@@ -1393,10 +1386,10 @@ export default function MiniNutrientGauge({
                                     ? profile.daysOnCarnivore < 30
                                     : profile?.carnivoreStartDate
                                       ? Math.floor(
-                                          (new Date().getTime() -
-                                            new Date(profile.carnivoreStartDate).getTime()) /
-                                            (1000 * 60 * 60 * 24)
-                                        ) < 30
+                                        (new Date().getTime() -
+                                          new Date(profile.carnivoreStartDate).getTime()) /
+                                        (1000 * 60 * 60 * 24)
+                                      ) < 30
                                       : false;
 
                             if (isAdaptationPhase) {
@@ -1488,10 +1481,10 @@ export default function MiniNutrientGauge({
                                     ? profile.daysOnCarnivore < 30
                                     : profile?.carnivoreStartDate
                                       ? Math.floor(
-                                          (new Date().getTime() -
-                                            new Date(profile.carnivoreStartDate).getTime()) /
-                                            (1000 * 60 * 60 * 24)
-                                        ) < 30
+                                        (new Date().getTime() -
+                                          new Date(profile.carnivoreStartDate).getTime()) /
+                                        (1000 * 60 * 60 * 24)
+                                      ) < 30
                                       : false;
                             if (isAdaptationPhase) {
                               const prevCurrent = current;
@@ -1523,7 +1516,6 @@ export default function MiniNutrientGauge({
                             return formula;
                           } else if (nutrient === 'zinc') {
                             let formula = `【基本値】\n11mg/日（RDA基準、男性）`;
-                            let current = 11;
 
                             formula += `\n\n（プロファイル設定による追加調整はありません）`;
 
@@ -1542,7 +1534,6 @@ export default function MiniNutrientGauge({
                             return formula;
                           } else if (nutrient === 'vitamin_c') {
                             let formula = `【基本値】\n10mg/日（カーニボアロジック）`;
-                            let current = 10;
 
                             formula += `\n\n（プロファイル設定による追加調整はありません）`;
 
@@ -1561,7 +1552,6 @@ export default function MiniNutrientGauge({
                             return formula;
                           } else if (nutrient === 'vitamin_a') {
                             let formula = `【基本値】\n5000IU/日（レチノール、活性型ビタミンA）`;
-                            let current = 5000;
 
                             formula += `\n\n（プロファイル設定による追加調整はありません）`;
 
@@ -1580,7 +1570,6 @@ export default function MiniNutrientGauge({
                             return formula;
                           } else if (nutrient === 'vitamin_k2') {
                             let formula = `【基本値】\n200μg/日（MK-4、メナキノン-4）`;
-                            let current = 200;
 
                             formula += `\n\n（プロファイル設定による追加調整はありません）`;
 
@@ -1636,72 +1625,8 @@ export default function MiniNutrientGauge({
                             return formula;
                           } else if (nutrient === 'choline') {
                             let formula = `【基本値】\n450mg/日（RDA基準、男性）`;
-                            let current = 450;
 
                             formula += `\n\n（プロファイル設定による追加調整はありません）`;
-
-                            // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
-                            if (
-                              profile?.customNutrientTargets?.[nutrient]?.mode === 'manual' &&
-                              profile.customNutrientTargets[nutrient].value !== undefined
-                            ) {
-                              const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
-                            } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(0)}mg/日`;
-                            }
-                            return formula;
-                          } else if (nutrient === 'iron') {
-                            // 鉄分の計算式
-                            let formula = `【基本値】\n`;
-                            let current = 8; // 男性の基本値
-                            let hasAdjustment = false;
-
-                            // 性別による調整
-                            if (profile?.gender === 'female') {
-                              if (profile?.isPostMenopause) {
-                                current = 8; // 閉経後は8mg（男性と同じ）
-                                formula += `8mg/日（女性・閉経後）`;
-                              } else {
-                                current = 18; // 女性は18mg推奨（月経がある場合）
-                                formula += `18mg/日（女性・月経あり）`;
-                                hasAdjustment = true;
-                              }
-                            } else {
-                              formula += `8mg/日（男性）`;
-                            }
-
-                            // 妊娠中・授乳中の調整
-                            if (profile?.isPregnant) {
-                              const prevCurrent = current;
-                              current = Math.max(current, 27);
-                              const actualIncrement = current - prevCurrent;
-                              if (actualIncrement > 0) {
-                                if (!hasAdjustment) {
-                                  formula += `\n\n【プロファイル設定による調整】`;
-                                  hasAdjustment = true;
-                                }
-                                formula += `\n妊娠中: 最低27mg（+${actualIncrement.toFixed(0)}mg） → ${current.toFixed(0)}mg`;
-                              }
-                            }
-                            if (profile?.isBreastfeeding) {
-                              const prevCurrent = current;
-                              current = Math.max(current, 9);
-                              const actualIncrement = current - prevCurrent;
-                              if (actualIncrement > 0) {
-                                if (!hasAdjustment) {
-                                  formula += `\n\n【プロファイル設定による調整】`;
-                                  hasAdjustment = true;
-                                }
-                                formula += `\n授乳中: 最低9mg（+${actualIncrement.toFixed(0)}mg） → ${current.toFixed(0)}mg`;
-                              }
-                            }
-
-                            if (!hasAdjustment) {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
-                            }
 
                             // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
                             if (
@@ -1724,7 +1649,6 @@ export default function MiniNutrientGauge({
                           ) {
                             // リン（phosphorus）の計算式
                             let formula = `【基本値】\n700mg/日（RDA基準）`;
-                            let current = 700;
 
                             formula += `\n\n（プロファイル設定による追加調整はありません）`;
 
@@ -1790,7 +1714,7 @@ export default function MiniNutrientGauge({
                             vitamin_k2: 'vitamin_k2',
                             vitamin_b12: 'vitamin_b12',
                             choline: 'choline',
-                            phosphorus: 'phosphorus' as any,
+                            phosphorus: 'phosphorus' as keyof typeof calculatedTargets,
                           };
                           if (inferredNutrientKey && nutrientKeyMap[inferredNutrientKey]) {
                             actualTarget = calculatedTargets[nutrientKeyMap[inferredNutrientKey]];
@@ -1814,7 +1738,7 @@ export default function MiniNutrientGauge({
                                 padding: '16px',
                                 backgroundColor: '#f0f9ff',
                                 borderRadius: '8px',
-                                border: '1px solid #3b82f6',
+                                border: '1px solid #f43f5e',
                               }}
                             >
                               <p
@@ -1872,7 +1796,7 @@ export default function MiniNutrientGauge({
                                   padding: '16px',
                                   backgroundColor: '#f0f9ff',
                                   borderRadius: '8px',
-                                  border: '1px solid #3b82f6',
+                                  border: '1px solid #f43f5e',
                                 }}
                               >
                                 <p

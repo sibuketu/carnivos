@@ -1,61 +1,26 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e2]:
-  - generic [ref=e3]:
-    - generic [ref=e6]:
-      - generic [ref=e7]:
-        - generic [ref=e8]:
-          - generic [ref=e9]: 🔔
-          - generic [ref=e10]:
-            - generic [ref=e11]: 通知設定
-            - generic [ref=e12]: 電解質アラート、脂質不足リマインダーなどの通知を受け取れます
-        - button "有効にする" [ref=e13] [cursor=pointer]
-      - generic [ref=e15]:
-        - button "+" [ref=e16] [cursor=pointer]
-        - button "📋" [ref=e17] [cursor=pointer]
-        - button "⭐" [ref=e18] [cursor=pointer]
-        - button "✏️" [ref=e19] [cursor=pointer]
-        - button "🍽️" [ref=e20] [cursor=pointer]
-        - button "📷" [ref=e21] [cursor=pointer]
-    - navigation "Main navigation" [ref=e22]:
-      - button "Home screen" [ref=e23] [cursor=pointer]:
-        - generic [ref=e24]: 🏠
-        - generic [ref=e25]: Home
-      - button "History screen" [ref=e26] [cursor=pointer]:
-        - generic [ref=e27]: 📊
-        - generic [ref=e28]: History
-      - button "Other screen" [ref=e29] [cursor=pointer]:
-        - generic [ref=e30]: 🧪
-        - generic [ref=e31]: Other
-      - button "Settings screen" [ref=e32] [cursor=pointer]:
-        - generic [ref=e33]: ⚙️
-        - generic [ref=e34]: Settings
-  - dialog "AIチャット（吹き出し）" [ref=e35]:
-    - generic [ref=e36]:
-      - heading "AIチャット" [level=3] [ref=e37]
-      - generic [ref=e38]:
-        - button "⛶" [ref=e39] [cursor=pointer]
-        - button "×" [ref=e40] [cursor=pointer]
-    - generic [ref=e42]:
-      - paragraph [ref=e43]: カーニボアダイエットに関する質問をどうぞ
-      - paragraph [ref=e44]: アプリの使い方についても質問できます
-      - generic [ref=e45]:
-        - generic [ref=e46]:
-          - generic [ref=e47]:
-            - text: 💡 移行期の下痢
-            - generic [ref=e48]: (55 / 60)
-          - button "☆" [ref=e49] [cursor=pointer]
-        - generic [ref=e50]: カーニボア移行初期に下痢になることがあります。これは脂質の摂取量が急に増えたことによる一時的な反応です。脂質を控えめにして、タンパク質を中心に摂取することで、症状を緩和できます。
-        - generic [ref=e51]:
-          - button "次のTipsを見る →" [ref=e52] [cursor=pointer]
-          - button "📤 Share" [ref=e53] [cursor=pointer]
-    - generic [ref=e55]:
-      - textbox "質問を入力..." [ref=e56]
-      - button "送信" [disabled] [ref=e57]
-    - generic "サイズを変更（左上）" [ref=e58]
-    - generic "サイズを変更（右上）" [ref=e59]
-    - generic "サイズを変更（左下）" [ref=e60]
-    - generic "サイズを変更（右下）" [ref=e61]
-  - button "💬" [ref=e62]
+- generic [ref=e6]:
+  - generic [ref=e7]:
+    - heading "CarnivOS" [level=1] [ref=e8]
+    - heading "ログイン" [level=2] [ref=e9]
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - generic [ref=e12]: Email
+      - textbox "Email" [ref=e13]:
+        - /placeholder: example@email.com
+    - generic [ref=e14]:
+      - generic [ref=e15]: Password
+      - textbox "Password" [ref=e16]
+    - button "ログイン" [ref=e17] [cursor=pointer]
+  - generic [ref=e18]:
+    - button "新規登録" [ref=e19] [cursor=pointer]
+    - button "パスワードを忘れた方" [ref=e20] [cursor=pointer]
+    - button "ゲストとして試す" [ref=e22] [cursor=pointer]
+  - generic [ref=e23]:
+    - link "プライバシーポリシー" [ref=e24]:
+      - /url: /privacy
+    - link "利用規約" [ref=e25]:
+      - /url: /terms
 ```

@@ -3,7 +3,7 @@
  *
  * バーコード読み取り機能
  * Web API: BarcodeDetector API（Chrome/Edge対応）
- * フォールバック: @zxing/library
+ * フォールバック: @zxing/library（#34: iOS Safari等での画像アップロード対応）
  */
 
 import { logError } from './errorHandler';
@@ -147,7 +147,7 @@ export async function scanBarcodeFromCamera(
       ],
     });
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       let scanCount = 0;
       const maxScans = 20; // 10秒間（500ms × 20回）
 
@@ -178,10 +178,8 @@ export async function scanBarcodeFromCamera(
             }
             resolve(null);
           }
-        } catch (error) {
-          // スキャン中のエラーは無視（カメラが準備できていない場合など）
-          if (import.meta.env.DEV) {
-          }
+        } catch {
+          if (import.meta.env.DEV) void 0;
         }
       }, 500);
     });
@@ -226,6 +224,54 @@ export interface OpenFoodFactsProduct {
     [key: string]: number | undefined;
   };
   [key: string]: unknown;
+}
+
+/**
+ * 画像ファイルからバーコードを読み取る（#34: ZXingフォールバック、iOS Safari等対応）
+ */
+export async function scanBarcodeFromImageFile(file: File): Promise<BarcodeResult | null> {
+  try {
+    if (isBarcodeDetectorAvailable()) {
+      return await scanBarcodeFromImage(file);
+    }
+
+    // BarcodeDetector 非対応時は ZXing を使用
+    const ZXing = await import('@zxing/library');
+    const img = await createImageBitmap(file);
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      img.close();
+      return null;
+    }
+    ctx.drawImage(img, 0, 0);
+    img.close();
+
+    const source = new ZXing.HTMLCanvasElementLuminanceSource(canvas);
+    const binarizer = new ZXing.HybridBinarizer(source);
+    const binaryBitmap = new ZXing.BinaryBitmap(binarizer);
+    const reader = new ZXing.MultiFormatReader();
+    const result = reader.decode(binaryBitmap);
+
+    const formatMap: Record<string, string> = {
+      [ZXing.BarcodeFormat.EAN_13]: 'ean_13',
+      [ZXing.BarcodeFormat.EAN_8]: 'ean_8',
+      [ZXing.BarcodeFormat.UPC_A]: 'upc_a',
+      [ZXing.BarcodeFormat.UPC_E]: 'upc_e',
+      [ZXing.BarcodeFormat.CODE_128]: 'code_128',
+      [ZXing.BarcodeFormat.CODE_39]: 'code_39',
+      [ZXing.BarcodeFormat.CODE_93]: 'code_93',
+      [ZXing.BarcodeFormat.QR_CODE]: 'qr_code',
+    };
+    const format = formatMap[result.getBarcodeFormat()] || 'unknown';
+
+    return { code: result.getText(), format };
+  } catch (error) {
+    logError(error, { component: 'barcodeScanner', action: 'scanBarcodeFromImageFile' });
+    return null;
+  }
 }
 
 export async function getFoodInfoFromBarcode(

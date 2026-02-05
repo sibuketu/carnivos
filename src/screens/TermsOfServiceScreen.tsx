@@ -23,8 +23,8 @@ export default function TermsOfServiceScreen() {
           <section className="terms-of-service-section">
             <h2>1. はじめに</h2>
             <p>
-              本利用規約（以下「本規約」）は、Primal
-              Logic（以下「当アプリ」）の利用条件を定めるものです。
+              本利用規約（以下「本規約」）は、CarnivOS
+              （以下「当アプリ」）の利用条件を定めるものです。
               当アプリを利用することにより、本規約に同意したものとみなされます。
             </p>
           </section>

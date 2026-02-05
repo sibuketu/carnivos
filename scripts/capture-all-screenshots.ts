@@ -4,7 +4,7 @@
  * アプリの全画面のスクリーンショットを自動取得し、Geminiに共有するための画像を生成します。
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -20,164 +20,164 @@ const SCREENS: Array<{
   requiresOnboarding?: boolean;
   setup?: (page: Page) => Promise<void>;
 }> = [
-  {
-    name: 'consent',
-    screen: 'consent',
-    description: '同意画面',
-    setup: async (page) => {
-      // localStorageをクリアして同意画面を表示
-      await page.evaluate(() => {
-        localStorage.removeItem('primal_logic_consent_accepted');
-        localStorage.removeItem('primal_logic_onboarding_completed');
-      });
-      await page.reload();
-      await page.waitForTimeout(1000);
+    {
+      name: 'consent',
+      screen: 'consent',
+      description: '同意画面',
+      setup: async (page) => {
+        // localStorageをクリアして同意画面を表示
+        await page.evaluate(() => {
+          localStorage.removeItem('primal_logic_consent_accepted');
+          localStorage.removeItem('primal_logic_onboarding_completed');
+        });
+        await page.reload();
+        await page.waitForTimeout(1000);
+      },
     },
-  },
-  {
-    name: 'onboarding',
-    screen: 'onboarding',
-    description: 'オンボーディング画面',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.removeItem('primal_logic_onboarding_completed');
-      });
-      await page.reload();
-      await page.waitForTimeout(1000);
+    {
+      name: 'onboarding',
+      screen: 'onboarding',
+      description: 'オンボーディング画面',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.removeItem('primal_logic_onboarding_completed');
+        });
+        await page.reload();
+        await page.waitForTimeout(1000);
+      },
     },
-  },
-  {
-    name: 'home',
-    screen: 'home',
-    description: 'ホーム画面（メインダッシュボード）',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.reload();
-      await page.waitForTimeout(2000); // データ読み込み待機
+    {
+      name: 'home',
+      screen: 'home',
+      description: 'ホーム画面（メインダッシュボード）',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.reload();
+        await page.waitForTimeout(2000); // データ読み込み待機
+      },
     },
-  },
-  {
-    name: 'profile',
-    screen: 'profile',
-    description: 'プロファイル設定画面',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#profile`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'profile',
+      screen: 'profile',
+      description: 'プロファイル設定画面',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#profile`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-  {
-    name: 'history',
-    screen: 'history',
-    description: '履歴画面',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#history`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'history',
+      screen: 'history',
+      description: '履歴画面',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#history`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-  {
-    name: 'labs',
-    screen: 'labs',
-    description: 'Labs画面（実験的機能）',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#labs`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'labs',
+      screen: 'labs',
+      description: 'Labs画面（実験的機能）',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#labs`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-  {
-    name: 'settings',
-    screen: 'settings',
-    description: '設定画面',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#settings`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'settings',
+      screen: 'settings',
+      description: '設定画面',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#settings`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-  {
-    name: 'customFood',
-    screen: 'customFood',
-    description: 'カスタム食品登録画面',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#customFood`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'customFood',
+      screen: 'customFood',
+      description: 'カスタム食品登録画面',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#customFood`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-  {
-    name: 'input',
-    screen: 'input',
-    description: '日次入力画面',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#input`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'input',
+      screen: 'input',
+      description: '日次入力画面',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#input`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-  {
-    name: 'gift',
-    screen: 'gift',
-    description: 'Gift画面（コミュニティ機能）',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#gift`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'gift',
+      screen: 'gift',
+      description: 'Gift画面（コミュニティ機能）',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#gift`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-  {
-    name: 'bioHack',
-    screen: 'bioHack',
-    description: 'Bio-Hackダッシュボード画面',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#bioHack`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'bioHack',
+      screen: 'bioHack',
+      description: 'Bio-Hackダッシュボード画面',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#bioHack`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-  {
-    name: 'ifThenRules',
-    screen: 'ifThenRules',
-    description: 'If-Thenルール画面',
-    setup: async (page) => {
-      await page.evaluate(() => {
-        localStorage.setItem('primal_logic_consent_accepted', 'true');
-        localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      });
-      await page.goto(`${BASE_URL}/#ifThenRules`);
-      await page.waitForTimeout(2000);
+    {
+      name: 'ifThenRules',
+      screen: 'ifThenRules',
+      description: 'If-Thenルール画面',
+      setup: async (page) => {
+        await page.evaluate(() => {
+          localStorage.setItem('primal_logic_consent_accepted', 'true');
+          localStorage.setItem('primal_logic_onboarding_completed', 'true');
+        });
+        await page.goto(`${BASE_URL}/#ifThenRules`);
+        await page.waitForTimeout(2000);
+      },
     },
-  },
-];
+  ];
 
 // スクリーンショットディレクトリを作成
 if (!fs.existsSync(SCREENSHOT_DIR)) {
@@ -228,15 +228,15 @@ test.afterAll(async () => {
 ## 📸 スクリーンショット一覧
 
 ${screenshots
-  .map(
-    (s, index) => `
+      .map(
+        (s, index) => `
 ### ${index + 1}. ${s.description} (${s.name})
 
 - **ファイルパス**: \`C:\\Users\\susam\\Downloads\\新しいフォルダー\\docs\\primal-logic-app\\primal-logic-web\\${s.path}\`
 - **説明**: ${s.description}
 `
-  )
-  .join('\n')}
+      )
+      .join('\n')}
 
 ---
 

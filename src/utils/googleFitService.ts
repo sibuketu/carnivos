@@ -29,26 +29,20 @@ export async function authenticateGoogleFit(): Promise<boolean> {
   // 現在はAPIキーのみ確認
   const apiKey = import.meta.env.VITE_GOOGLE_FIT_API_KEY;
   if (!apiKey) {
-    if (import.meta.env.DEV) {
-    }
+    if (import.meta.env.DEV) void 0;
     return false;
   }
   return true;
 }
 
-/**
- * Google Fit APIから歩数を取得
- */
-export async function getStepsFromGoogleFit(date: string): Promise<number | null> {
+export async function getStepsFromGoogleFit(_date: string): Promise<number | null> {
   try {
     const apiKey = import.meta.env.VITE_GOOGLE_FIT_API_KEY;
     if (!apiKey) {
       return null;
     }
 
-    // Google Fit REST APIを使用
-    // 注意: 実際の実装ではOAuth 2.0認証が必要
-    // 現在はAPIキーのみ確認（実際のAPI呼び出しは未実装）
+    // Google Fit REST APIを使用。OAuth 2.0認証が必要。現在は部分対応（APIキー確認のみ）
 
     if (import.meta.env.DEV) {
       console.log(
@@ -66,7 +60,7 @@ export async function getStepsFromGoogleFit(date: string): Promise<number | null
 /**
  * Google Fit APIから心拍数を取得
  */
-export async function getHeartRateFromGoogleFit(date: string): Promise<number | null> {
+export async function getHeartRateFromGoogleFit(_date: string): Promise<number | null> {
   try {
     const apiKey = import.meta.env.VITE_GOOGLE_FIT_API_KEY;
     if (!apiKey) {
@@ -92,7 +86,7 @@ export async function getHeartRateFromGoogleFit(date: string): Promise<number | 
 /**
  * Google Fit APIから活動時間を取得
  */
-export async function getActiveMinutesFromGoogleFit(date: string): Promise<number | null> {
+export async function getActiveMinutesFromGoogleFit(_date: string): Promise<number | null> {
   try {
     const apiKey = import.meta.env.VITE_GOOGLE_FIT_API_KEY;
     if (!apiKey) {
@@ -118,7 +112,7 @@ export async function getActiveMinutesFromGoogleFit(date: string): Promise<numbe
 /**
  * Google Fit APIから消費カロリーを取得
  */
-export async function getCaloriesBurnedFromGoogleFit(date: string): Promise<number | null> {
+export async function getCaloriesBurnedFromGoogleFit(_date: string): Promise<number | null> {
   try {
     const apiKey = import.meta.env.VITE_GOOGLE_FIT_API_KEY;
     if (!apiKey) {

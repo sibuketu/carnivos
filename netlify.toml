@@ -10,6 +10,12 @@
   to = "/privacy.html"
   status = 200
 
+# 英語プライバシーポリシー（App Store Connect 英語必須用）
+[[redirects]]
+  from = "/privacy-en.html"
+  to = "/privacy-en.html"
+  status = 200
+
 # 利用規約ページ
 [[redirects]]
   from = "/terms"

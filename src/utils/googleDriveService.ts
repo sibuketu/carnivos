@@ -19,17 +19,13 @@ export async function authenticateGoogleDrive(): Promise<boolean> {
   // 現在はAPIキーのみ確認
   const apiKey = import.meta.env.VITE_GOOGLE_DRIVE_API_KEY;
   if (!apiKey) {
-    if (import.meta.env.DEV) {
-    }
+    if (import.meta.env.DEV) void 0;
     return false;
   }
   return true;
 }
 
-/**
- * Google Driveにデータをバックアップ
- */
-export async function backupToGoogleDrive(data: string, filename: string): Promise<boolean> {
+export async function backupToGoogleDrive(_data: string, _filename: string): Promise<boolean> {
   try {
     const apiKey = import.meta.env.VITE_GOOGLE_DRIVE_API_KEY;
     if (!apiKey) {
@@ -55,7 +51,7 @@ export async function backupToGoogleDrive(data: string, filename: string): Promi
 /**
  * Google Driveからデータを復元
  */
-export async function restoreFromGoogleDrive(filename: string): Promise<string | null> {
+export async function restoreFromGoogleDrive(_filename: string): Promise<string | null> {
   try {
     const apiKey = import.meta.env.VITE_GOOGLE_DRIVE_API_KEY;
     if (!apiKey) {

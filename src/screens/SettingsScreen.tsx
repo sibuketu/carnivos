@@ -7,9 +7,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../utils/i18n';
 import { useSettings } from '../hooks/useSettings';
-import { saveUserProfile } from '../utils/storage';
-import { isSupabaseAvailable } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import { requestNotificationPermission } from '../utils/defrostReminder';
+import { getFastingDefaultHours, setFastingDefaultHours } from '../utils/fastingDefaults';
 import HelpTooltip from '../components/common/HelpTooltip';
 
 import './SettingsScreen.css';
@@ -20,7 +20,7 @@ interface SettingsScreenProps {
 }
 
 export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScreenProps = {}) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const {
     showKnowledge,
     toggleKnowledge,
@@ -32,10 +32,14 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
     toggleDarkMode,
     tipsEnabled,
     toggleTips,
+    debugMode,
     toggleDebugMode,
   } = useSettings();
 
+  const { signOut } = useAuth();
+
   const [fontSizeLocal, setFontSizeLocal] = useState(fontSize || 'medium');
+  const [fastingDefaultHours, setFastingDefaultHoursLocal] = useState(() => getFastingDefaultHours());
   const [notificationPermission, setNotificationPermission] =
     useState<NotificationPermission>('default');
   const [notificationEnabled, setNotificationEnabled] = useState(() => {
@@ -70,7 +74,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
         setNotificationPermission(Notification.permission);
         localStorage.setItem('settings_notification_enabled', JSON.stringify(true));
       } else {
-        alert('通知の許可が必要です。ブラウザの設定から通知を許可してください。');
+        alert(t('settings.notificationPermissionRequired'));
       }
     } else {
       // 通知を無効にする場合
@@ -107,6 +111,59 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
           <h1 className="settings-screen-title" style={{ marginBottom: 0 }}>{t('settings.title')}</h1>
         </div>
 
+        <div className="settings-screen-button-row">
+          <button
+            className={`settings-screen-option-button ${i18n.language === 'en' ? 'active' : ''}`}
+            onClick={() => changeLanguage('en')}
+          >
+            English
+          </button>
+          <button
+            className={`settings-screen-option-button ${language === 'ja' ? 'active' : ''}`}
+            onClick={() => setLanguage('ja')}
+          >
+            日本語
+          </button>
+          <button
+            className={`settings-screen-option-button ${i18n.language === 'fr' ? 'active' : ''}`}
+            onClick={() => changeLanguage('fr')}
+          >
+            Français
+          </button>
+          <button
+            className={`settings-screen-option-button ${language === 'de' ? 'active' : ''}`}
+            onClick={() => setLanguage('de')}
+          >
+            Deutsch
+          </button>
+          <button
+            className={`settings-screen-option-button ${language === 'zh' ? 'active' : ''}`}
+            onClick={() => setLanguage('zh')}
+          >
+            中文
+          </button>
+        </div>
+
+
+        {/* 断食タイマーのデフォルト時間 */}
+        <div className="settings-screen-section">
+          <h2 className="settings-screen-section-title">断食タイマー（デフォルト時間）</h2>
+          <div className="settings-screen-button-row">
+            {[12, 16, 18, 24].map((h) => (
+              <button
+                key={h}
+                className={`settings-screen-option-button ${fastingDefaultHours === h ? 'active' : ''}`}
+                onClick={() => {
+                  setFastingDefaultHours(h);
+                  setFastingDefaultHoursLocal(h);
+                }}
+              >
+                {h}{t('settings.hours')}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* 文字サイズ設定 */}
         <div className="settings-screen-section">
           <h2 className="settings-screen-section-title">文字サイズ</h2>
@@ -115,25 +172,25 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
               className={`settings-screen-option-button ${fontSizeLocal === 'small' ? 'active' : ''}`}
               onClick={() => handleFontSizeChange('small')}
             >
-              小
+              {t('settings.fontSizeSmall')}
             </button>
             <button
               className={`settings-screen-option-button ${fontSizeLocal === 'medium' ? 'active' : ''}`}
               onClick={() => handleFontSizeChange('medium')}
             >
-              中
+              {t('settings.fontSizeMedium')}
             </button>
             <button
               className={`settings-screen-option-button ${fontSizeLocal === 'large' ? 'active' : ''}`}
               onClick={() => handleFontSizeChange('large')}
             >
-              大
+              {t('settings.fontSizeLarge')}
             </button>
             <button
               className={`settings-screen-option-button ${fontSizeLocal === 'xlarge' ? 'active' : ''}`}
               onClick={() => handleFontSizeChange('xlarge')}
             >
-              特大
+              {t('settings.fontSizeXlarge')}
             </button>
           </div>
         </div>
@@ -147,11 +204,11 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
           <div className="settings-screen-switch-row">
             <div className="settings-screen-switch-label-group">
               <label className="settings-screen-switch-label">
-                知識ベースを表示
-                <HelpTooltip text="カーニボアダイエットに関する科学的根拠に基づいた知識を表示します。各栄養素や食品について詳しい説明が確認できます。" />
+                {t('settings.showKnowledge')}
+                <HelpTooltip text={t('settings.knowledgeTooltip')} />
               </label>
               <div className="settings-screen-switch-description">
-                カーニボアダイエットに関する知識を表示します
+                {t('settings.knowledgeDesc')}
               </div>
             </div>
             <label className="settings-screen-switch">
@@ -181,11 +238,11 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
           <div className="settings-screen-switch-row">
             <div className="settings-screen-switch-label-group">
               <label className="settings-screen-switch-label">
-                ダークモード
-                <HelpTooltip text="ダークテーマに切り替えます。暗い環境での使用時や、目に優しい表示を希望する場合に有効にしてください。" />
+                {t('settings.darkMode')}
+                <HelpTooltip text={t('settings.darkModeTooltip')} />
               </label>
               <div className="settings-screen-switch-description">
-                ダークテーマに切り替えます（目に優しい暗い背景）
+                {t('settings.darkModeDesc')}
               </div>
             </div>
             <label className="settings-screen-switch">
@@ -211,11 +268,11 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
           <div className="settings-screen-switch-row">
             <div className="settings-screen-switch-label-group">
               <label className="settings-screen-switch-label">
-                デバッグモード
-                <HelpTooltip text="開発・テスト用の機能です。30日分のサンプルデータを表示します。実際のデータではなく、アプリの動作確認用の仮データです。" />
+                {t('settings.debugMode')}
+                <HelpTooltip text={t('settings.debugModeTooltip')} />
               </label>
               <div className="settings-screen-switch-description">
-                仮データを表示（30日分のサンプルデータ）
+                {t('settings.debugModeDesc')}
               </div>
             </div>
             <label className="settings-screen-switch">
@@ -231,15 +288,15 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
           <div className="settings-screen-switch-row">
             <div className="settings-screen-switch-label-group">
               <label className="settings-screen-switch-label">
-                通知を有効にする
-                <HelpTooltip text="ブラウザの通知機能を有効にします。電解質アラート、脂質不足リマインダー、ストリークリマインダーなどの通知を受け取れます。" />
+                {t('settings.notificationEnable')}
+                <HelpTooltip text={t('settings.notificationTooltip')} />
               </label>
               <div className="settings-screen-switch-description">
                 {notificationPermission === 'granted'
-                  ? '通知が許可されています'
+                  ? t('settings.notificationGranted')
                   : notificationPermission === 'denied'
-                    ? '通知が拒否されています。ブラウザの設定から許可してください。'
-                    : '通知の許可をリクエストします'}
+                    ? t('settings.notificationDenied')
+                    : t('settings.notificationRequest')}
               </div>
             </div>
             <label className="settings-screen-switch">
@@ -264,14 +321,14 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                 color: '#991b1b',
               }}
             >
-              ⚠️ 通知が拒否されています。ブラウザの設定から通知を許可してください。
+              ⚠️ {t('settings.notificationDenied')}
             </div>
           )}
         </div>
 
         {/* データ管理 */}
         <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">データ管理</h2>
+          <h2 className="settings-screen-section-title">{t('settings.dataManagement')}</h2>
           <div className="settings-screen-button-row">
             <button
               className="settings-screen-option-button"
@@ -280,7 +337,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                 window.dispatchEvent(event);
               }}
             >
-              データエクスポート
+              {t('profile.exportData')}
             </button>
             <button
               className="settings-screen-option-button"
@@ -289,14 +346,54 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                 window.dispatchEvent(event);
               }}
             >
-              データインポート
+              {t('profile.importData')}
             </button>
+          </div>
+        </div>
+
+        {/* 機能紹介: 軽い説明→タップで実際のUIを見せる（決定の背景） */}
+        <div className="settings-screen-section">
+          <h2 className="settings-screen-section-title">{t('settings.featureIntro')}</h2>
+          <p className="settings-screen-section-description" style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem' }}>
+            {t('settings.featureIntroDesc')}
+          </p>
+          <div className="settings-feature-intro-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {[
+              { titleKey: 'settings.featureHome', descKey: 'settings.featureHomeDesc', screen: 'home' as const },
+              { titleKey: 'settings.featureDiary', descKey: 'settings.featureDiaryDesc', screen: 'diary' as const },
+              { titleKey: 'settings.featureHistory', descKey: 'settings.featureHistoryDesc', screen: 'history' as const },
+              { titleKey: 'settings.featureStats', descKey: 'settings.featureStatsDesc', screen: 'stats' as const },
+              { titleKey: 'settings.featureLabs', descKey: 'settings.featureLabsDesc', screen: 'labs' as const },
+            ].map((item) => (
+              <div
+                key={item.screen}
+                style={{
+                  padding: '0.75rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  backgroundColor: '#fafafa',
+                }}
+              >
+                <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{item.title}</div>
+                <div style={{ fontSize: '0.8125rem', color: '#6b7280', marginBottom: '0.5rem' }}>{item.desc}</div>
+                <button
+                  type="button"
+                  className="settings-screen-option-button"
+                  style={{ width: '100%', textAlign: 'left' }}
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: item.screen }));
+                  }}
+                >
+                  実際の画面を見る →
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* サポート */}
         <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">サポート</h2>
+          <h2 className="settings-screen-section-title">{t('settings.support')}</h2>
           <div className="settings-screen-button-row">
             <button
               className="settings-screen-option-button"
@@ -312,7 +409,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
         {/* アプリ情報 */}
         <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">アプリ情報</h2>
+          <h2 className="settings-screen-section-title">{t('settings.appInfo')}</h2>
           <div className="settings-screen-button-row">
             <button
               className="settings-screen-option-button"
@@ -324,6 +421,52 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
               }}
             >
               オンボーディングを再表示
+            </button>
+            <button
+              className="settings-screen-option-button"
+              onClick={() => {
+                const event = new CustomEvent('navigateToScreen', { detail: 'privacy' });
+                window.dispatchEvent(event);
+              }}
+            >
+              プライバシーポリシー
+            </button>
+            <button
+              className="settings-screen-option-button"
+              onClick={() => {
+                const event = new CustomEvent('navigateToScreen', { detail: 'terms' });
+                window.dispatchEvent(event);
+              }}
+            >
+              利用規約
+            </button>
+          </div>
+        </div>
+
+        {/* アカウント管理（危険エリア） */}
+        <div className="settings-screen-section" style={{ border: '1px solid #fee2e2', backgroundColor: '#fff5f5' }}>
+          <h2 className="settings-screen-section-title" style={{ color: '#dc2626' }}>{t('settings.accountMgmt')}</h2>
+          <div className="settings-screen-button-row">
+            <button
+              className="settings-screen-option-button"
+              onClick={async () => {
+                if (window.confirm('ログアウトしますか？')) {
+                  await signOut();
+                }
+              }}
+              style={{ color: '#374151' }}
+            >
+              {t('settings.logout')}
+            </button>
+            <button
+              className="settings-screen-option-button"
+              onClick={() => {
+                const event = new CustomEvent('navigateToScreen', { detail: 'dataDelete' });
+                window.dispatchEvent(event);
+              }}
+              style={{ color: '#dc2626', fontWeight: 'bold' }}
+            >
+              {t('settings.deleteAccount')}
             </button>
           </div>
         </div>

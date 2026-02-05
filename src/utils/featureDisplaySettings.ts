@@ -11,13 +11,12 @@ export type FeatureKey =
   // 画面要素
   | 'streakDisplay' // ストリーク表示
   | 'phaseDisplay' // Phase表示
-  | 'transitionBanner' // 移行期間バナー
-  | 'transitionGuide' // 移行期間ガイド
+  // Phase 1 related keys removed
   | 'pfRatioGauge' // P:F比率ゲージ
   | 'omegaRatioGauge' // オメガ比率ゲージ
   | 'calciumPhosphorusRatioGauge' // カルシウム:リン比率ゲージ
   | 'glycineMethionineRatioGauge' // グリシン:メチオニン比率ゲージ
-  | 'argumentCard' // 理論武装カード
+  | 'argumentCard' // 根拠カード（栄養タップ時の説明）
   | 'recoveryProtocol' // 回復プロトコル
   | 'myFoodsTab' // 「いつもの」タブ
   | 'historyTab' // 履歴タブ
@@ -73,26 +72,13 @@ export const ALL_FEATURE_DISPLAY_CONFIGS: FeatureDisplayConfig[] = [
     defaultVisible: true,
     description: '現在のPhase（Rookie, Carnivore, Hunter等）',
   },
-  {
-    key: 'transitionBanner',
-    label: '移行期間バナー',
-    category: 'screenElement',
-    defaultVisible: true,
-    description: '移行期間中の進捗バナー',
-  },
-  {
-    key: 'transitionGuide',
-    label: '移行期間ガイド',
-    category: 'screenElement',
-    defaultVisible: true,
-    description: '移行期間の詳細ガイド',
-  },
+  // Phase 1 config removed
   {
     key: 'pfRatioGauge',
     label: 'P:F比率ゲージ',
     category: 'screenElement',
     defaultVisible: true,
-    description: 'タンパク質:脂質比率',
+    description: 'タンパク質:脂質の達成率',
   },
   {
     key: 'omegaRatioGauge',
@@ -117,7 +103,7 @@ export const ALL_FEATURE_DISPLAY_CONFIGS: FeatureDisplayConfig[] = [
   },
   {
     key: 'argumentCard',
-    label: '理論武装カード',
+    label: '根拠カード',
     category: 'screenElement',
     defaultVisible: true,
     description: '栄養素をタップした時の理論説明',
@@ -293,6 +279,29 @@ export const ALL_FEATURE_DISPLAY_CONFIGS: FeatureDisplayConfig[] = [
 ];
 
 const STORAGE_KEY = 'primal_logic_feature_display_settings';
+const FEEDBACK_CONTRIBUTOR_KEY = 'primal_logic_feedback_contributor'; // #35
+
+/**
+ * バグ報告・機能提案をしたユーザーか（#35 フィードバックご褒美）
+ */
+export function isFeedbackContributor(): boolean {
+  try {
+    return localStorage.getItem(FEEDBACK_CONTRIBUTOR_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * フィードバック貢献者フラグを設定（FeedbackScreenから呼ぶ）
+ */
+export function setFeedbackContributor(): void {
+  try {
+    localStorage.setItem(FEEDBACK_CONTRIBUTOR_KEY, 'true');
+  } catch {
+    // ignore
+  }
+}
 
 /**
  * 機能の表示設定を取得（デフォルトは全部表示）
@@ -306,14 +315,23 @@ export function getFeatureDisplaySettings(): Record<FeatureKey, boolean> {
       defaults[config.key] = config.defaultVisible;
     });
 
-    // 既存の設定があればマージ、なければデフォルト
     if (saved) {
       const parsed = JSON.parse(saved);
-      // 新しい機能（parsedにないキー）はデフォルト値(true)を使う
-      return { ...defaults, ...parsed };
+      const merged = { ...defaults, ...parsed };
+      // #35: フィードバック貢献者はレシピ・写真分析モーダルを先行開放
+      if (isFeedbackContributor()) {
+        merged.recipeScreen = merged.recipeScreen ?? true;
+        merged.photoAnalysisModal = merged.photoAnalysisModal ?? true;
+      }
+      return merged;
     }
 
-    return defaults;
+    const result = { ...defaults };
+    if (isFeedbackContributor()) {
+      result.recipeScreen = true;
+      result.photoAnalysisModal = true;
+    }
+    return result;
   } catch (error) {
     logError(error, { component: 'featureDisplaySettings', action: 'getFeatureDisplaySettings' });
     // エラー時もデフォルトは全部表示

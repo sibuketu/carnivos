@@ -8,7 +8,6 @@
  */
 
 import { useState, useMemo } from 'react';
-import { getDailyLogs } from '../utils/storage';
 import type { DailyLog } from '../types';
 import './StreakCalendar.css';
 
@@ -21,7 +20,7 @@ export default function StreakCalendar({ logs, onDayClick }: StreakCalendarProps
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // 現在の月の開始日と終了日を取得
-  const { startDate, endDate, daysInMonth } = useMemo(() => {
+  const { startDate, endDate: _endDate, daysInMonth } = useMemo(() => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const start = new Date(year, month, 1);
@@ -241,7 +240,7 @@ export default function StreakCalendar({ logs, onDayClick }: StreakCalendarProps
       {/* 凡例 */}
       <div className="streak-calendar-legend">
         <div className="streak-calendar-legend-item">
-          <div className="streak-calendar-legend-color" style={{ backgroundColor: '#10b981' }} />
+          <div className="streak-calendar-legend-color" style={{ backgroundColor: '#f43f5e' }} />
           <span>連続記録中</span>
         </div>
         <div className="streak-calendar-legend-item">

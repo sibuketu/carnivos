@@ -1,85 +1,99 @@
 # 家に帰ったら実行する手順（Androidネイティブアプリ化）
 
-> 実機（Android）でネイティブアプリをテストする手順
+> 実機（Android）でネイティブアプリをテストする手順。コピペするものはすべてコードブロック。パスは絶対パス（CarnivOS）。
 
 ---
 
-## 📱 前提条件
+## 前提条件
 
-- ✅ Android実機がある
-- ✅ USBケーブルがある
-- ✅ Android Studioがインストールされている（なければインストールが必要）
+- Android実機がある
+- USBケーブルがある
+- Android Studioがインストールされている（なければインストールが必要）
 
 ---
 
-## 🚀 実行手順
+## 実行手順
 
-### 方法1: バッチファイルを使用（推奨・一番簡単）
+### 方法1: バッチファイルを使用（推奨）
 
-**エクスプローラーから:**
 1. エクスプローラーを開く（Windowsキー+E）
-2. アドレスバーに以下を貼り付けてEnter:
-   ```
-   C:\Users\susam\Downloads\新しいフォルダー\docs\primal-logic-app\primal-logic-web
-   ```
-3. `setup-capacitor.bat` をダブルクリック
-4. 自動的にビルド、Androidプラットフォーム追加、同期が実行されます
-5. 完了後、Android Studioが自動的に開きます
+2. アドレスバーに以下を貼り付けてEnter（コピペ）:
 
-### 方法2: 手動で実行
-
-**PowerShellから:**
-1. 新しいPowerShellを開く（Windowsキー → 「PowerShell」と入力 → Enter）
-2. 以下のコマンドを順番に実行:
-
-```powershell
-cd "C:\Users\susam\Downloads\新しいフォルダー\docs\primal-logic-app\primal-logic-web"
-npm run build
-npx cap add android
-npx cap sync
-npx cap open android
+```
+C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web
 ```
 
+3. `setup-capacitor.bat` をダブルクリック
+4. ビルド・Android追加・同期が自動実行される（完了後、必要なら「Android Studioで開く」は方法2のブロックを実行）
+
+### 方法2: PowerShell でビルド〜Android Studio で開く（コピペ1ブロック）
+
+PowerShell を開き、以下をそのまま貼り付けて実行:
+
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npm run build; npx cap sync android; npx cap open android
+```
+
+（Android は既に追加済みのため `cap add android` は不要。iOS は Windows では sync で失敗するので `cap sync android` のみ。）
+
 ---
 
-## 📱 実機でテスト
+## 実機でテスト
 
-1. **Android Studioで開く**: `npx cap open android`（バッチファイル実行後は自動的に開きます）
+1. **Android Studioで開く**: 上記のブロックで開いていない場合は、以下をコピペ1ブロックで実行:
+
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npx cap open android
+```
+
 2. **実機をUSBで接続**: Android実機をUSBケーブルで接続
 3. **USBデバッグを有効化**: 実機で「USBデバッグ」を有効化（初回のみ）
 4. **実機を選択**: Android Studioのデバイス選択で実機を選択
 5. **実行**: 「Run」ボタン（緑の再生ボタン）をクリック
-6. **アプリが起動**: 実機でアプリが起動します
+6. **アプリが起動**: 実機でアプリが起動する
+
+**エクスプローラーで android フォルダを開く場合（アドレスバーに貼る）:**
+
+```
+C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web\android
+```
+
+→ 開いたフォルダを Android Studio で「Open」する。
 
 ---
 
-## 🔍 Recovery Protocolの確認
+## Recovery Protocolの確認
 
-**実機で確認する項目:**
-- ✅ Recovery Protocol表示
-- ✅ Recovery Protocol生成（違反食品を追加した時）
-- ✅ Recovery Protocol設定
-- ✅ 「明日のログに追加」機能
+実機で確認する項目:
 
-**全ての機能がそのまま動作します（心配なし）**
+- Recovery Protocol表示
+- Recovery Protocol生成（違反食品を追加した時）
+- Recovery Protocol設定
+- 「明日のログに追加」機能
 
----
-
-## 📝 注意事項
-
-1. **ビルド**: ネイティブアプリを実行する前に、必ず`npm run build`を実行してください（バッチファイルで自動実行されます）
-2. **同期**: コードを変更したら、`npx cap sync`を実行してください
-3. **Android Studio**: Android開発にはAndroid Studioが必要です（なければインストールが必要）
+全ての機能がそのまま動作する。
 
 ---
 
-## 🎯 完了後の確認
+## 注意事項
 
-- ✅ アプリが実機で起動する
-- ✅ Recovery Protocolが動作する
-- ✅ 全機能が動作する
+- **ビルド**: ネイティブアプリを実行する前に、必ずビルドと同期を行う（バッチまたは上記PowerShellブロック）。
+- **同期**: コードを変更したら、以下をコピペ1ブロックで実行:
+
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npm run build; npx cap sync android
+```
+
+- **Android Studio**: Android開発にはAndroid Studioが必要（なければインストールが必要）。
 
 ---
 
-最終更新: 2026-01-03
+## 完了後の確認
 
+- アプリが実機で起動する
+- Recovery Protocolが動作する
+- 全機能が動作する
+
+---
+
+最終更新: 2026-02-03

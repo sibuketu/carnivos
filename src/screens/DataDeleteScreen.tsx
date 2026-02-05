@@ -41,11 +41,14 @@ export default function DataDeleteScreen() {
           data: { session },
         } = await supabase.auth.getSession();
         if (session) {
-          // ユーザーのデータを削除（将来的に実装）
-          // await supabase.from('daily_logs').delete().eq('user_id', session.user.id);
-          // await supabase.from('user_profiles').delete().eq('user_id', session.user.id);
-
-          // ログアウト（アカウント削除はサーバー側で実装が必要）
+          const userId = session.user.id;
+          await supabase.from('daily_logs').delete().eq('user_id', userId);
+          await supabase.from('profiles').delete().eq('user_id', userId);
+          try {
+            await supabase.from('streaks').delete().eq('user_id', userId);
+          } catch {
+            // streaks テーブルが存在しない場合などは無視
+          }
           await supabase.auth.signOut();
         }
       }

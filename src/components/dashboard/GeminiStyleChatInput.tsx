@@ -28,15 +28,15 @@ export default function GeminiStyleChatInput({
   isLoading,
   placeholder = 'CarnivOS に相談',
   onFileUpload,
-  onPhotoClick,
+  onPhotoClick: _onPhotoClick,
 }: GeminiStyleChatInputProps) {
-  const { aiMode } = useSettings();
-  const [thinkingMode, setThinkingMode] = useState<'fast' | 'auto' | 'deep'>(() => {
+  const { aiMode: _aiMode } = useSettings();
+  const [thinkingMode, _setThinkingMode] = useState<'fast' | 'auto' | 'deep'>(() => {
     const saved = localStorage.getItem('ai_thinking_mode');
     return (saved as 'fast' | 'auto' | 'deep') || 'auto';
   });
-  const [showFileMenu, setShowFileMenu] = useState(false);
-  const [showThinkingModeMenu, setShowThinkingModeMenu] = useState(false);
+  const [_showFileMenu, setShowFileMenu] = useState(false);
+  const [_showThinkingModeMenu, setShowThinkingModeMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileMenuRef = useRef<HTMLDivElement>(null);
   const thinkingModeMenuRef = useRef<HTMLDivElement>(null);
@@ -63,25 +63,24 @@ export default function GeminiStyleChatInput({
     };
   }, []);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const _handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && onFileUpload) {
       onFileUpload(file);
     }
-    // リセット（同じファイルを再度選択できるように）
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
     setShowFileMenu(false);
   };
 
-  const thinkingModeLabels = {
+  const _thinkingModeLabels = {
     fast: 'Fast',
     auto: 'Auto',
     deep: 'Deep',
   };
 
-  const thinkingModeDescriptions = {
+  const _thinkingModeDescriptions = {
     fast: 'Quick, concise answers',
     auto: 'Smart detection (default)',
     deep: 'Detailed analysis with evidence',

@@ -6,7 +6,6 @@
 
 import type { DailyLog, FoodItem, UserProfile } from '../types';
 import { calculateAllMetrics } from './nutrientCalculator';
-import { getCarnivoreTargets } from '../data/carnivoreTargets';
 import { getFoodMasterItem } from '../data/foodMaster';
 import { getLanguage } from './i18n';
 

@@ -58,10 +58,7 @@ export function useNutrition() {
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [todayLog, setTodayLog] = useState<DailyLog | null>(null);
 
-  // アプリ起動時に今日のログを読み込む
-  useEffect(() => {
-    loadTodayLog();
-  }, []);
+
 
   // 今日のログを読み込む
   const loadTodayLog = useCallback(async () => {
@@ -87,6 +84,11 @@ export function useNutrition() {
       return [];
     }
   }, []);
+
+  // アプリ起動時に今日のログを読み込む
+  useEffect(() => {
+    loadTodayLog();
+  }, [loadTodayLog]);
 
   const setPreview = useCallback((data: PreviewData) => {
     setPreviewData(data);

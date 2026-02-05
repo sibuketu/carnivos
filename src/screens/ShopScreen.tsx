@@ -87,7 +87,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
 
     // Stripe決済処理（環境変数が設定されている場合のみ実行）
     const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-    if (stripeKey && typeof window !== 'undefined' && (window as any).Stripe) {
+    if (stripeKey && typeof window !== 'undefined' && (window as Window & { Stripe?: (key: string) => { redirectToCheckout: (opts: { sessionId: string }) => Promise<unknown> } }).Stripe) {
       try {
         // Stripe Checkout Sessionを作成
         const response = await fetch('/api/create-checkout-session', {
@@ -105,7 +105,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
 
         if (response.ok) {
           const { sessionId } = await response.json();
-          const stripe = (window as any).Stripe(stripeKey);
+          const stripe = (window as Window & { Stripe: (key: string) => { redirectToCheckout: (opts: { sessionId: string }) => Promise<unknown> } }).Stripe(stripeKey);
           await stripe.redirectToCheckout({ sessionId });
           return; // リダイレクトされるため、ここで終了
         }

@@ -28,7 +28,7 @@ interface InputScreenProps {
 }
 
 export default function InputScreen({ onClose }: InputScreenProps = {}) {
-  const { t } = useTranslation();
+  const { t: _t } = useTranslation();
   const {
     addFood,
     removeFood,
@@ -36,6 +36,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
     updateStatus,
     updateDiary,
     updateWeight,
+    updateWaterIntake,
     dailyLog,
     userProfile,
   } = useApp();
@@ -86,6 +87,8 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
     dailyLog?.status?.bowelMovement,
   ]);
 
+  const currentWaterMl = dailyLog?.waterIntake ?? 0;
+
   const [foodInput, setFoodInput] = useState('');
   const [foodAmount, setFoodAmount] = useState('300'); // カーニボアサイズのデフォルト（300g）
   const [foodUnit, setFoodUnit] = useState<'g' | 'piece' | '個'>('g');
@@ -110,14 +113,63 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
   useEffect(() => {
     // Setup voice input callbacks
     voiceInputManager.onResult((result: VoiceInputResult) => {
-      setFoodInput(result.text);
-      if (result.isFinal) {
-        setIsListening(false);
-        // Automatically search for food matches
-        setShowFoodSuggestions(true);
-        const found = searchFoods(result.text);
-        if (found.length > 0) {
-          setSelectedFoodData(found[0]);
+      // Interim feedback
+      if (!result.isFinal) {
+        setFoodInput(result.text);
+        return;
+      }
+
+      // Final processing
+      setIsListening(false);
+      const text = result.text;
+
+      // Smart Parser (Regex)
+      let parsedAmount = '';
+      let parsedUnit = 'g';
+      let parsedFoodName = text;
+
+      // Regex for "200g Steak" or "Steak 200g"
+      // Supports: g, kg, pieces, 個
+      const amountUnitMatch = text.match(/(\d+)\s*(g|kg|ml|oz|lb|grams|gram|个|個|pieces|piece)/i);
+
+      if (amountUnitMatch) {
+        parsedAmount = amountUnitMatch[1];
+        const unitStr = amountUnitMatch[2].toLowerCase();
+
+        if (['个', '個', 'piece', 'pieces'].includes(unitStr)) {
+          parsedUnit = '個';
+        } else {
+          parsedUnit = 'g'; // Default to grams for weight units
+        }
+
+        // Remove the amount string from food name
+        parsedFoodName = text.replace(amountUnitMatch[0], '').trim();
+      } else {
+        // Heuristic: "200 Steak" -> 200g Steak
+        const startNumberMatch = text.match(/^(\d+)\s+(.+)/);
+        if (startNumberMatch) {
+          parsedAmount = startNumberMatch[1];
+          parsedFoodName = startNumberMatch[2];
+        }
+      }
+
+      setFoodInput(parsedFoodName);
+      if (parsedAmount) {
+        setFoodAmount(parsedAmount);
+        setFoodUnit(parsedUnit as 'g' | 'oz' | '個');
+      }
+
+      // Auto-search
+      setShowFoodSuggestions(true);
+      const found = searchFoods(parsedFoodName);
+      if (found.length > 0) {
+        setSelectedFoodData(found[0]);
+      } else {
+        // If strict match fails, try searching the original text just in case
+        const foundFallback = searchFoods(text);
+        if (foundFallback.length > 0) {
+          setSelectedFoodData(foundFallback[0]);
+          setFoodInput(text); // Revert to full text if parsing failed to find food
         }
       }
     });
@@ -163,9 +215,10 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
           // 天気情報に基づいてisSunnyを自動設定
           setIsSunny(weather.condition === 'sunny' || weather.condition === 'partly-cloudy');
         }
-      } catch (error) {
+      } catch {
         // エラーは無視（手動入力にフォールバック）
         if (import.meta.env.DEV) {
+          void 0;
         }
       } finally {
         setIsLoadingWeather(false);
@@ -655,7 +708,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                           weather.condition === 'sunny' || weather.condition === 'partly-cloudy'
                         );
                       }
-                    } catch (error) {
+                    } catch {
                       // エラーは無視
                     } finally {
                       setIsLoadingWeather(false);
@@ -820,6 +873,34 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
               </div>
             </div>
           )}
+        </div>
+
+        {/* 水分セクション */}
+        <div className="input-screen-section">
+          <h2 className="input-screen-section-title">水分 (ml)</h2>
+          <div className="input-screen-input-group">
+            <div style={{ marginBottom: '0.5rem', fontSize: '14px', color: '#78716c' }}>
+              今日: {currentWaterMl}ml
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {[100, 200, 500, 1000].map((ml) => (
+                <button
+                  key={ml}
+                  onClick={() => updateWaterIntake(ml)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid #d6d3d1',
+                    backgroundColor: '#fafaf9',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  +{ml}ml
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* 日記セクション */}
@@ -1072,10 +1153,18 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 };
 
                 // 現在のメトリクス
-                const currentMetrics = dailyLog?.calculatedMetrics;
+                const currentMetrics = dailyLog?.calculatedMetrics || {
+                  effectiveProtein: 0,
+                  fatTotal: 0,
+                  vitaminB12Total: 0,
+                  effectiveIron: 0,
+                  effectiveZinc: 0,
+                } as any; // Allow partial missing props if needed, or cast to CalculatedMetrics if imported
+
                 // プレビュー用のメトリクス（この食品を追加した場合）
+                const currentFuel = dailyLog?.fuel || [];
                 const previewMetrics = calculateAllMetrics(
-                  [...dailyLog.fuel, previewFood],
+                  [...currentFuel, previewFood],
                   userProfile
                 );
 

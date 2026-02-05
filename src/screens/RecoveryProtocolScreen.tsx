@@ -6,9 +6,11 @@
 
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import type { RecoveryProtocol, TodoItem } from '../types';
+import type { RecoveryProtocol } from '../types';
 import { calculateTargetFastEnd } from '../utils/recoveryAlgorithm';
-import { scheduleDefrostReminder, hasMeatInPlan } from '../utils/defrostReminder';
+import { FASTING_TEMPLATES } from '../utils/fastingDefaults';
+import type { DailyLog } from '../types';
+import { scheduleDefrostReminder, hasMeatInPlan, requestNotificationPermission } from '../utils/defrostReminder';
 import { addProtocolToTomorrowLog } from '../utils/tomorrowLog';
 import { logError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
 import './RecoveryProtocolScreen.css';
@@ -24,7 +26,7 @@ export default function RecoveryProtocolScreen({
   onClose,
   onSetProtocol,
 }: RecoveryProtocolScreenProps) {
-  const { dailyLog, saveDailyLog, loadDailyLog } = useApp();
+  const { dailyLog, saveDailyLog, loadTodayLog, updateWaterIntake } = useApp();
   const [fastingHours, setFastingHours] = useState(protocol.fastingTargetHours);
 
   const handleSetProtocol = async () => {
@@ -64,7 +66,7 @@ export default function RecoveryProtocolScreen({
       logError(error, { component: 'RecoveryProtocolScreen', action: 'handleSetProtocol' });
       alert(
         getUserFriendlyErrorMessage(error) ||
-          'エラー: プロトコルの設定に失敗しました。再度お試しください。'
+        'エラー: プロトコルの設定に失敗しました。再度お試しください。'
       );
     }
   };
@@ -86,9 +88,9 @@ export default function RecoveryProtocolScreen({
 
         <div className="recovery-protocol-content">
           {/* Beta版の注意書き */}
-          <div style={{ 
-            padding: '0.75rem', 
-            backgroundColor: '#fef3c7', 
+          <div style={{
+            padding: '0.75rem',
+            backgroundColor: '#fef3c7',
             border: '1px solid #fbbf24',
             borderRadius: '8px',
             marginBottom: '1rem',
@@ -118,6 +120,48 @@ export default function RecoveryProtocolScreen({
             <div className="recovery-protocol-fasting-hint">
               目標断食終了時刻: {calculateTargetFastEnd(fastingHours)}
             </div>
+            <button
+              onClick={async () => {
+                if ('Notification' in window && Notification.permission === 'default') {
+                  await requestNotificationPermission();
+                }
+                const endAt = new Date(Date.now() + fastingHours * 60 * 60 * 1000).toISOString();
+                localStorage.setItem('primal_logic_fasting_timer_end', endAt);
+                (window as unknown as { showToast?: (msg: string) => void }).showToast?.(
+                  `${fastingHours}時間の断食タイマーを開始しました`
+                );
+              }}
+              style={{
+                marginTop: '0.5rem',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid #f43f5e',
+                backgroundColor: '#dcfce7',
+                color: '#166534',
+                cursor: 'pointer',
+                fontSize: '14px',
+              }}
+            >
+              ⏱ 断食タイマーを今すぐ開始
+            </button>
+            <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+              {Object.entries(FASTING_TEMPLATES).map(([key, { name, hours }]) => (
+                <button
+                  key={key}
+                  onClick={() => setFastingHours(hours)}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '6px',
+                    border: '1px solid #a3a3a3',
+                    backgroundColor: '#fafaf9',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {name} ({hours}h)
+                </button>
+              ))}
+            </div>
           </div>
 
           {protocol.activities && protocol.activities.length > 0 && (
@@ -141,8 +185,71 @@ export default function RecoveryProtocolScreen({
                   <span className="recovery-protocol-list-text">{rec}</span>
                 </div>
               ))}
+              <button
+                onClick={() => {
+                  localStorage.setItem('primal_logic_highlight_electrolytes', '1');
+                  onClose();
+                  window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'home' }));
+                  window.dispatchEvent(new CustomEvent('openButcherSelect'));
+                }}
+                style={{
+                  marginTop: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid #f43f5e',
+                  backgroundColor: '#dbeafe',
+                  color: '#1e40af',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                🍽 電解質の多い食品を表示
+              </button>
             </div>
           )}
+
+          {/* 水分追加クイックアクション */}
+          <div className="recovery-protocol-section">
+            <button
+              onClick={() => {
+                updateWaterIntake(2000);
+                (window as unknown as { showToast?: (msg: string) => void }).showToast?.(
+                  '水分 +2000ml を記録しました'
+                );
+              }}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid #0ea5e9',
+                backgroundColor: '#e0f2fe',
+                color: '#0369a1',
+                cursor: 'pointer',
+                fontSize: '14px',
+                width: '100%',
+              }}
+            >
+              💧 水分 +2L を記録
+            </button>
+            <button
+              onClick={() => {
+                onClose();
+                window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'input' }));
+              }}
+              style={{
+                marginTop: '0.5rem',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid #94a3b8',
+                backgroundColor: '#f8fafc',
+                color: '#475569',
+                cursor: 'pointer',
+                fontSize: '14px',
+                width: '100%',
+              }}
+            >
+              水分入力画面を開く
+            </button>
+          </div>
 
           {protocol.supplements && protocol.supplements.length > 0 && (
             <div className="recovery-protocol-section">
@@ -209,7 +316,7 @@ export default function RecoveryProtocolScreen({
                           recoveryProtocol: updatedProtocol,
                         };
                         await saveDailyLog(updatedLog);
-                        loadDailyLog(new Date().toISOString().split('T')[0]);
+                        loadTodayLog();
                       }
                     }}
                     style={{

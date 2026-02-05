@@ -21,23 +21,14 @@ import { logError } from '../utils/errorHandler';
  */
 export async function generateImage(
   prompt: string,
-  size: '1024x1024' | '1792x1024' | '1024x1792' = '1024x1024'
+  _size: '1024x1024' | '1792x1024' | '1024x1792' = '1024x1024'
 ): Promise<string> {
-  // 無料版: プロンプトを返すだけ
-  // 実際の画像生成は以下のサービスで手動実行:
-  // - https://replicate.com/ (Stable Diffusion - 無料枠あり)
-  // - https://huggingface.co/spaces/stabilityai/stable-diffusion (完全無料)
-  // - https://www.craiyon.com/ (無料)
+  if (import.meta.env.DEV) void 0;
 
-  if (import.meta.env.DEV) {
-  }
-
-  // プロンプトをクリップボードにコピーする機能を提供
   if (navigator.clipboard) {
     try {
       await navigator.clipboard.writeText(prompt);
-      if (import.meta.env.DEV) {
-      }
+      if (import.meta.env.DEV) void 0;
     } catch (err) {
       logError(err, {
         component: 'imageGenerationService',

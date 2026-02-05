@@ -59,6 +59,7 @@ export async function saveDailyLog(log: DailyLog): Promise<void> {
               notes: log.status.bowelMovement.notes,
             }
             : undefined,
+          water_intake: log.waterIntake,
         },
         fuel: log.fuel.map((f) => ({
           item: f.item,
@@ -67,7 +68,7 @@ export async function saveDailyLog(log: DailyLog): Promise<void> {
           type: f.type,
           nutrients: f.nutrients || {},
         })),
-        calculated_metrics: {
+        calculated_metrics: log.calculatedMetrics ? {
           net_carbs: log.calculatedMetrics.netCarbs,
           effective_vit_c: log.calculatedMetrics.effectiveVitC,
           vit_c_requirement: log.calculatedMetrics.vitCRequirement,
@@ -111,7 +112,7 @@ export async function saveDailyLog(log: DailyLog): Promise<void> {
                 value,
               ])
           ),
-        },
+        } : {},
         recovery_protocol: log.recoveryProtocol
           ? {
             violation_type: log.recoveryProtocol.violationType,
@@ -175,7 +176,7 @@ async function saveToLocalStorage(log: DailyLog): Promise<void> {
     if (rawData) {
       try {
         logs = JSON.parse(rawData) as DailyLog[];
-      } catch (e) {
+      } catch {
         // パースエラーの場合は空配列から開始
         logs = [];
       }
@@ -443,6 +444,7 @@ function convertLogRowToDailyLog(row: DailyLogRow): DailyLog {
     diary: row.diary,
     weight: row.weight,
     bodyFatPercentage: row.body_fat_percentage,
+    waterIntake: (row.status as { water_intake?: number })?.water_intake,
   };
 }
 
@@ -724,9 +726,9 @@ export async function syncLocalStorageToSupabase(): Promise<void> {
         if (!data) {
           await saveDailyLog(log);
         }
-      } catch (err: any) {
-        // PGRST116は「行が見つからない」エラーなので、保存を試みる
-        if (err.code === 'PGRST116') {
+      } catch (err: unknown) {
+        const code = (err as { code?: string })?.code;
+        if (code === 'PGRST116') {
           await saveDailyLog(log);
         } else {
           logError(err, {
@@ -753,8 +755,9 @@ export async function syncLocalStorageToSupabase(): Promise<void> {
         if (!data) {
           await saveUserProfile(localProfile);
         }
-      } catch (err: any) {
-        if (err.code === 'PGRST116') {
+      } catch (err: unknown) {
+        const code = (err as { code?: string })?.code;
+        if (code === 'PGRST116') {
           await saveUserProfile(localProfile);
         } else {
           logError(err, {

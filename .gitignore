@@ -31,3 +31,11 @@ ios/
 *.njsproj
 *.sln
 *.sw?
+
+# Local Netlify folder
+.netlify
+
+# Security
+*.key
+*.pem
+*.keystore

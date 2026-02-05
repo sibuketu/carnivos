@@ -28,8 +28,8 @@ type CommunityCategory = 'conversations' | 'insights' | 'patterns' | 'consultati
 export default function CommunityScreen({ onBack }: CommunityScreenProps) {
   const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<CommunityCategory>('conversations');
-  const [patterns, setPatterns] = useState<PatternAnalysis | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_patterns, setPatterns] = useState<PatternAnalysis | null>(null);
+  const [_isLoading, setIsLoading] = useState(false);
   const [showConcept, setShowConcept] = useState(false);
 
   useEffect(() => {

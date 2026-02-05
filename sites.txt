@@ -1,0 +1,314 @@
+
+────────────────────────────┐
+ Current Netlify Projects │
+────────────────────────────┘
+
+Count: 75
+
+carnivoslol - 58e34e54-5f4d-446e-b449-69be405283f6
+  url:  https://carnivoslol.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+carnivos - 76fe8c68-347b-4913-8851-1a1613d9afd2
+  url:  https://carnivos.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+incandescent-semifreddo-931cc6 - 5f04d612-6db6-4171-a1f2-908ca7953391
+  url:  https://incandescent-semifreddo-931cc6.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+lambent-crepe-1f7cfb - 1e2f3018-383b-4c3a-93a5-cec9a4a95b7e
+  url:  https://lambent-crepe-1f7cfb.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+poetic-maamoul-08a24d - b47d340d-4a57-4ce3-a692-a53cb63079c8
+  url:  https://poetic-maamoul-08a24d.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+cozy-douhua-d143bf - 83d21571-21a8-43de-84ae-8efffc4e3fbd
+  url:  https://cozy-douhua-d143bf.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+sage-smakager-b7d7d1 - 25eef787-1c03-4eb6-8b97-cb3a054ae37d
+  url:  https://sage-smakager-b7d7d1.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+effulgent-tanuki-c9bb53 - f4b9612d-a5d5-40b8-bc98-49d670d14a2c
+  url:  https://effulgent-tanuki-c9bb53.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+incomparable-dieffenbachia-65efe4 - 5ef10b58-32f2-4057-b7dc-19ef72bf007f
+  url:  https://incomparable-dieffenbachia-65efe4.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+fanciful-arithmetic-9158df - 3f922165-85ae-4f62-a047-b67e658c81e2
+  url:  https://fanciful-arithmetic-9158df.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+funny-rabanadas-fe50ae - b36d6bfe-a4c9-4b8c-ab9f-2e5fc22890d1
+  url:  https://funny-rabanadas-fe50ae.netlify.app
+  repo: https://github.com/sibuketu/carnivos
+  account: UniBloom
+─────────────────────────────────────────────────
+gleaming-donut-0094f6 - 736ac488-9366-4609-b0c1-29d014064f32
+  url:  https://gleaming-donut-0094f6.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+scintillating-dodol-e8fcf2 - 89e8abe3-4c15-4ff6-974b-80cfad6096f1
+  url:  https://scintillating-dodol-e8fcf2.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+fascinating-taffy-bea66c - 46f9472c-fa3e-48df-867d-532ce7da066b
+  url:  https://fascinating-taffy-bea66c.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+ifthen - f089903e-6486-4210-b45c-15e4413d215e
+  url:  https://ifthen.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+glowing-beignet-aac710 - 2aff4a57-805a-4497-aa2d-306756e16651
+  url:  https://glowing-beignet-aac710.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+incomparable-raindrop-06c097 - 3925e157-695d-40c5-9aac-82c4e4d73c64
+  url:  https://incomparable-raindrop-06c097.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+fastidious-rolypoly-431f4e - d01b70c7-a858-4520-a99e-01a76eed2d18
+  url:  https://fastidious-rolypoly-431f4e.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+grand-churros-760b44 - 6e0a83f8-04fd-4e11-83b9-6a7d7c436a4a
+  url:  https://grand-churros-760b44.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+effervescent-dango-861874 - 70cdf1aa-db4f-43b9-9357-fdfd26407f94
+  url:  https://effervescent-dango-861874.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+eloquent-cat-0bbc86 - 98913904-c6d1-4ec9-8438-5be04e46a738
+  url:  https://eloquent-cat-0bbc86.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+glowing-panda-6f166c - 4dfb92b7-6433-4a69-80c5-26fd5791c9b2
+  url:  https://glowing-panda-6f166c.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+dazzling-cassata-88dcf6 - 17968156-9807-4722-8bad-b6301160b5ed
+  url:  https://dazzling-cassata-88dcf6.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+spontaneous-pie-9cd46c - b3033704-c364-451d-828e-0e5ed005579a
+  url:  https://spontaneous-pie-9cd46c.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+elegant-muffin-ad24bd - 74d43b61-d628-4ef6-8a80-6f66bc17d1a9
+  url:  https://elegant-muffin-ad24bd.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+capable-granita-30a6ea - 2c65a8f7-6349-430d-ba04-8834099e92d4
+  url:  https://capable-granita-30a6ea.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+cosmic-jelly-acd17e - acde4b94-343a-4c55-9a7a-522a90fee788
+  url:  https://cosmic-jelly-acd17e.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+celadon-otter-2c756a - 91669019-2db2-44fc-9094-adc8fd8c3b76
+  url:  https://celadon-otter-2c756a.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+zippy-moxie-130cdc - a2608c27-eb3e-4a83-b68a-250b004af0af
+  url:  https://zippy-moxie-130cdc.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+dapper-semifreddo-efea9e - b809a121-c969-4f16-a0ff-0cb76a1fd0d6
+  url:  https://dapper-semifreddo-efea9e.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+amazing-squirrel-526a3a - cbcdce19-347a-47c1-9b62-e15a16bdd161
+  url:  https://amazing-squirrel-526a3a.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+celebrated-queijadas-a79ee4 - e28ca651-ebc9-4dd0-bc57-0478baeb6f0f
+  url:  https://celebrated-queijadas-a79ee4.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+heroic-stardust-524119 - 7799d946-bd26-4aee-a4dc-4f5007a64d65
+  url:  https://heroic-stardust-524119.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+fancy-puppy-70f0cd - 53214ea6-35b4-4182-ad83-4cd5756ea3b7
+  url:  https://fancy-puppy-70f0cd.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+sage-mermaid-06290f - c7428db2-b0f3-4105-80d5-06e11577bb3a
+  url:  https://sage-mermaid-06290f.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+cozy-shortbread-a7a9e6 - ad190f54-ff4b-41ba-8d5b-0f0a0815d8d8
+  url:  https://cozy-shortbread-a7a9e6.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+visionary-dieffenbachia-681e4c - 90b4c66e-0815-4e49-9109-977d5e541052
+  url:  https://visionary-dieffenbachia-681e4c.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+heartfelt-semolina-f3560a - b118a7b3-9ace-4393-a81e-6e0592556139
+  url:  https://heartfelt-semolina-f3560a.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+mellifluous-mooncake-7a0852 - e2c10bf3-d9d9-4d39-93b3-a37ab88bc671
+  url:  https://mellifluous-mooncake-7a0852.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+willowy-kataifi-08d641 - d301a45f-209f-435b-9df0-50775b0bfc4c
+  url:  https://willowy-kataifi-08d641.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+chic-pie-4727f1 - 62cadf87-cefe-42ad-b9e2-d1a465b3f79e
+  url:  https://chic-pie-4727f1.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+rococo-alfajores-8bd456 - ba76e4cd-e04f-470d-8a18-4fdb25fdc22d
+  url:  https://rococo-alfajores-8bd456.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+resonant-clafoutis-bb4e25 - 0149deba-60d9-46c9-afa9-870937e12967
+  url:  https://resonant-clafoutis-bb4e25.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+coruscating-mooncake-f9725f - d655314b-79a5-4cf9-b2b5-47cfff920ccd
+  url:  https://coruscating-mooncake-f9725f.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+dazzling-gecko-d5098a - a94f3e85-c3fe-4d74-9533-16dd53f5779d
+  url:  https://dazzling-gecko-d5098a.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+rad-bubblegum-186743 - 9fea4463-055b-4c9c-bb80-1ba3d380b935
+  url:  https://rad-bubblegum-186743.netlify.app
+  repo: https://github.com/sibuketu/if-then-habit-app-v2
+  account: UniBloom
+─────────────────────────────────────────────────
+if-then-habit-speedrun - 78ad2e2f-3f14-4b3d-8ff4-fdda26e4e719
+  url:  https://if-then-habit-speedrun.netlify.app
+  repo: https://github.com/sibuketu/if-then-habit-app-v2
+  account: UniBloom
+─────────────────────────────────────────────────
+snazzy-puffpuff-4f271f - 341935e8-7b7c-497d-8284-3d2ab7c460a5
+  url:  https://snazzy-puffpuff-4f271f.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+if-then-habit - cbb31a45-5a80-4cb3-8e4a-a423718a6621
+  url:  https://if-then-habit.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+if-then-habit-app - 80fafe14-f818-4d3d-a112-87d3757c150a
+  url:  https://if-then-habit-app.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+jikkou - 9914d0e9-885e-4879-8b28-31ecabdb33b1
+  url:  https://jikkou.netlify.app
+  repo: https://github.com/sibuketu/sibuketu
+  account: UniBloom
+─────────────────────────────────────────────────
+if-then - fc890e94-9ff0-441d-9d8b-9c80f3877e62
+  url:  https://if-then.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+super-taffy-1f52a5 - da77bfce-48e1-4e0a-b1cc-179f7de419b1
+  url:  https://super-taffy-1f52a5.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+bespoke-brioche-7805d6 - ad85e677-b115-43d4-9d23-8606256c61b9
+  url:  https://bespoke-brioche-7805d6.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+harmonious-souffle-f473ce - 535202c8-3832-4d90-9240-137969fc00ee
+  url:  https://harmonious-souffle-f473ce.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+mellow-otter-2e493f - a858df8e-4efb-4973-9de9-24acf5c7c38f
+  url:  https://mellow-otter-2e493f.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+grand-crepe-cfa827 - 1d93efe6-fd37-45b2-b4a0-142377a50100
+  url:  https://grand-crepe-cfa827.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+preeminent-bienenstitch-99d6d0 - 32544901-128d-4b8a-ba68-7b58a0dcd451
+  url:  https://preeminent-bienenstitch-99d6d0.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+resilient-cajeta-d7247b - f9342216-36d7-4603-ac9f-9692097e8af6
+  url:  https://resilient-cajeta-d7247b.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+resplendent-pie-fd2ea3 - 1c62af8c-a539-480e-a4fd-bcaf8381d4e1
+  url:  https://resplendent-pie-fd2ea3.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+scintillating-kelpie-a19b52 - a4bc84f3-2c74-4d84-b0a0-5c3b466eb061
+  url:  https://scintillating-kelpie-a19b52.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+zesty-tanuki-9beaba - 77982b27-4e42-458a-9788-4a20ff940e34
+  url:  https://zesty-tanuki-9beaba.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+darling-marigold-f8d526 - c25f8e82-b733-4e86-87e1-64bbe6acfdd7
+  url:  https://darling-marigold-f8d526.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+coruscating-froyo-417624 - 7379cd15-749e-42ed-9c69-ad3071837b58
+  url:  https://coruscating-froyo-417624.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+elaborate-faloodeh-85b1ee - 96dcbe28-03dd-4027-b4c9-c6487bd96fec
+  url:  https://elaborate-faloodeh-85b1ee.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+thunderous-sherbet-026d72 - 6936dd0a-ae3d-4ba9-83dd-486b8e34da20
+  url:  https://thunderous-sherbet-026d72.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+transcendent-mousse-07eca7 - 3fbfda5a-1f78-4004-b21f-f86863e1aad7
+  url:  https://transcendent-mousse-07eca7.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+legendary-biscuit-694b8d - c2d0e02b-9587-4b0c-9af6-c837f664f405
+  url:  https://legendary-biscuit-694b8d.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+taupe-zuccutto-22d416 - 412ce3bd-8c22-4b15-a141-2476018c6379
+  url:  https://taupe-zuccutto-22d416.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+deft-biscochitos-e1684b - 6c051c1d-c642-4d0a-b62e-40e6f54a10e8
+  url:  https://deft-biscochitos-e1684b.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+unismartphone - 17d59683-96fa-41fe-9791-82f6089c045f
+  url:  https://unismartphone.netlify.app
+  repo: https://github.com/sibuketu/sibuketu
+  account: UniBloom
+─────────────────────────────────────────────────
+idyllic-bonbon-29154f - 7aacd95b-8586-43ab-9bb0-378e1d9d72af
+  url:  https://idyllic-bonbon-29154f.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+zippy-torte-f967a7 - b4e1ccb1-7194-4c60-b543-063df9d5e999
+  url:  https://zippy-torte-f967a7.netlify.app
+  account: UniBloom
+─────────────────────────────────────────────────
+scintillating-dango-95380a - 69f67707-83ab-4846-a5f2-966483320ffd
+  url:  https://scintillating-dango-95380a.netlify.app
+  repo: https://github.com/sibuketu/sibuketu
+  account: UniBloom
+─────────────────────────────────────────────────
+shimmering-entremet-16aa21 - ec76339a-692e-4f93-aab8-06daa7ce7fb5
+  url:  https://shimmering-entremet-16aa21.netlify.app
+  repo: https://github.com/sibuketu/sibuketu
+  account: UniBloom
+─────────────────────────────────────────────────

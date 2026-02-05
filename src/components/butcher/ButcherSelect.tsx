@@ -9,7 +9,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { getFoodMasterItem, type FoodMasterItem } from '../../data/foodMaster';
 import { useUserConfig } from '../../hooks/useUserConfig';
-import { DEFAULT_CARNIVORE_TARGETS, CARNIVORE_NUTRIENT_TARGETS, type CarnivoreTargets } from '../../data/carnivoreTargets';
+import { DEFAULT_CARNIVORE_TARGETS, CARNIVORE_NUTRIENT_TARGETS, type CarnivoreTarget } from '../../data/carnivoreTargets';
 import type { PreviewData } from '../../hooks/useNutrition';
 import {
   getButcherNutrientOrder,
@@ -19,19 +19,19 @@ import {
 } from '../../utils/butcherNutrientOrder';
 import { getNutrientDisplaySettings, type NutrientKey } from '../../utils/nutrientDisplaySettings';
 import { getFeatureDisplaySettings } from '../../utils/featureDisplaySettings';
-import { analyzeFoodImage } from '../../services/aiService';
-import { logError } from '../../utils/errorHandler';
+
 import { useTranslation, getLanguage } from '../../utils/i18n';
 import MiniNutrientGauge from '../MiniNutrientGauge';
 import StorageNutrientGauge from '../StorageNutrientGauge';
 import type { FoodItem } from '../../types';
+import FoodSearchModal from './FoodSearchModal';
+
 
 // masterRef: maps each part to its FOOD_MASTER category and key
 type PartDef = { id: string; label: string; masterRef: { category: string; key: string } };
 type AnimalDef = {
   type: string;
   label: string;
-  labelJa: string;
   icon: string;
   omega6Warning?: boolean;
   parts: PartDef[];
@@ -41,8 +41,7 @@ type AnimalDef = {
 const INTERNAL_ANIMALS: AnimalDef[] = [
   {
     type: 'ruminant',
-    label: 'Ruminant Meat',
-    labelJa: '反芻動物（牛・羊）',
+    label: 'Ruminant',
     icon: '🥩',
     parts: [
       { id: 'ribeye', label: 'Ribeye Steak', masterRef: { category: 'beef', key: 'ribeye' } },
@@ -60,9 +59,8 @@ const INTERNAL_ANIMALS: AnimalDef[] = [
   {
     type: 'pork_poultry',
     label: 'Pork & Poultry',
-    labelJa: '豚・鶏 ⚠️Ω6',
     icon: '🥓',
-    omega6Warning: true, // ⚠️ High Omega-6 表示用
+    omega6Warning: true,
     parts: [
       { id: 'bacon', label: 'Bacon (Sugar-Free)', masterRef: { category: 'pork', key: 'bacon' } },
       { id: 'chicken_thigh', label: 'Chicken Thighs', masterRef: { category: 'chicken', key: 'thigh' } },
@@ -76,7 +74,6 @@ const INTERNAL_ANIMALS: AnimalDef[] = [
   {
     type: 'seafood',
     label: 'Seafood',
-    labelJa: '魚介類',
     icon: '🐟',
     parts: [
       { id: 'salmon', label: 'Salmon', masterRef: { category: 'fish', key: 'salmon' } },
@@ -92,7 +89,6 @@ const INTERNAL_ANIMALS: AnimalDef[] = [
   {
     type: 'eggs_fats',
     label: 'Eggs & Fats',
-    labelJa: '卵・脂質',
     icon: '🥚',
     parts: [
       { id: 'egg', label: 'Whole Eggs', masterRef: { category: 'dairy', key: 'egg' } },
@@ -109,7 +105,6 @@ const INTERNAL_ANIMALS: AnimalDef[] = [
   {
     type: 'organs',
     label: 'Organs',
-    labelJa: '内臓',
     icon: '🫀',
     parts: [
       { id: 'beef_liver', label: 'Beef Liver', masterRef: { category: 'beef', key: 'liver' } },
@@ -144,24 +139,7 @@ interface ButcherSelectProps {
   initialAnimal?: AnimalType;
   onSelect?: (animal: string, part: string) => void;
   onPreviewChange?: (preview: PreviewData | null) => void;
-  onFoodAdd?: (foodItem: {
-    item: string;
-    amount: number;
-    unit: 'g' | '個';
-    type: 'animal' | 'ruminant' | 'dairy';
-    nutrients: {
-      protein: number;
-      fat: number;
-      carbs: number;
-      netCarbs: number;
-      zinc?: number;
-      sodium?: number;
-      magnesium?: number;
-      iron?: number;
-      vitaminB12?: number;
-      [key: string]: number | undefined;
-    };
-  }) => void;
+  onFoodAdd?: (foodItem: FoodItem) => void;
   previewGauges?: React.ReactNode[]; // プレビューゲージをpropsとして受け取る
   currentDailyTotal?: {
     protein?: number;
@@ -179,7 +157,7 @@ interface ButcherSelectProps {
     vitamin_b7?: number;
     [key: string]: number | undefined;
   }; // 今日すでに確定した摂取量
-  dynamicTargets?: CarnivoreTargets; // 動的栄養素目標値（ユーザープロファイルから計算）
+  dynamicTargets?: CarnivoreTarget; // 動的栄養素目標値（ユーザープロファイルから計算）
 }
 
 // Avoid Zoneゲージ用コンポーネント（上限違反でOUT表示、4ゾーングラデーション統一）
@@ -208,9 +186,9 @@ const AvoidGauge = ({
     } else if (percentValue < 100) {
       return '#f97316'; // オレンジ（やや不足）
     } else if (percentValue < 120) {
-      return '#22c55e'; // 緑（適切）
+      return '#f43f5e'; // 緑（適切）
     } else {
-      return '#a855f7'; // 紫（過剰）
+      return '#f43f5e'; // 紫（過剰）
     }
   };
 
@@ -308,12 +286,6 @@ const OmegaRatioDisplay = ({ omega3, omega6 }: { omega3: number; omega6: number 
   };
 
   const status = getStatus();
-
-  const getStatusColor = () => {
-    if (status === 'optimal') return '#34C759';
-    if (status === 'warning') return '#FF3B30';
-    return '#FF9500';
-  };
 
   // シーソー表示用のパーセンテージ
   const total = omega3 + omega6;
@@ -431,7 +403,7 @@ export default function ButcherSelect({
   onSelect,
   onPreviewChange,
   onFoodAdd,
-  previewGauges = [],
+  previewGauges: _previewGauges = [],
   currentDailyTotal = {},
   dynamicTargets = DEFAULT_CARNIVORE_TARGETS,
 }: ButcherSelectProps) {
@@ -446,13 +418,16 @@ export default function ButcherSelect({
   const [selectedSaltType, setSelectedSaltType] = useState<
     'table_salt' | 'sea_salt' | 'himalayan_salt' | 'celtic_salt'
   >(config.saltType || 'table_salt');
-  const [eggCookingMethod, setEggCookingMethod] = useState<'raw' | 'cooked'>('cooked'); // 卵の調理法（デフォルト: 加熱）
+  const [eggCookingMethod, _setEggCookingMethod] = useState<'raw' | 'cooked'>('cooked'); // 卵の調理法（デフォルト: 加熱）
   // 各動物タイプごとの調理法を保持（タブ切り替え時も状態を維持）
   const [cookingMethodByAnimal, setCookingMethodByAnimal] = useState<Record<string, 'raw' | 'cooked'>>({
     ruminant: 'raw',
     pork_poultry: 'raw',
     seafood: 'raw',
   });
+  // const [eggCookingMethod, setEggCookingMethod] = useState<'raw' | 'cooked'>('cooked'); // Unused separate state? Using cookingMethodByAnimal logic instead?
+  // Actually line 428 defined eggCookingMethod. Let's keep it but prefix setter if unused
+
 
   // 現在の動物の調理法を取得
   const meatCookingMethod = cookingMethodByAnimal[selectedAnimal] || 'raw';
@@ -466,13 +441,22 @@ export default function ButcherSelect({
   };
 
   // Nutrients Breakdownの並び順管理
-  const [nutrientOrder, setNutrientOrder] = useState(getButcherNutrientOrder);
+  const [nutrientOrder, _setNutrientOrder] = useState(getButcherNutrientOrder);
   const [sortMode, setSortMode] = useState<SortMode>('default'); // 並び替えモード
   // 写真アップロード関連
-  const [isAnalyzingPhoto, setIsAnalyzingPhoto] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   // 「避けるべきもの」セクションの「もっと見る」ボタン状態
   const [showAllAntinutrients, setShowAllAntinutrients] = useState(false);
+  // AI自信度検証用ステート
+  const [pendingVerification, setPendingVerification] = useState<{
+    foodItem: FoodItem;
+    confidence: number;
+  } | null>(null);
+
+  // Manual Search Modal State
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [searchModalQuery, setSearchModalQuery] = useState('');
+
 
   // 機能表示設定を取得
   const featureDisplaySettings = getFeatureDisplaySettings();
@@ -525,8 +509,7 @@ export default function ButcherSelect({
       }, 0);
       return () => clearTimeout(timer);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialAnimal]); // initialAnimalのみを依存配列に（selectedAnimalは意図的に除外）
+  }, [initialAnimal]);
 
   // 選択された食品マスターデータを取得
   const selectedFoodItem: FoodMasterItem | undefined = useMemo(() => {
@@ -534,8 +517,75 @@ export default function ButcherSelect({
     return lookupFoodMaster(selectedAnimal, selectedPart);
   }, [selectedAnimal, selectedPart]);
 
+  // 食品おすすめ（不足栄養素を補える上位3食品に色付け）
+  // リカバリー「電解質の多い食品を表示」時は電解質のみを優先
+  const recommendedPartIds = useMemo(() => {
+    const highlightElectrolytes = typeof window !== 'undefined' && localStorage.getItem('primal_logic_highlight_electrolytes') === '1';
+    if (highlightElectrolytes) {
+      try {
+        localStorage.removeItem('primal_logic_highlight_electrolytes');
+      } catch {
+        void 0;
+      }
+    }
+    const nutrientsToCheck: Array<{ targetKey: keyof CarnivoreTarget; foodKey: keyof FoodMasterItem }> = highlightElectrolytes
+      ? [
+          { targetKey: 'sodium', foodKey: 'sodium' },
+          { targetKey: 'magnesium', foodKey: 'magnesium' },
+          { targetKey: 'potassium', foodKey: 'potassium' },
+        ]
+      : [
+      { targetKey: 'protein', foodKey: 'protein' },
+      { targetKey: 'fat', foodKey: 'fat' },
+      { targetKey: 'zinc', foodKey: 'zinc' },
+      { targetKey: 'magnesium', foodKey: 'magnesium' },
+      { targetKey: 'iron', foodKey: 'iron' },
+      { targetKey: 'sodium', foodKey: 'sodium' },
+      { targetKey: 'potassium', foodKey: 'potassium' },
+      { targetKey: 'vitamin_a', foodKey: 'vitamin_a' },
+      { targetKey: 'vitamin_d', foodKey: 'vitamin_d' },
+      { targetKey: 'vitamin_k2', foodKey: 'vitamin_k2' },
+      { targetKey: 'vitamin_b12', foodKey: 'vitamin_b12' },
+      { targetKey: 'choline', foodKey: 'choline' },
+    ];
+    const deficits: Record<string, number> = {};
+    if (highlightElectrolytes) {
+      deficits.sodium = 5000;
+      deficits.magnesium = 400;
+      deficits.potassium = 3000;
+    } else {
+    for (const { targetKey } of nutrientsToCheck) {
+      const target = (dynamicTargets as Record<string, number>)[targetKey];
+      const current = (currentDailyTotal as Record<string, number>)[targetKey] ?? 0;
+      if (typeof target === 'number' && target > 0) {
+        const d = Math.max(0, target - current);
+        if (d > 0) deficits[targetKey] = d;
+      }
+    }
+    }
+    if (Object.keys(deficits).length === 0) return [];
+    const scores: Array<{ partId: string; score: number }> = [];
+    for (const part of currentAnimal.parts) {
+      const foodItem = lookupFoodMaster(selectedAnimal, part.id);
+      if (!foodItem) continue;
+      let score = 0;
+      for (const { targetKey, foodKey } of nutrientsToCheck) {
+        const deficit = deficits[targetKey];
+        if (!deficit) continue;
+        const foodVal = (foodItem as Record<string, { value?: number } | undefined>)[foodKey]?.value ?? 0;
+        if (foodVal > 0) score += Math.min(100, (foodVal / deficit) * 100);
+      }
+      scores.push({ partId: part.id, score });
+    }
+    return scores
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .filter((s) => s.score > 0)
+      .map((s) => s.partId);
+  }, [currentAnimal, selectedAnimal, currentDailyTotal, dynamicTargets]);
+
   // 栄養素をリアルタイム計算（微量栄養素も含む）
-  // TODO: Implement actual topping logic. Currently using defaults to fix crash.
+  // topping 専用機能は作らない。タロー等は部位選択で追加する想定。塩は saltGrinds（docs/用語_実装の定義と表記一覧.md）
   const toppingNutrients = {
     fat: 0,
     fat_tallow: 0,
@@ -633,6 +683,10 @@ export default function ButcherSelect({
     config.saltUnitWeight,
     eggCookingMethod,
     meatCookingMethod,
+    toppingNutrients.fat,
+    toppingNutrients.fat_tallow,
+    toppingNutrients.magnesium,
+    toppingNutrients.sodium
   ]);
 
 
@@ -681,8 +735,7 @@ export default function ButcherSelect({
 
   // パーツ選択ハンドラ
   const handlePartSelect = (partId: string) => {
-    if (import.meta.env.DEV) {
-    }
+    if (import.meta.env.DEV) void 0;
     setSelectedPart(partId);
 
     // デフォルト量を設定
@@ -713,156 +766,53 @@ export default function ButcherSelect({
     }
   };
 
-  // 写真アップロード処理
-  const handlePhotoUpload = async () => {
-    if (!fileInputRef.current) {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.capture = 'environment';
-      input.style.display = 'none';
-      document.body.appendChild(input);
-      fileInputRef.current = input;
-    }
 
-    fileInputRef.current.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file || !onFoodAdd) return;
+  const handleSearchSelect = (masterItem: FoodMasterItem) => {
+    // 検索結果からFoodItemを生成
+    const amount = masterItem.default_unit || 100;
+    const ratio = amount / 100;
 
-      setIsAnalyzingPhoto(true);
-      try {
-        const result = await analyzeFoodImage(file);
-        const { getFoodMasterItem, searchFoodMasterByName } = await import('../../data/foodMaster');
-
-        // 食品名からマスターデータを検索（AIが返した食品名を使用）
-        let masterItem = searchFoodMasterByName(result.foodName);
-
-        // 見つからない場合は、typeに基づいてデフォルトを設定
-        if (!masterItem) {
-          if (result.type === 'ruminant' || result.type === 'animal') {
-            masterItem = getFoodMasterItem('beef', 'ribeye');
-          } else if (result.type === 'dairy') {
-            masterItem = getFoodMasterItem('dairy', 'butter');
-          } else {
-            masterItem = getFoodMasterItem('beef', 'ribeye'); // デフォルト
-          }
-        }
-
-        const ratio = result.estimatedWeight / 100;
-
-        const foodItem: FoodItem = {
-          item: result.foodName,
-          amount: result.estimatedWeight,
-          unit: 'g' as const,
-          type: 'ruminant' as const,
-          nutrients: (() => {
-            // 栄養素キー名のマッピング（AIが返すキー名 → FoodItemのキー名）
-            const nutrientKeyMap: Record<string, string> = {
-              protein: 'protein',
-              fat: 'fat',
-              carbs: 'carbs',
-              fiber: 'fiber',
-              sodium: 'sodium',
-              potassium: 'potassium',
-              magnesium: 'magnesium',
-              zinc: 'zinc',
-              iron: 'iron',
-              calcium: 'calcium',
-              phosphorus: 'phosphorus',
-              selenium: 'selenium',
-              copper: 'copper',
-              manganese: 'manganese',
-              vitaminA: 'vitaminA',
-              vitaminD: 'vitaminD',
-              vitaminE: 'vitaminE',
-              vitaminK: 'vitaminK',
-              vitaminK2: 'vitaminK2',
-              vitaminB1: 'vitaminB1',
-              vitaminB2: 'vitaminB2',
-              vitaminB3: 'vitaminB3',
-              vitaminB5: 'vitaminB5',
-              vitaminB6: 'vitaminB6',
-              vitaminB7: 'vitaminB7',
-              vitaminB9: 'vitaminB9',
-              vitaminB12: 'vitaminB12',
-              vitaminC: 'vitaminC',
-              choline: 'choline',
-              taurine: 'taurine',
-              iodine: 'iodine',
-              omega3: 'omega3',
-              omega6: 'omega6',
-              glycine: 'glycine',
-              methionine: 'methionine',
-              chromium: 'chromium',
-              molybdenum: 'molybdenum',
-              boron: 'boron',
-              vanadium: 'vanadium',
-            };
-
-            // マスターデータから基本栄養素を取得
-            const baseNutrients: Partial<FoodItem['nutrients']> = masterItem
-              ? {
-                protein: (masterItem.protein?.value || 0) * ratio,
-                fat: (masterItem.fat?.value || 0) * ratio,
-                carbs: (masterItem.carbs?.value || 0) * ratio,
-                netCarbs: (masterItem.carbs?.value || 0) * ratio,
-                zinc: (masterItem.zinc?.value || 0) * ratio,
-                sodium: (masterItem.sodium?.value || 0) * ratio,
-                magnesium: (masterItem.magnesium?.value || 0) * ratio,
-                hemeIron: (masterItem.iron?.value || 0) * ratio,
-                nonHemeIron: 0,
-                vitaminB12: (masterItem.vitamin_b12?.value || 0) * ratio,
-                potassium: (masterItem.potassium?.value || 0) * ratio,
-                calcium: (masterItem.calcium?.value || 0) * ratio,
-                phosphorus: (masterItem.phosphorus?.value || 0) * ratio,
-                vitaminA: (masterItem.vitamin_a?.value || 0) * ratio,
-                vitaminD: (masterItem.vitamin_d?.value || 0) * ratio,
-                vitaminK2: (masterItem.vitamin_k2?.value || 0) * ratio,
-                omega3: (masterItem.omega_3?.value || 0) * ratio,
-                omega6: (masterItem.omega_6?.value || 0) * ratio,
-                choline: (masterItem.choline?.value || 0) * ratio,
-                iodine: (masterItem.iodine?.value || 0) * ratio,
-                vitaminB7: (masterItem.vitamin_b7?.value || 0) * ratio,
-                glycine: (masterItem.glycine?.value || 0) * ratio,
-                methionine: (masterItem.methionine?.value || 0) * ratio,
-              }
-              : {};
-
-            // AIが返した栄養素をマッピングして追加（マスターデータを上書き）
-            const aiNutrients: Partial<FoodItem['nutrients']> = {};
-            if (result.nutrients) {
-              Object.entries(result.nutrients).forEach(([key, value]) => {
-                const mappedKey = nutrientKeyMap[key] || key;
-                if (mappedKey && typeof value === 'number') {
-                  (aiNutrients as Record<string, number>)[mappedKey] = value * ratio;
-                }
-              });
-            }
-
-            // マスターデータとAIの栄養素をマージ（AIの値を優先）
-            return { ...baseNutrients, ...aiNutrients };
-          })(),
-        };
-
-        onFoodAdd(foodItem as Parameters<NonNullable<ButcherSelectProps['onFoodAdd']>>[0]);
-        setIsAnalyzingPhoto(false);
-
-        // ファイル入力クリア
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-      } catch (error) {
-        setIsAnalyzingPhoto(false);
-        logError(error, { component: 'ButcherSelect', action: 'handlePhotoAnalysis' });
-        alert(t('butcher.photoAnalysisFailed'));
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
+    const foodItem: FoodItem = {
+      item: currentLang === 'ja' ? masterItem.name_ja : masterItem.name,
+      amount: amount,
+      unit: 'g',
+      type: 'ruminant', // Default fallback
+      nutrients: {
+        protein: (masterItem.protein.value || 0) * ratio,
+        fat: (masterItem.fat.value || 0) * ratio,
+        carbs: (masterItem.carbs?.value || 0) * ratio,
+        netCarbs: (masterItem.carbs?.value || 0) * ratio,
+        zinc: (masterItem.zinc?.value || 0) * ratio,
+        sodium: (masterItem.sodium?.value || 0) * ratio,
+        magnesium: (masterItem.magnesium?.value || 0) * ratio,
+        hemeIron: (masterItem.iron?.value || 0) * ratio,
+        nonHemeIron: 0,
+        vitaminB12: (masterItem.vitamin_b12?.value || 0) * ratio,
+        potassium: (masterItem.potassium?.value || 0) * ratio,
+        calcium: (masterItem.calcium?.value || 0) * ratio,
+        phosphorus: (masterItem.phosphorus?.value || 0) * ratio,
+        vitaminA: (masterItem.vitamin_a?.value || 0) * ratio,
+        vitaminD: (masterItem.vitamin_d?.value || 0) * ratio,
+        vitaminK2: (masterItem.vitamin_k2?.value || 0) * ratio,
+        omega3: (masterItem.omega_3?.value || 0) * ratio,
+        omega6: (masterItem.omega_6?.value || 0) * ratio,
+        choline: (masterItem.choline?.value || 0) * ratio,
+        iodine: (masterItem.iodine?.value || 0) * ratio,
+        vitaminB7: (masterItem.vitamin_b7?.value || 0) * ratio,
+        glycine: (masterItem.glycine?.value || 0) * ratio,
+        methionine: (masterItem.methionine?.value || 0) * ratio,
       }
     };
 
-    fileInputRef.current.click();
+    if (onFoodAdd) {
+      onFoodAdd(foodItem);
+      if (typeof window !== 'undefined' && (window as Window & { showToast?: (msg: string) => void }).showToast) {
+        (window as Window & { showToast: (msg: string) => void }).showToast(`🥩 ${foodItem.item} 追加!`);
+      }
+    }
   };
+
+
 
   const handleAddFood = () => {
     if (!selectedFoodItem || !calculatedNutrients || !onFoodAdd) return;
@@ -961,26 +911,21 @@ export default function ButcherSelect({
     onFoodAdd(foodItem);
 
     // トースト通知を表示
-    if (typeof window !== 'undefined' && (window as any).showToast) {
+    const win = window as Window & { showToast?: (msg: string) => void };
+    if (typeof window !== 'undefined' && win.showToast) {
       const displayAmount = selectedAnimal === 'eggs_fats' && selectedPart === 'egg' && unit === '個'
         ? amount
         : actualAmount;
       const displayUnit = selectedAnimal === 'eggs_fats' && selectedPart === 'egg' && unit === '個'
         ? '個'
         : 'g';
-      (window as any).showToast(`🥩 ${getFoodName(selectedFoodItem)} ${displayAmount}${displayUnit} 追加!`);
+      win.showToast(`🥩 ${getFoodName(selectedFoodItem)} ${displayAmount}${displayUnit} 追加!`);
     }
 
-    // 食品追加後は選択部位のみリセット（連続追加を可能にする）
-    // ButcherSelect自体は開いたままにする
-    const currentPart = selectedPart; // リセット前に保存
     setSelectedPart(null);
 
-    // デフォルト量をリセット
     if (selectedAnimal === 'eggs_fats') {
-      setAmount(50);
-    } else if (selectedAnimal === 'eggs_fats') {
-      setAmount(100);
+      setAmount(selectedPart === 'egg' ? 50 : 100);
     } else {
       setAmount(300);
     }
@@ -990,9 +935,8 @@ export default function ButcherSelect({
     }
   };
 
-  // 表示用データ（プレビュー値 = 選択中の食品のみの値）
-  // 注意: これはプレビュー値なので、確定値（NutrientGauge）とは異なる可能性がある
-  const currentNutrients = calculatedNutrients
+  // 表示用データ（プレビュー値 = 選択中の食品のみの値）（将来の表示用に保持）
+  const _currentNutrients = calculatedNutrients
     ? {
       protein: calculatedNutrients.protein,
       fat: calculatedNutrients.fat,
@@ -1017,7 +961,7 @@ export default function ButcherSelect({
   return (
     <div className="flex flex-col gap-4 p-4 w-full max-w-md mx-auto pb-40 pt-36">
       {/* 動物タブ (Style強制) */}
-      <div className="flex gap-2 mb-4 relative z-40">
+      <div className="flex flex-wrap gap-2 mb-4 relative z-40">
         {INTERNAL_ANIMALS.map((animal) => {
           const isActive = selectedAnimal === animal.type;
           return (
@@ -1035,18 +979,21 @@ export default function ButcherSelect({
                   setAmount(300);
                 }
               }}
-              className="flex-1 py-3 px-2 rounded-lg font-bold transition-all border-b-4 shadow-sm relative overflow-hidden active:scale-95"
+              className="px-3 py-3 rounded-2xl flex flex-col items-center justify-center transition-all duration-200 min-w-[30%]"
               style={{
-                backgroundColor: isActive ? '#b91c1c' : '#f5f5f4',
-                color: isActive ? 'white' : '#78716c',
-                borderColor: isActive ? '#991b1b' : 'transparent',
-                transform: isActive ? 'scale(1.02)' : 'scale(1)',
+                flex: '1 1 30%',
+                backgroundColor: isActive ? '#ef4444' : '#292524', // Red-500 : Stone-800
+                color: isActive ? 'white' : '#a8a29e', // White : Stone-400
+                boxShadow: isActive
+                  ? '0 10px 15px -3px rgba(239, 68, 68, 0.4)'
+                  : '0 4px 6px -1px rgba(0, 0, 0, 0.2)', // Darker shadow for inactive
+                transform: isActive ? 'translateY(-2px)' : 'scale(1)',
                 cursor: 'pointer',
               }}
             >
-              <span className="text-2xl block">{animal.icon}</span>
-              <span className="text-[10px] font-bold block leading-tight mt-1">
-                {currentLang === 'ja' ? animal.labelJa : animal.label}
+              <span className="text-2xl mb-1 drop-shadow-sm">{animal.icon}</span>
+              <span className={`text-[12px] font-bold tracking-wide ${isActive ? 'opacity-100' : 'opacity-70'}`}>
+                {animal.label}
               </span>
             </button>
           );
@@ -1104,8 +1051,8 @@ export default function ButcherSelect({
 
       {/* Nutrients Breakdown Summary (Unselected State) - Moved above buttons for visibility */}
       {!selectedPart && (
-        <div className="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden relative z-40 p-4 mb-4">
-          <h3 className="text-sm font-bold text-stone-500 mb-3 flex items-center gap-2">
+        <div className="bg-stone-900/80 rounded-xl shadow-lg border border-stone-800 overflow-hidden relative z-40 p-4 mb-4">
+          <h3 className="text-sm font-bold text-stone-400 mb-3 flex items-center gap-2">
             <span>📊</span> {t('butcher.nutrientBreakdown') || 'NUTRIENT BREAKDOWN'} (Today)
           </h3>
           <div className="space-y-3">
@@ -1132,39 +1079,45 @@ export default function ButcherSelect({
 
       {/* カテゴリと部位の境界線 */}
       <div className="flex items-center gap-2 mb-4 mt-2">
-        <div className="h-px bg-stone-300 flex-1"></div>
-        <span className="text-xs font-bold text-stone-400">SELECT PART</span>
-        <div className="h-px bg-stone-300 flex-1"></div>
+        <div className="h-px bg-stone-800 flex-1"></div>
+        <span className="text-xs font-bold text-stone-500">SELECT PART</span>
+        <div className="h-px bg-stone-800 flex-1"></div>
       </div>
 
       {/* 部位ボタン */}
-      <div className="grid grid-cols-3 gap-3 mb-4 relative z-40">
+      <div className="grid grid-cols-2 gap-3 mb-6 relative z-40">
         {currentAnimal.parts.map((part) => {
           const isPartActive = selectedPart === part.id;
+          const isRecommended = recommendedPartIds.includes(part.id);
           // 食品名を取得（foodMasterから）
           const foodItem = lookupFoodMaster(selectedAnimal, part.id);
           const getPartLabel = (): string => {
             if (!foodItem) return part.label;
-            if (currentLang === 'ja') return foodItem.name_ja;
-            if (currentLang === 'fr') return foodItem.name_fr || foodItem.name;
-            if (currentLang === 'de') return foodItem.name_de || foodItem.name;
-            if (currentLang === 'zh') return foodItem.name_ja;
-            return foodItem.name;
+            return foodItem.name; // Always English
           };
           return (
             <button
               key={part.id}
               onClick={() => handlePartSelect(part.id)}
-              className="py-3 px-1 rounded-md text-sm font-bold shadow-sm transition-all active:scale-95"
+              className="py-4 px-4 rounded-2xl text-sm font-bold transition-all duration-200 flex items-center justify-between group"
               style={{
-                backgroundColor: isPartActive ? '#dc2626' : 'white',
-                color: isPartActive ? 'white' : '#44403c',
-                border: isPartActive ? 'none' : '1px solid #e7e5e4',
-                boxShadow: isPartActive ? '0 4px 6px -1px rgba(220, 38, 38, 0.5)' : 'none',
+                backgroundColor: isPartActive ? '#ef4444' : isRecommended ? 'rgba(76, 175, 80, 0.15)' : '#292524',
+                color: isPartActive ? 'white' : isRecommended ? '#86efac' : '#d6d3d1',
+                border: isPartActive ? 'none' : isRecommended ? '2px solid #4CAF50' : '1px solid #44403c',
+                boxShadow: isPartActive
+                  ? '0 10px 15px -3px rgba(239, 68, 68, 0.3)'
+                  : isRecommended
+                    ? '0 0 0 1px rgba(76, 175, 80, 0.4), 0 4px 6px -1px rgba(0, 0, 0, 0.2)'
+                    : '0 4px 6px -1px rgba(0, 0, 0, 0.2)',
+                transform: isPartActive ? 'scale(1.02)' : 'scale(1)',
                 cursor: 'pointer',
               }}
             >
-              {getPartLabel()}
+              <span className="transform group-active:scale-95 transition-transform flex items-center gap-1.5">
+                {getPartLabel()}
+                {isRecommended && !isPartActive && <span className="text-xs opacity-90">⭐</span>}
+              </span>
+              {isPartActive && <span className="text-lg animate-pulse">●</span>}
             </button>
           );
         })}
@@ -1174,9 +1127,9 @@ export default function ButcherSelect({
 
 
       {selectedPart && selectedFoodItem && (
-        <div className="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden relative z-40">
+        <div className="bg-stone-900 rounded-xl shadow-lg border border-stone-800 overflow-hidden relative z-40">
           {/* 量入力エリア */}
-          <div className="p-4 border-b border-stone-100">
+          <div className="p-4 border-b border-stone-800">
             {/* 量入力エリア */}
             {selectedAnimal === 'eggs_fats' && selectedPart === 'salt' ? (
               // 塩の場合はスピナー（数値入力）
@@ -1309,10 +1262,10 @@ export default function ButcherSelect({
               // その他の食品はスライダー
               <>
                 <div className="flex justify-between items-baseline mb-2">
-                  <label className="text-sm font-bold text-stone-700">
+                  <label className="text-sm font-bold text-stone-400">
                     {t('butcher.quantity')}
                   </label>
-                  <span className="text-2xl font-bold text-stone-900">
+                  <span className="text-2xl font-bold text-stone-200">
                     {amount}
                     {unit === '個' ? t('butcher.piece') : 'g'}
                   </span>
@@ -1342,7 +1295,7 @@ export default function ButcherSelect({
                         setAmount(newValue);
                       }
                     }}
-                    className="flex-1 h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-red-600"
+                    className="flex-1 h-2 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-red-600"
                   />
                   <button
                     onClick={() => {
@@ -1429,7 +1382,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.protein || 0,
                     previewAmount: calculatedNutrients.protein,
                     target: dynamicTargets.protein,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'g',
                   },
                   fat: {
@@ -1437,7 +1390,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.fat || 0,
                     previewAmount: calculatedNutrients.fat,
                     target: dynamicTargets.fat,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'g',
                   },
                   zinc: {
@@ -1445,7 +1398,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.zinc || 0,
                     previewAmount: calculatedNutrients.zinc,
                     target: dynamicTargets.zinc,
-                    color: '#06b6d4',
+                    color: '#f43f5e',
                     unit: 'mg',
                   },
                   magnesium: {
@@ -1455,7 +1408,7 @@ export default function ButcherSelect({
                     target:
                       CARNIVORE_NUTRIENT_TARGETS.magnesium?.target ||
                       dynamicTargets.magnesium,
-                    color: '#06b6d4',
+                    color: '#f43f5e',
                     unit: 'mg',
                     logic: CARNIVORE_NUTRIENT_TARGETS.magnesium?.logic,
                     hint: t('butcher.magnesiumHint'),
@@ -1467,7 +1420,7 @@ export default function ButcherSelect({
                       ((currentDailyTotal as Record<string, number>).nonHemeIron || 0),
                     previewAmount: calculatedNutrients.iron,
                     target: dynamicTargets.iron,
-                    color: '#06b6d4',
+                    color: '#f43f5e',
                     unit: 'mg',
                   },
                   potassium: {
@@ -1477,7 +1430,7 @@ export default function ButcherSelect({
                     target:
                       CARNIVORE_NUTRIENT_TARGETS.potassium?.target ||
                       dynamicTargets.potassium,
-                    color: '#10b981',
+                    color: '#f43f5e',
                     unit: 'mg',
                     logic: CARNIVORE_NUTRIENT_TARGETS.potassium?.logic,
                   },
@@ -1487,7 +1440,7 @@ export default function ButcherSelect({
                     previewAmount: calculatedNutrients.sodium,
                     target:
                       CARNIVORE_NUTRIENT_TARGETS.sodium?.min || dynamicTargets.sodium,
-                    color: '#10b981',
+                    color: '#f43f5e',
                     unit: 'mg',
                     logic: CARNIVORE_NUTRIENT_TARGETS.sodium?.logic,
                   },
@@ -1496,7 +1449,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.vitamin_a || 0,
                     previewAmount: calculatedNutrients.vitamin_a,
                     target: dynamicTargets.vitamin_a,
-                    color: '#a855f7',
+                    color: '#f43f5e',
                     unit: 'IU',
                   },
                   vitaminD: {
@@ -1504,7 +1457,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.vitamin_d || 0,
                     previewAmount: calculatedNutrients.vitamin_d,
                     target: dynamicTargets.vitamin_d,
-                    color: '#a855f7',
+                    color: '#f43f5e',
                     unit: 'IU',
                   },
                   vitaminK2: {
@@ -1512,7 +1465,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.vitamin_k2 || 0,
                     previewAmount: calculatedNutrients.vitamin_k2,
                     target: dynamicTargets.vitamin_k2,
-                    color: '#a855f7',
+                    color: '#f43f5e',
                     unit: 'μg',
                   },
                   vitaminB12: {
@@ -1520,7 +1473,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.vitamin_b12 || 0,
                     previewAmount: calculatedNutrients.vitamin_b12,
                     target: dynamicTargets.vitamin_b12,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'μg',
                   },
                   vitaminB7: {
@@ -1528,7 +1481,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.vitamin_b7 || 0,
                     previewAmount: calculatedNutrients.vitamin_b7,
                     target: 30,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'μg',
                     hint:
                       eggCookingMethod === 'raw' &&
@@ -1542,7 +1495,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.choline || 0,
                     previewAmount: calculatedNutrients.choline,
                     target: dynamicTargets.choline,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'mg',
                   },
                   iodine: {
@@ -1550,7 +1503,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.iodine || 0,
                     previewAmount: calculatedNutrients.iodine,
                     target: 150,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'μg',
                   },
                   calcium: {
@@ -1558,7 +1511,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.calcium || 0,
                     previewAmount: calculatedNutrients.calcium,
                     target: 1000,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'mg',
                   },
                   phosphorus: {
@@ -1566,7 +1519,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.phosphorus || 0,
                     previewAmount: calculatedNutrients.phosphorus,
                     target: 700,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'mg',
                   },
                   glycine: {
@@ -1574,7 +1527,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.glycine || 0,
                     previewAmount: calculatedNutrients.glycine,
                     target: 0,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'g',
                   },
                   methionine: {
@@ -1582,7 +1535,7 @@ export default function ButcherSelect({
                     currentDailyTotal: currentDailyTotal.methionine || 0,
                     previewAmount: calculatedNutrients.methionine,
                     target: 0,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: 'g',
                   },
                   omegaRatio: {
@@ -1590,7 +1543,7 @@ export default function ButcherSelect({
                     currentDailyTotal: 0,
                     previewAmount: 0,
                     target: 0,
-                    color: '#3b82f6',
+                    color: '#f43f5e',
                     unit: '',
                     isRatio: true,
                   },
@@ -1717,7 +1670,7 @@ export default function ButcherSelect({
 
                             return displaySettings[nutrientKey] !== false;
                           })
-                          .map((orderItem, index) => {
+                          .map((orderItem, _index) => {
                             const nutrient = nutrientDataMap[orderItem.key];
                             if (!nutrient) return null;
 
@@ -1767,12 +1720,23 @@ export default function ButcherSelect({
             {calculatedNutrients &&
               selectedAnimal !== 'plant' &&
               (() => {
-                // 貯蔵可能な栄養素のデータ
+                // HomeScreen と同一の nutrient_storage_levels を参照（貯蔵量は日次減衰＋摂取で更新）
+                const storedLevels = (() => {
+                  try {
+                    const s = localStorage.getItem('nutrient_storage_levels');
+                    return s ? (JSON.parse(s) as Record<string, number>) : {};
+                  } catch {
+                    return {};
+                  }
+                })();
+                const clamp = (v: number) => Math.min(100, Math.max(0, v));
+                const def = 70;
+
                 const storageNutrientsData = [
                   {
                     key: 'vitaminA' as const,
                     label: t('customFood.vitaminA'),
-                    currentStorage: 80, // TODO: 実際の貯蔵量を計算（前日の貯蔵量 - 1日の消費量 + 今日の摂取量）
+                    currentStorage: clamp(storedLevels.vitamin_a ?? def),
                     dailyIntake: calculatedNutrients.vitamin_a,
                     dailyRequirement: dynamicTargets.vitamin_a,
                     unit: 'IU',
@@ -1780,7 +1744,7 @@ export default function ButcherSelect({
                   {
                     key: 'vitaminD' as const,
                     label: t('customFood.vitaminD'),
-                    currentStorage: 75, // TODO: 実際の貯蔵量を計算
+                    currentStorage: clamp(storedLevels.vitamin_d ?? def),
                     dailyIntake: calculatedNutrients.vitamin_d,
                     dailyRequirement: dynamicTargets.vitamin_d,
                     unit: 'IU',
@@ -1788,7 +1752,7 @@ export default function ButcherSelect({
                   {
                     key: 'vitaminK2' as const,
                     label: t('customFood.vitaminK2'),
-                    currentStorage: 70, // TODO: 実際の貯蔵量を計算
+                    currentStorage: clamp(storedLevels.vitamin_k2 ?? def),
                     dailyIntake: calculatedNutrients.vitamin_k2,
                     dailyRequirement: dynamicTargets.vitamin_k2,
                     unit: 'μg',
@@ -1796,7 +1760,7 @@ export default function ButcherSelect({
                   {
                     key: 'calcium' as const,
                     label: t('customFood.calcium'),
-                    currentStorage: 85, // TODO: 実際の貯蔵量を計算
+                    currentStorage: clamp(storedLevels.calcium ?? def),
                     dailyIntake: calculatedNutrients.calcium,
                     dailyRequirement: 1000,
                     unit: 'mg',
@@ -1804,7 +1768,7 @@ export default function ButcherSelect({
                   {
                     key: 'phosphorus' as const,
                     label: t('customFood.phosphorus'),
-                    currentStorage: 80, // TODO: 実際の貯蔵量を計算
+                    currentStorage: clamp(storedLevels.phosphorus ?? def),
                     dailyIntake: calculatedNutrients.phosphorus,
                     dailyRequirement: 700,
                     unit: 'mg',
@@ -1822,7 +1786,7 @@ export default function ButcherSelect({
                   <div className="mt-4">
                     <h3
                       className="text-sm font-semibold text-stone-600 mb-2"
-                      style={{ color: '#a855f7' }}
+                      style={{ color: '#f43f5e' }}
                     >
                       貯蔵可能な栄養素
                     </h3>
@@ -1842,12 +1806,11 @@ export default function ButcherSelect({
                       {storageNutrientsData.map((item) => (
                         <StorageNutrientGauge
                           key={item.key}
+                          nutrientKey={item.key}
                           label={item.label}
                           currentStorage={item.currentStorage}
-                          dailyIntake={item.dailyIntake}
-                          dailyRequirement={item.dailyRequirement}
+                          dailyTarget={item.dailyRequirement} // mapped from requirement to target
                           unit={item.unit}
-                          color="#a855f7"
                         />
                       ))}
                     </div>
@@ -2107,6 +2070,9 @@ export default function ButcherSelect({
       {/* 追加ボタンと写真アップロードボタン */}
       {onFoodAdd && (
         <div className="mt-4 space-y-3">
+          {/* 写真解析ボタン */}
+          {/* Photo analyze button removed as duplicate */}
+
           {/* 選択した食品の追加ボタン */}
           {selectedPart && selectedFoodItem && (
             <button
@@ -2133,6 +2099,71 @@ export default function ButcherSelect({
           )}
         </div>
       )}
+      {/* AI Confidence Verification Dialog */}
+      {pendingVerification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-stone-900 border border-stone-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="text-center mb-6">
+              <span className="text-4xl mb-2 block">🤔</span>
+              <h3 className="text-xl font-bold text-white mb-2">
+                これは「{pendingVerification.foodItem.item}」ですか？
+              </h3>
+              <p className="text-stone-400 text-sm mb-4">
+                AIの自信度: {Math.round(pendingVerification.confidence * 100)}%
+              </p>
+
+              {/* Confidence Bar */}
+              <div className="w-full bg-stone-800 h-2 rounded-full overflow-hidden mb-2">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${pendingVerification.confidence > 0.6 ? 'bg-rose-500' : 'bg-red-500'
+                    }`}
+                  style={{ width: `${pendingVerification.confidence * 100}%` }}
+                />
+              </div>
+              <p className="text-xs text-stone-500">
+                写真が不鮮明か、判断が難しい食品の可能性があります。
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => {
+                  const initialQuery = pendingVerification.foodItem.item;
+                  setPendingVerification(null);
+                  setSearchModalQuery(initialQuery);
+                  setIsSearchModalOpen(true);
+                }}
+                className="py-3 px-4 rounded-xl font-bold bg-stone-800 text-stone-300 hover:bg-stone-700 transition-colors"
+              >
+                いいえ
+              </button>
+              <button
+                onClick={() => {
+                  if (onFoodAdd) {
+                    onFoodAdd(pendingVerification.foodItem);
+                    if (typeof window !== 'undefined' && (window as Window & { showToast?: (msg: string) => void }).showToast) {
+                      (window as Window & { showToast: (msg: string) => void }).showToast(`🥩 ${pendingVerification.foodItem.item} 追加!`);
+                    }
+                  }
+                  setPendingVerification(null);
+                }}
+                className="py-3 px-4 rounded-xl font-bold bg-red-600 text-white hover:bg-red-500 transition-colors"
+              >
+                はい
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* Manual Search Modal */}
+      <FoodSearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+        onSelect={handleSearchSelect}
+        initialQuery={searchModalQuery}
+      />
     </div>
   );
 }

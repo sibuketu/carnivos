@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Knowledge Screen (理論武装モード)
+ * Primal Logic - Tips Screen
  *
  * カーニボアダイエットに関する一般的な誤解（Myth）と科学的真実（Truth）を表示
  * カード型のリスト表示で、MythをタップするとTruthとSourceが表示される
@@ -12,7 +12,7 @@ import {
   getKnowledgeByCategory,
   type KnowledgeItem,
 } from '../data/knowledgeBase';
-import './KnowledgeScreen.css';
+// import './KnowledgeScreen.css'; // Deleted
 
 export default function TipsScreen() {
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
@@ -43,9 +43,9 @@ export default function TipsScreen() {
   return (
     <div className="knowledge-screen-container">
       <div className="knowledge-screen-header">
-        <h1 className="knowledge-screen-title">🛡️ Logic Armor (理論武装)</h1>
+        <h1 className="knowledge-screen-title">💡 Tips</h1>
         <p className="knowledge-screen-subtitle">
-          カーニボアに対する誤解を解き、科学的根拠で武装する
+          カーニボアに対する誤解と真実
         </p>
       </div>
 

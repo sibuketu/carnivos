@@ -8,7 +8,7 @@
 ## チェック記号の意味
 - ✅ **完了・問題なし**
 - ⚠️ **要改善**（動くが不完全）
-- ❌ **未実装・問題あり**
+- ❌ **未対応・問題あり**
 - 🔍 **未チェック**
 
 ---
@@ -16,10 +16,10 @@
 ## 1. 認証・ユーザー管理
 
 ### 1.1 ログイン機能
-- ✅ **ログイン画面の有無**: AuthScreen.tsx実装済み
+- ✅ **ログイン画面の有無**: AuthScreen.tsx完了
 - ✅ **認証フロー**: Supabase認証統合（ログイン/新規登録/パスワードリセット）
 - ✅ **匿名ユーザー対応**: 匿名ID自動生成（`anon_{timestamp}_{random}`）、localStorageで動作
-- ✅ **パスワードリセット**: `supabase.auth.resetPasswordForEmail()`実装済み
+- ✅ **パスワードリセット**: `supabase.auth.resetPasswordForEmail()`完了
 
 **備考**: Supabase未設定時はゲストモードで完全動作。
 
@@ -39,16 +39,16 @@
 ### 2.1 決済フロー
 - ✅ **決済画面**: GiftScreen.tsx完全実装
 - ✅ **Stripe統合**: Stripe Checkout統合済み
-- ❌ **オンボーディング後の決済遷移**: **未実装**（OnboardingScreen最後に追加必要）
+- ❌ **オンボーディング後の決済遷移**: **未対応**（OnboardingScreen最後に追加必要）
 - ⚠️ **サブスクリプション管理**: GiftScreen内で購入履歴表示
 - ⚠️ **領収書発行**: 未確認（Stripe Dashboardで自動発行される可能性あり）
 - ❌ **無料トライアル期間管理**: **要実装**（7日間）
 
 ### 2.2 Gift機能
 - ✅ **Gift購入フロー**: 金額指定/人数指定、メッセージ機能実装
-- ✅ **Stripe Webhook設定**: `stripe-webhook` Edge Function実装済み
+- ✅ **Stripe Webhook設定**: `stripe-webhook` Edge Function完了
 - ❌ **Edge Function デプロイ**: **未デプロイ**（REMAINING_TASKS.md記載済み）
-- ❌ **支払額同期機能**: **未実装**（ページロード時に実際の支払額と同期）
+- ❌ **支払額同期機能**: **未対応**（ページロード時に実際の支払額と同期）
 
 **要対応**:
 1. Edge FunctionをSupabase Dashboardにデプロイ
@@ -62,7 +62,7 @@
 
 ### 3.1 データ保存
 - ✅ **ローカルストレージ**: storage.ts完全実装
-- ✅ **Supabase同期**: Upsert操作、自動同期機能実装済み
+- ✅ **Supabase同期**: Upsert操作、自動同期機能完了
 - ✅ **オフライン対応**: localStorage優先、オフライン動作可能
 
 ### 3.2 データ移行
@@ -84,7 +84,7 @@
 ### 4.2 栄養計算
 - ✅ **動的目標値計算**: `getCarnivoreTargets()`実装（性別・年齢・活動量対応）
 - ❌ **ButcherSelectとHomeScreenの計算一致**: **不一致あり**（IMPROVEMENT_IDEAS.md記載済み）
-- ❌ **計算式の透明性（💡ボタン）**: **未実装**（要件定義必要）
+- ❌ **計算式の透明性（💡ボタン）**: **未対応**（要件定義必要）
 
 **要対応**:
 1. ButcherSelectに`dynamicTargets`をprops渡し
@@ -129,8 +129,8 @@
 
 ### 7.1 通知機能
 - ⚠️ **解凍リマインダー**: `defrostReminder.ts`実装（Web Notification API）
-- ❌ **電解質アラート**: **未実装**
-- ❌ **脂質不足リマインダー**: **未実装**
+- ❌ **電解質アラート**: **未対応**
+- ❌ **脂質不足リマインダー**: **未対応**
 
 **備考**: Webアプリのため、バックグラウンド通知は制限あり。
 
@@ -143,7 +143,7 @@
 ## 8. 外部連携
 
 ### 8.1 デバイス連携
-- ⚠️ **Google Fit**: HealthDeviceScreen.tsx（手動入力のみ、自動同期未実装）
+- ⚠️ **Google Fit**: HealthDeviceScreen.tsx（手動入力のみ、自動同期未対応）
 - ❌ **Apple Health**: 未対応（モバイルアプリで実装予定）
 - ❌ **Oura Ring**: 未対応
 - ❌ **Whoop**: 未対応
@@ -151,7 +151,7 @@
 **備考**: Webアプリの制約により、デバイス連携は限定的。
 
 ### 8.2 SNS連携
-- ❌ **シェア機能**: 未実装
+- ❌ **シェア機能**: 未対応
 - ⚠️ **コミュニティ機能**: CommunityScreen.tsx（モックデータ、DB未接続）
 
 ---
@@ -166,7 +166,7 @@
 ### 9.2 テスト
 - ⚠️ **ユニットテスト**: `setupTests.ts`存在、カバレッジ不明
 - ✅ **E2Eテスト**: Playwright実装（visual-regression.spec.ts等）
-- ✅ **Visual Regression Test**: 実装済み
+- ✅ **Visual Regression Test**: 完了
 
 **要確認**: ユニットテストのカバレッジ
 
@@ -192,7 +192,7 @@
 - **チェック済み**: 71項目（100%）
 - **✅ 完了**: 50項目（70%）
 - **⚠️ 要改善**: 12項目（17%）
-- **❌ 未実装**: 9項目（13%）
+- **❌ 未対応**: 9項目（13%）
 
 ---
 
@@ -227,8 +227,8 @@
 ## 11. 法的・コンプライアンス
 
 ### 11.1 規約・ポリシー
-- ✅ **プライバシーポリシー画面**: PrivacyPolicyScreen.tsx実装済み
-- ✅ **利用規約画面**: TermsOfServiceScreen.tsx実装済み
+- ✅ **プライバシーポリシー画面**: PrivacyPolicyScreen.tsx完了
+- ✅ **利用規約画面**: TermsOfServiceScreen.tsx完了
 - ✅ **同意取得フロー**: ConsentScreen.tsx（初回起動時）
 - 🔍 **Cookie同意**: 未確認（Webアプリで必要か検討）
 
@@ -241,16 +241,16 @@
 ## 12. 分析・監視
 
 ### 12.1 アナリティクス
-- ❌ **Google Analytics統合**: 未実装（gtag、GA4なし）
-- ❌ **ユーザー行動トラッキング**: 未実装
-- ❌ **コンバージョン計測**: 未実装
+- ❌ **Google Analytics統合**: 未対応（gtag、GA4なし）
+- ❌ **ユーザー行動トラッキング**: 未対応
+- ❌ **コンバージョン計測**: 未対応
 
 **備考**: パッケージにアナリティクスライブラリなし
 
 ### 12.2 エラートラッキング
 - ⚠️ **Sentry統合**: errorHandler.tsにスキャフォールド実装、SDK未インストール
-- ⚠️ **エラーログ収集**: GlobalErrorBoundary実装済み、Sentry未接続
-- ❌ **パフォーマンス監視**: 未実装
+- ⚠️ **エラーログ収集**: GlobalErrorBoundary完了、Sentry未接続
+- ❌ **パフォーマンス監視**: 未対応
 
 **要対応**: Sentry SDKインストール、VITE_SENTRY_DSN設定
 
@@ -260,16 +260,16 @@
 
 ### 13.1 SEO対策
 - ⚠️ **meta タグ設定**: 基本タグあり（title, description）、keywords/canonical/hreflang未設定
-- ❌ **OGP設定**: 未実装（og:title, og:image等なし）
-- ❌ **sitemap.xml**: 未実装
-- ❌ **robots.txt**: 未実装
+- ❌ **OGP設定**: 未対応（og:title, og:image等なし）
+- ❌ **sitemap.xml**: 未対応
+- ❌ **robots.txt**: 未対応
 
 **備考**: index.htmlに基本的なメタタグあり、SEO最適化は不十分
 
 ### 13.2 SNSシェア
-- ❌ **Twitter Card**: 未実装（twitter:card等なし）
-- ❌ **Facebook OGP**: 未実装
-- ❌ **シェアボタン**: 未実装（GiftScreenにメッセージ機能のみ）
+- ❌ **Twitter Card**: 未対応（twitter:card等なし）
+- ❌ **Facebook OGP**: 未対応
+- ❌ **シェアボタン**: 未対応（GiftScreenにメッセージ機能のみ）
 
 **要対応**:
 1. public/robots.txt作成
@@ -299,7 +299,7 @@
 - 🔍 **フォントサイズ調整**: 未確認
 
 **要改善**:
-1. 画像alt text未実装
+1. 画像alt text未対応
 2. semantic HTML不足（main, section等）
 3. prefers-reduced-motion未対応
 4. フォーム入力のラベル関連付け不十分
@@ -313,15 +313,15 @@
 ### 16.1 サポート
 - ✅ **フィードバック機能**: FeedbackScreen.tsx実装（3種類: 一般/バグ/機能要望）
 - ✅ **バグ報告フロー**: FeedbackScreen統合、mailto経由（sibuketu12345@gmail.com）
-- ❌ **FAQ画面**: 未実装（KnowledgeScreen存在、Q&A形式ではない）
+- ❌ **FAQ画面**: 未対応（KnowledgeScreen存在、Q&A形式ではない）
 - ⚠️ **問い合わせフォーム**: FeedbackScreenのみ、バックエンド統合なし
 
 **備考**: メール送信はmailto:プロトコル、SendGrid/Mailgun未使用
 
 ### 16.2 更新管理
 - ⚠️ **バージョン管理**: ハードコード "0.0.0"（ProfileScreen.tsx）、package.jsonから取得せず
-- ❌ **リリースノート**: 未実装（ドキュメントのみ存在）
-- ❌ **強制アップデート機能**: 未実装、バージョンチェックなし
+- ❌ **リリースノート**: 未対応（ドキュメントのみ存在）
+- ❌ **強制アップデート機能**: 未対応、バージョンチェックなし
 
 **備考**: PWA auto-update設定済み、UI通知なし
 
@@ -336,15 +336,15 @@
 
 ### 良い発見
 1. ✅ **多言語対応が充実**: 5言語（ja, en, fr, de, zh）完全実装
-2. ✅ **フィードバック機能実装済み**: FeedbackScreen完成
+2. ✅ **フィードバック機能完了**: FeedbackScreen完成
 3. ✅ **カラーコントラスト優秀**: WCAG AAA準拠
 4. ✅ **PWA自動更新設定**: vite.config.tsで設定済み
 
 ### 問題発見
-1. ❌ **SEO未対応**: robots.txt, sitemap.xml, OGPすべて未実装
+1. ❌ **SEO未対応**: robots.txt, sitemap.xml, OGPすべて未対応
 2. ❌ **アナリティクス未統合**: GA4なし、ユーザー行動データ取得不可
 3. ⚠️ **Sentry未完成**: コードあり、SDKインストールなし
-4. ⚠️ **アクセシビリティ不完全**: ARIA属性一部のみ、alt text未実装
+4. ⚠️ **アクセシビリティ不完全**: ARIA属性一部のみ、alt text未対応
 5. ⚠️ **バージョン管理不十分**: ハードコード "0.0.0"
 
 ---

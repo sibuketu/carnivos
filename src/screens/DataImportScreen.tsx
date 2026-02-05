@@ -5,7 +5,8 @@
  */
 
 import { useState, useRef } from 'react';
-import { getDailyLogs, saveDailyLog, saveUserProfile } from '../utils/storage';
+import { useTranslation } from '../utils/i18n';
+import { saveDailyLog, saveUserProfile } from '../utils/storage';
 import { logError } from '../utils/errorHandler';
 import './DataImportScreen.css';
 
@@ -14,6 +15,7 @@ interface DataImportScreenProps {
 }
 
 export default function DataImportScreen({ onBack }: DataImportScreenProps) {
+  const { t } = useTranslation();
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +38,7 @@ export default function DataImportScreen({ onBack }: DataImportScreenProps) {
 
       // バージョンチェック
       if (!importData.version) {
-        throw new Error('無効なデータ形式です');
+        throw new Error(t('dataImport.invalidFormat'));
       }
 
       // 既存データのバックアップ（確認）
@@ -67,7 +69,7 @@ export default function DataImportScreen({ onBack }: DataImportScreenProps) {
       }
 
       setImported(true);
-      alert('データのインポートが完了しました');
+      alert(t('dataImport.importComplete'));
       // 画面をリロードしてデータを反映
       setTimeout(() => {
         window.location.reload();
@@ -84,11 +86,11 @@ export default function DataImportScreen({ onBack }: DataImportScreenProps) {
     <div className="data-import-screen">
       <div className="data-import-container">
         <button onClick={onBack} className="data-import-back-button">
-          ← 設定に戻る
+          {t('dataImport.backToSettings')}
         </button>
-        <h1 className="data-import-title">データインポート</h1>
+        <h1 className="data-import-title">{t('dataImport.title')}</h1>
         <p className="data-import-description">
-          エクスポートしたJSONファイルを選択して、データを復元できます。
+          {t('dataImport.description')}
         </p>
 
         <div className="data-import-form">
@@ -127,11 +129,11 @@ export default function DataImportScreen({ onBack }: DataImportScreenProps) {
         {error && <div className="data-import-error">⚠️ {error}</div>}
 
         <div className="data-import-info">
-          <h3>注意事項</h3>
+          <h3>{t('dataImport.notes')}</h3>
           <ul>
-            <li>インポート前に既存データのエクスポートを推奨します</li>
-            <li>既存のデータは上書きされます</li>
-            <li>エクスポートしたJSONファイルのみインポート可能です</li>
+            <li>{t('dataImport.note1')}</li>
+            <li>{t('dataImport.note2')}</li>
+            <li>{t('dataImport.note3')}</li>
           </ul>
         </div>
       </div>

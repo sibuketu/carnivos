@@ -1736,3 +1736,90 @@ export function searchFoodMasterByName(foodName: string): FoodMasterItem | undef
 
   return bestMatch;
 }
+
+/**
+ * 検索語に一致する食品をリストで返す（スコア順）
+ */
+export function searchFoodMasterItems(query: string): FoodMasterItem[] {
+  if (!query) return [];
+
+  const lowerName = query.toLowerCase().trim();
+  const results: { item: FoodMasterItem; score: number }[] = [];
+
+  for (const animal of Object.keys(FOOD_MASTER) as Array<keyof FoodMaster>) {
+    const animalData = FOOD_MASTER[animal];
+    if (!animalData) continue;
+    for (const part of Object.keys(animalData)) {
+      const item = animalData[part];
+      if (!item) continue;
+
+      const nameLower = item.name.toLowerCase();
+      const nameJaLower = item.name_ja.toLowerCase();
+      const nameFrLower = item.name_fr?.toLowerCase() || '';
+      const nameDeLower = item.name_de?.toLowerCase() || '';
+      const idLower = item.id.toLowerCase();
+
+      let score = 0;
+
+      // 完全一致（最高スコア: 100点）
+      if (
+        nameLower === lowerName ||
+        nameJaLower === lowerName ||
+        idLower === lowerName ||
+        nameFrLower === lowerName ||
+        nameDeLower === lowerName
+      ) {
+        score = 100;
+      }
+      // 前方一致（80点）
+      else if (
+        nameLower.startsWith(lowerName) ||
+        nameJaLower.startsWith(lowerName) ||
+        nameFrLower.startsWith(lowerName) ||
+        nameDeLower.startsWith(lowerName)
+      ) {
+        score = 80;
+      }
+      // 後方一致（70点）
+      else if (
+        nameLower.endsWith(lowerName) ||
+        nameJaLower.endsWith(lowerName) ||
+        nameFrLower.endsWith(lowerName) ||
+        nameDeLower.endsWith(lowerName)
+      ) {
+        score = 70;
+      }
+      // 部分一致（60点）
+      else if (
+        nameLower.includes(lowerName) ||
+        nameJaLower.includes(lowerName) ||
+        nameFrLower.includes(lowerName) ||
+        nameDeLower.includes(lowerName)
+      ) {
+        score = 60;
+      }
+      // 単語単位の部分一致（30点/単語）
+      else {
+        const nameWords = nameLower.split(/[\s\-_]+/);
+        const nameJaWords = nameJaLower.split(/[\s\-_]+/);
+        const searchWords = lowerName.split(/[\s\-_]+/);
+
+        for (const searchWord of searchWords) {
+          if (nameWords.some((w) => w.includes(searchWord) || searchWord.includes(w))) {
+            score += 30;
+          }
+          if (nameJaWords.some((w) => w.includes(searchWord) || searchWord.includes(w))) {
+            score += 30;
+          }
+        }
+      }
+
+      if (score > 0) {
+        results.push({ item, score });
+      }
+    }
+  }
+
+  // スコアの降順でソート
+  return results.sort((a, b) => b.score - a.score).map((r) => r.item);
+}

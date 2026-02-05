@@ -11,15 +11,15 @@
  */
 export function getNutrientColor(nutrientKey: string): string {
     const colorMap: Record<string, string> = {
-        protein: '#3b82f6',   // blue-500
-        fat: '#3b82f6',       // blue-500
-        zinc: '#06b6d4',      // cyan-500
-        magnesium: '#06b6d4', // cyan-500
-        iron: '#06b6d4',      // cyan-500
-        sodium: '#10b981',    // emerald-500
-        potassium: '#10b981', // emerald-500
+        protein: '#f43f5e',   // rose-500 (neon red)
+        fat: '#f43f5e',       // rose-500 (neon red)
+        zinc: '#f43f5e',      // rose-500 (neon red)
+        magnesium: '#f43f5e', // rose-500 (neon red)
+        iron: '#f43f5e',      // rose-500 (neon red)
+        sodium: '#f43f5e',    // rose-500 (neon red)
+        potassium: '#f43f5e', // rose-500 (neon red)
     };
-    return colorMap[nutrientKey] || '#06b6d4'; // デフォルトはcyan-500
+    return colorMap[nutrientKey] || '#f43f5e'; // デフォルトは rose-500 (neon red)
 }
 
 /**

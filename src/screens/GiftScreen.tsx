@@ -311,7 +311,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
               .eq('message_id', g.id)
               .order('created_at', { ascending: true });
 
-            const replies: GiftReply[] = (repliesData || []).map((r: any) => ({
+            const replies: GiftReply[] = (repliesData || []).map((r: { id: string; message_id: string; user_id: string; reply_text: string; created_at: string }) => ({
               id: r.id,
               messageId: r.message_id,
               userId: r.user_id,
@@ -556,7 +556,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                     const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
                     setGiftAmount(value);
                   }}
-                  onBlur={(e) => {
+                  onBlur={() => {
                     // フォーカスが外れた時に0の場合は最小値に設定
                     if (giftAmount === 0 || giftAmount < 1) {
                       setGiftAmount(1350);
@@ -679,7 +679,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                               setReplyText('');
                             }}
                           >
-                            💬 {t('gift.reply')}{' '}
+                            {t('gift.reply')}{' '}
                             {msg.replies && msg.replies.length > 0 && `(${msg.replies.length})`}
                           </button>
                         </div>
@@ -801,7 +801,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                               }
                             }}
                           >
-                            {msg.userLiked ? '❤️' : '🤍'} {msg.likes || 0}
+                            {msg.userLiked ? 'Liked' : 'Like'} {msg.likes || 0}
                           </button>
                           <button
                             className="gift-message-reply-button"
@@ -810,7 +810,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                               setReplyText('');
                             }}
                           >
-                            💬 {t('gift.reply')}{' '}
+                            {t('gift.reply')}{' '}
                             {msg.replies && msg.replies.length > 0 && `(${msg.replies.length})`}
                           </button>
                         </div>

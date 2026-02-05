@@ -23,7 +23,7 @@ function getObsidianVaultPath(): string {
   // プロジェクトルートから相対パスでObsidianのVaultを参照
   // シンボリックリンクが作成されている場合: ./obsidian-vault
   // または、絶対パスを指定: C:\Users\susam\Documents\ObsidianVault
-  
+
   const possiblePaths = [
     path.join(process.cwd(), 'obsidian-vault'),
     path.join(process.cwd(), '..', 'obsidian-vault'),
@@ -57,7 +57,7 @@ function saveTodoToObsidian(todos: TodoItem[]): void {
   try {
     const vaultPath = getObsidianVaultPath();
     const dailyFolder = path.join(vaultPath, 'Daily');
-    
+
     // Dailyフォルダが存在しない場合は作成
     if (!fs.existsSync(dailyFolder)) {
       fs.mkdirSync(dailyFolder, { recursive: true });
@@ -76,26 +76,26 @@ function saveTodoToObsidian(todos: TodoItem[]): void {
     const todoSection = `## Cursor TODOリスト (${today})
 
 ${todos.map(todo => {
-  const statusIcon = {
-    pending: '- [ ]',
-    in_progress: '- [~]',
-    completed: '- [x]',
-    cancelled: '- [ ] ~~',
-  }[todo.status];
+      const statusIcon = {
+        pending: '- [ ]',
+        in_progress: '- [~]',
+        completed: '- [x]',
+        cancelled: '- [ ] ~~',
+      }[todo.status];
 
-  const statusText = {
-    pending: '未着手',
-    in_progress: '進行中',
-    completed: '完了',
-    cancelled: 'キャンセル',
-  }[todo.status];
+      const statusText = {
+        pending: '未着手',
+        in_progress: '進行中',
+        completed: '完了',
+        cancelled: 'キャンセル',
+      }[todo.status];
 
-  const content = todo.status === 'cancelled' 
-    ? `~~${todo.content}~~` 
-    : todo.content;
+      const content = todo.status === 'cancelled'
+        ? `~~${todo.content}~~`
+        : todo.content;
 
-  return `${statusIcon} ${content} (${statusText})`;
-}).join('\n')}
+      return `${statusIcon} ${content} (${statusText})`;
+    }).join('\n')}
 
 ---
 
@@ -140,7 +140,7 @@ function getCursorTodos(): TodoItem[] {
       if (Array.isArray(todos)) {
         return todos;
       }
-    } catch (error) {
+    } catch {
       console.warn('コマンドライン引数のパースに失敗しました。デフォルトのTODOリストを使用します。');
     }
   }
@@ -153,27 +153,27 @@ function getCursorTodos(): TodoItem[] {
         .filter(file => file.endsWith('.md') && file.match(/^\d{4}-\d{2}-\d{2}\.md$/))
         .sort()
         .reverse(); // 最新のファイルを先に
-      
+
       if (files.length > 0) {
         const latestFile = path.join(secondBrainPath, files[0]);
         const content = fs.readFileSync(latestFile, 'utf-8');
-        
+
         // MarkdownのTODOリストをパース（🔵付きのタスクを抽出）
         // 形式: "- 1. 🔵 タスク内容" または "- [ ] タスク内容"
         const todoRegex = /[-*]\s*(?:\[([ x~])\])?\s*(?:\d+\.\s*)?(?:🔵\s*)?(.+)/g;
         const todos: TodoItem[] = [];
         let match;
         let id = 1;
-        
+
         while ((match = todoRegex.exec(content)) !== null) {
           const checkbox = match[1];
           const taskContent = match[2].trim();
-          
+
           // 空のタスクや「（ToDo）」のようなプレースホルダーはスキップ
           if (!taskContent || taskContent === '（ToDo）' || taskContent === '(ToDo)') {
             continue;
           }
-          
+
           let status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
           if (checkbox === 'x') {
             status = 'completed';
@@ -185,14 +185,14 @@ function getCursorTodos(): TodoItem[] {
             // 🔵付きのタスクは未完了として扱う
             status = 'pending';
           }
-          
+
           todos.push({
             id: String(id++),
             content: taskContent,
             status,
           });
         }
-        
+
         if (todos.length > 0) {
           console.log(`📝 second-brainから ${todos.length} 件のTODOを読み込みました`);
           return todos;

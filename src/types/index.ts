@@ -35,8 +35,8 @@ export interface DefrostReminder {
  * Metabolic Status
  */
 export type MetabolicStatus =
-  | typeof METABOLIC_STATUS.ADAPTED
-  | typeof METABOLIC_STATUS.TRANSITIONING;
+  | typeof METABOLIC_STATUS.ADAPTED;
+// | typeof METABOLIC_STATUS.TRANSITIONING; // Removed Phase 1
 
 /**
  * User Goals
@@ -217,9 +217,10 @@ export interface UserProfile {
   language?: 'ja' | 'en' | 'fr' | 'de'; // 言語設定
 
   // カーニボア歴（Gemini提案：導入期判定用）
-  daysOnCarnivore?: number; // カーニボア開始からの日数
-  carnivoreStartDate?: string; // ISO date string (YYYY-MM-DD)
-  forceAdaptationMode?: boolean | null; // Phase 1: 移行期間モードの手動オーバーライド（true: 強制ON, false: 強制OFF, null/undefined: 自動判定）
+  // カーニボア歴（Gemini提案：導入期判定用）
+  daysOnCarnivore?: number; // カーニボア継続日数
+  carnivoreStartDate?: string; // ISO date string
+  forceAdaptationMode?: boolean; // 適応期モード強制フラグ
   // Phase 4: 代謝ストレス指標
   metabolicStressIndicators?: string[];
   // Phase 5: 栄養素目標値のカスタマイズ
@@ -239,7 +240,7 @@ export const defaultUserProfile: UserProfile = {
   age: 30,
   activityLevel: 'moderate',
   goal: USER_GOALS.HEALING,
-  metabolicStatus: METABOLIC_STATUS.TRANSITIONING,
+  metabolicStatus: METABOLIC_STATUS.ADAPTED,
   mode: DIET_MODES.LION_DIET,
 };
 
@@ -506,13 +507,13 @@ export interface TodoItem {
   id: string;
   title: string;
   description?: string;
-  actionType: 'timer' | 'add_food' | 'set_protocol' | 'open_screen' | 'update_input' | 'custom';
-  actionParams?: Record<string, any>;
+  actionType: 'timer' | 'add_food' | 'set_protocol' | 'open_screen' | 'update_input' | 'suggest_target' | 'custom';
+  actionParams?: Record<string, unknown>;
   isCompleted: boolean;
   // 後方互換性のため（コード内でaction.typeとaction.paramsを使っている場合）
   action?: {
-    type: 'timer' | 'add_food' | 'set_protocol' | 'open_screen' | 'update_input' | 'custom';
-    params?: Record<string, any>;
+    type: 'timer' | 'add_food' | 'set_protocol' | 'open_screen' | 'update_input' | 'suggest_target' | 'custom';
+    params?: Record<string, unknown>;
   };
 }
 
@@ -541,6 +542,7 @@ export interface DailyLog {
   diary?: string; // 日記（自由入力、メンタル・体調・身体能力など総合的に記録）
   weight?: number; // 体重（kg）- 日次記録
   bodyFatPercentage?: number; // 体脂肪率（%）- 日次記録
+  waterIntake?: number; // 飲んだ水の量（ml/日）
 }
 
 /**

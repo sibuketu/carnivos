@@ -28,8 +28,7 @@ export async function generateImageAuto(prompt: string): Promise<string> {
   }
 
   try {
-    if (import.meta.env.DEV) {
-    }
+    if (import.meta.env.DEV) void 0;
 
     // Replicate APIでStable Diffusionを実行
     const response = await fetch('https://api.replicate.com/v1/predictions', {
@@ -79,8 +78,7 @@ export async function generateImageAuto(prompt: string): Promise<string> {
 
     if (result.status === 'succeeded' && result.output && result.output.length > 0) {
       const imageUrl = result.output[0];
-      if (import.meta.env.DEV) {
-      }
+      if (import.meta.env.DEV) void 0;
       return imageUrl;
     } else {
       throw new Error(`画像生成に失敗しました: ${result.error || '不明なエラー'}`);

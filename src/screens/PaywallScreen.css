@@ -1,0 +1,182 @@
+.paywall-screen {
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.paywall-screen-inner {
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.paywall-screen-icon {
+  font-size: 56px;
+  margin-bottom: 1rem;
+}
+
+.paywall-screen-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.paywall-screen-description {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.paywall-screen-pricing {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.paywall-screen-plan {
+  flex: 1;
+  background: var(--color-bg-secondary);
+  border-radius: 12px;
+  padding: 1.25rem 0.75rem;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.paywall-screen-plan-featured {
+  border-color: var(--color-accent);
+}
+
+.paywall-screen-plan-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-accent);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+}
+
+.paywall-screen-plan-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.paywall-screen-plan-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.2rem;
+  margin-bottom: 0.4rem;
+}
+
+.paywall-screen-plan-amount {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-accent);
+}
+
+.paywall-screen-plan-period {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.paywall-screen-plan-note {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  line-height: 1.3;
+}
+
+.paywall-screen-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.paywall-screen-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+}
+
+.paywall-screen-feature-icon {
+  flex-shrink: 0;
+}
+
+.paywall-screen-btn {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.6rem;
+  border: none;
+}
+
+.paywall-screen-btn-primary {
+  background: var(--color-accent);
+  color: white;
+}
+
+.paywall-screen-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.paywall-screen-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.paywall-screen-btn-secondary {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-text-secondary);
+}
+
+.paywall-screen-btn-secondary:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.paywall-screen-link-login {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.paywall-screen-link-login:hover {
+  color: var(--color-accent);
+}
+
+@media (max-width: 480px) {
+  .paywall-screen-pricing {
+    flex-direction: column;
+  }
+  .paywall-screen-plan-amount {
+    font-size: 1.25rem;
+  }
+}

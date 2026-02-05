@@ -7,10 +7,12 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   scanBarcodeFromCamera,
+  scanBarcodeFromImageFile,
   getFoodInfoFromBarcode,
   isBarcodeDetectorAvailable,
   type BarcodeResult,
 } from '../utils/barcodeScanner';
+import { useTranslation } from '../utils/i18n';
 import { logError } from '../utils/errorHandler';
 import './BarcodeScannerModal.css';
 
@@ -25,17 +27,21 @@ export default function BarcodeScannerModal({
   onClose,
   onSuccess,
 }: BarcodeScannerModalProps) {
+  const { t } = useTranslation();
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [barcodeResult, setBarcodeResult] = useState<BarcodeResult | null>(null);
-  const [foodInfo, setFoodInfo] = useState<any>(null);
+  const [foodInfo, setFoodInfo] = useState<Record<string, unknown> | null>(null);
   const [loadingFoodInfo, setLoadingFoodInfo] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       setScanning(false);
+      setUploading(false);
       setError(null);
       setBarcodeResult(null);
       setFoodInfo(null);
@@ -103,11 +109,11 @@ export default function BarcodeScannerModal({
           if (info) {
             setFoodInfo(info);
           } else {
-            setError('商品情報が見つかりませんでした。');
+            setError(t('barcode.errorNoProduct'));
           }
         } catch (infoError) {
           logError(infoError, { component: 'BarcodeScannerModal', action: 'getFoodInfo' });
-          setError('商品情報の取得に失敗しました。');
+          setError(t('barcode.errorFetchFailed'));
         } finally {
           setLoadingFoodInfo(false);
         }
@@ -120,13 +126,49 @@ export default function BarcodeScannerModal({
 
       const err = error as { name?: string; message?: string };
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        setError('カメラの許可が必要です。ブラウザの設定からカメラを許可してください。');
+        setError(t('barcode.errorCameraPermission'));
       } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-        setError('カメラが見つかりませんでした。');
+        setError(t('barcode.errorNoCamera'));
       } else {
-        setError('バーコード読み取りに失敗しました。もう一度お試しください。');
+        setError(t('barcode.errorScanFailed'));
       }
       setScanning(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
+
+    setUploading(true);
+    setError(null);
+    setBarcodeResult(null);
+    setFoodInfo(null);
+    e.target.value = '';
+
+    try {
+      const result = await scanBarcodeFromImageFile(file);
+      if (result) {
+        setBarcodeResult(result);
+        setLoadingFoodInfo(true);
+        try {
+          const info = await getFoodInfoFromBarcode(result.code);
+          if (info) setFoodInfo(info);
+          else setError('商品情報が見つかりませんでした。');
+        } catch (infoError) {
+          logError(infoError, { component: 'BarcodeScannerModal', action: 'getFoodInfo' });
+          setError('商品情報の取得に失敗しました。');
+        } finally {
+          setLoadingFoodInfo(false);
+        }
+      } else {
+        setError(t('barcode.errorImageScanFailed'));
+      }
+    } catch (err) {
+      logError(err, { component: 'BarcodeScannerModal', action: 'handleImageUpload' });
+      setError(t('barcode.errorImageReadFailed'));
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -162,19 +204,50 @@ export default function BarcodeScannerModal({
     <div className="barcode-scanner-modal-overlay" onClick={handleClose}>
       <div className="barcode-scanner-modal" onClick={(e) => e.stopPropagation()}>
         <div className="barcode-scanner-modal-header">
-          <h2 className="barcode-scanner-modal-title">バーコード読み取り</h2>
+          <h2 className="barcode-scanner-modal-title">{t('barcode.title')}</h2>
           <button onClick={handleClose} className="barcode-scanner-modal-close">
             ×
           </button>
         </div>
 
         <div className="barcode-scanner-modal-content">
-          {!scanning && !barcodeResult && !error && (
+          {!scanning && !uploading && !barcodeResult && !error && (
             <div className="barcode-scanner-modal-start">
-              <p>バーコードを読み取る準備ができました。</p>
-              <button onClick={handleStartScan} className="barcode-scanner-modal-start-button">
-                スキャンを開始
+              <p>
+                {isBarcodeDetectorAvailable()
+                  ? 'バーコードを読み取る準備ができました。'
+                  : 'カメラには対応していません。画像をアップロードしてバーコードを読み取れます。'}
+              </p>
+              {isBarcodeDetectorAvailable() && (
+                <button onClick={handleStartScan} className="barcode-scanner-modal-start-button">
+                  スキャンを開始
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{ display: 'none' }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="barcode-scanner-modal-start-button"
+                style={
+                  isBarcodeDetectorAvailable()
+                    ? { marginTop: '0.5rem', backgroundColor: '#6b7280' }
+                    : {}
+                }
+              >
+                {isBarcodeDetectorAvailable() ? '画像から読み取る（iOS等）' : '画像を選択'}
               </button>
+            </div>
+          )}
+
+          {uploading && (
+            <div className="barcode-scanner-modal-scanning">
+              <p className="barcode-scanner-modal-scanning-text">{t('barcode.analyzing')}</p>
             </div>
           )}
 
@@ -198,26 +271,35 @@ export default function BarcodeScannerModal({
           {error && (
             <div className="barcode-scanner-modal-error">
               <p>⚠️ {error}</p>
-              <button onClick={handleStartScan} className="barcode-scanner-modal-retry-button">
-                もう一度試す
-              </button>
+              {isBarcodeDetectorAvailable() ? (
+                <button onClick={handleStartScan} className="barcode-scanner-modal-retry-button">
+                  {t('barcode.retry')}
+                </button>
+              ) : (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="barcode-scanner-modal-retry-button"
+                >
+                  画像を選択
+                </button>
+              )}
             </div>
           )}
 
           {barcodeResult && (
             <div className="barcode-scanner-modal-result">
-              <p className="barcode-scanner-modal-success">✓ バーコードを読み取りました</p>
-              <p className="barcode-scanner-modal-barcode">コード: {barcodeResult.code}</p>
+              <p className="barcode-scanner-modal-success">{t('barcode.scanSuccess')}</p>
+              <p className="barcode-scanner-modal-barcode">{t('barcode.code')}: {barcodeResult.code}</p>
 
               {loadingFoodInfo && (
-                <p className="barcode-scanner-modal-loading">商品情報を取得中...</p>
+                <p className="barcode-scanner-modal-loading">{t('barcode.fetchingProduct')}</p>
               )}
 
               {foodInfo && (
                 <div className="barcode-scanner-modal-food-info">
-                  <h3>{foodInfo.product_name || foodInfo.product_name_en || '不明な食品'}</h3>
+                  <h3>{foodInfo.product_name || foodInfo.product_name_en || t('barcode.unknownFood')}</h3>
                   <button onClick={handleAddFood} className="barcode-scanner-modal-add-button">
-                    食品を追加
+                    {t('barcode.addFood')}
                   </button>
                 </div>
               )}

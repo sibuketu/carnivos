@@ -1,11 +1,10 @@
-import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { NutritionProvider } from './context/NutritionContext';
-import { supabase, isSupabaseAvailable } from './lib/supabaseClient';
-import { getUserFriendlyErrorMessage, logError } from './utils/errorHandler';
+import { isSupabaseAvailable } from './lib/supabaseClient';
 import { useTranslation } from './utils/i18n';
 import type { FoodItem } from './types';
-import type { Session } from '@supabase/supabase-js';
 // メイン画面（即座に読み込む必要がある）
 import HomeScreen from './screens/HomeScreen';
 
@@ -14,11 +13,14 @@ import SettingsScreen from './screens/SettingsScreen';
 import CustomFoodScreen from './screens/CustomFoodScreen';
 import AuthScreen from './screens/AuthScreen';
 import ConsentScreen from './screens/ConsentScreen';
+import PaywallScreen from './screens/PaywallScreen';
+import { getPaywallChoice, clearPaywallChoice } from './screens/PaywallScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import AISpeedDial from './components/dashboard/AISpeedDial';
 import Toast from './components/common/Toast';
 import PaywallModal from './components/PaywallModal';
 import { getFeatureDisplaySettings } from './utils/featureDisplaySettings';
+import { startFastingTimerWatcher } from './utils/notificationService';
 import './App.css';
 import './styles/common.css';
 import './styles/pixel-art.css';
@@ -26,7 +28,6 @@ import './styles/pixel-art.css';
 // レイジーローディング（パフォーマンス最適化）
 const LazyHistoryScreen = lazy(() => import('./screens/HistoryScreen'));
 const LazyUserSettingsScreen = lazy(() => import('./screens/UserSettingsScreen'));
-const LazyStreakTrackerScreen = lazy(() => import('./screens/StreakTrackerScreen'));
 const LazyCommunityScreen = lazy(() => import('./screens/CommunityScreen'));
 const LazyDiaryScreen = lazy(() => import('./screens/DiaryScreen'));
 const LazyStatsScreen = lazy(() => import('./screens/StatsScreen'));
@@ -46,63 +47,92 @@ const LazyRecipeScreen = lazy(() => import('./screens/RecipeScreen'));
 const LazyHealthDeviceScreen = lazy(() => import('./screens/HealthDeviceScreen'));
 const LazyInputScreen = lazy(() => import('./screens/InputScreen'));
 
-type Screen = 'home' | 'profile' | 'history' | 'labs' | 'settings' | 'userSettings' | 'streakTracker' | 'customFood' | 'community' | 'diary' | 'stats' | 'auth' | 'privacy' | 'terms' | 'dataExport' | 'dataImport' | 'dataDelete' | 'feedback' | 'consent' | 'onboarding' | 'language' | 'salt' | 'carbTarget' | 'nutrientCustom' | 'gift' | 'shop' | 'recipe' | 'healthDevice' | 'input';
+type Screen = 'home' | 'profile' | 'history' | 'labs' | 'settings' | 'userSettings' | 'streakTracker' | 'customFood' | 'community' | 'diary' | 'stats' | 'auth' | 'privacy' | 'terms' | 'dataExport' | 'dataImport' | 'dataDelete' | 'feedback' | 'consent' | 'paywall' | 'onboarding' | 'language' | 'salt' | 'carbTarget' | 'nutrientCustom' | 'gift' | 'shop' | 'recipe' | 'healthDevice' | 'input';
 
 // アプリケーション本体
 function AppContent() {
   const { t } = useTranslation();
   const { syncLocalStorageToSupabase, error, clearError, isLoading, trialStatus } = useApp();
   const [currentScreen, setCurrentScreen] = useState<Screen>(() => {
-    // 初回起動時の画面決定
+    // 初回起動時の画面決定（docs/フロー_ログインサブスク.md）
+    // 初回: Consent → サブスク → auth → オンボーディング / 既存ユーザー別デバイス: paywallで「ログイン」→ auth → home
     const consentAccepted = localStorage.getItem('primal_logic_consent_accepted');
     const onboardingCompleted = localStorage.getItem('primal_logic_onboarding_completed');
 
-    if (!consentAccepted) {
-      return 'consent';
-    }
-    if (!onboardingCompleted) {
-      return 'onboarding';
-    }
+    if (!consentAccepted) return 'consent';
+    if (!onboardingCompleted) return 'paywall';
     return 'home';
   });
   const [openFatTabCallback, setOpenFatTabCallback] = useState<(() => void) | null>(null);
   const [addFoodCallback, setAddFoodCallback] = useState<((foodItem: FoodItem) => void) | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [showAuth, setShowAuth] = useState(false);
+
+
   const [isPixelArtEnabled, setIsPixelArtEnabled] = useState(() => {
     return localStorage.getItem('primal_logic_dot_ui_enabled') === 'true';
   });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(() => typeof navigator !== 'undefined' && navigator.onLine);
+
+  // オフライン検出（ネットワークエラー時は永遠にローディングしないため）
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // グローバルなToast表示関数を設定
   useEffect(() => {
-    (window as any).showToast = (message: string) => {
+    (window as unknown as { showToast: (msg: string) => void }).showToast = (message: string) => {
       setToastMessage(message);
     };
     return () => {
-      delete (window as any).showToast;
+      delete (window as unknown as { showToast: ((msg: string) => void) | undefined }).showToast;
     };
   }, []);
 
-  // 認証状態の確認
+  // 断食タイマー終了通知
   useEffect(() => {
-    if (isSupabaseAvailable() && supabase) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        // セッションがない場合は認証画面を表示（オプション：必須にする場合はコメントアウトを解除）
-        // if (!session) {
-        //   setShowAuth(true);
-        // }
-      });
-
-      supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
-        if (session) {
-          setShowAuth(false);
-        }
-      });
-    }
+    return startFastingTimerWatcher();
   }, []);
+
+  const { session, isGuest, loading: authLoading } = useAuth();
+
+  // 認証状態の確認と画面遷移（#29: 初回=サブスク→ログイン→オンボ、既存ユーザー別デバイス=ログイン→ホーム）
+  useEffect(() => {
+    if (authLoading) return;
+
+    const consentAccepted = localStorage.getItem('primal_logic_consent_accepted');
+    const onboardingCompleted = localStorage.getItem('primal_logic_onboarding_completed');
+
+    if (!consentAccepted) {
+      if (currentScreen !== 'consent') setCurrentScreen('consent');
+      return;
+    }
+
+    // 既存ユーザー別デバイス: Supabaseログイン済みならオンボーディングをスキップしてホームへ
+    if (session && !onboardingCompleted) {
+      localStorage.setItem('primal_logic_onboarding_completed', 'true');
+      if (['paywall', 'auth', 'onboarding'].includes(currentScreen)) setCurrentScreen('home');
+      return;
+    }
+
+    if (!onboardingCompleted) {
+      if (!['paywall', 'auth', 'onboarding'].includes(currentScreen)) setCurrentScreen('paywall');
+      return;
+    }
+
+    if (!session && !isGuest) {
+      if (['consent', 'paywall', 'onboarding', 'auth'].includes(currentScreen)) return;
+      setCurrentScreen('auth');
+    } else {
+      if (currentScreen === 'auth') setCurrentScreen('home');
+    }
+  }, [session, isGuest, authLoading, currentScreen]);
 
   // URLパスまたはパラメータによる画面切り替え（/privacy, /terms, ?screen=privacy など）
   useEffect(() => {
@@ -128,7 +158,7 @@ function AppContent() {
     }
 
     // クエリパラメータから画面を判定
-    if (screenParam && allowedScreens.includes(screenParam as any)) {
+    if (screenParam && allowedScreens.includes(screenParam as typeof allowedScreens[number])) {
       setCurrentScreen(screenParam as typeof allowedScreens[number]);
     }
   }, []);
@@ -147,7 +177,7 @@ function AppContent() {
 
       // 少し遅延させてトースト表示（DOMのマウントを待つ）
       setTimeout(() => {
-        (window as any).showToast?.('ようこそ！CarnivOSへ（決済完了）');
+        (window as unknown as { showToast: (msg: string) => void }).showToast?.('ようこそ！CarnivOSへ（決済完了）');
       }, 1000);
     }
   }, []);
@@ -183,7 +213,7 @@ function AppContent() {
   // 言語変更イベントをリッスンして全画面を再レンダリング
   const [languageChangeKey, setLanguageChangeKey] = useState(0);
   useEffect(() => {
-    const handleLanguageChange = (event: CustomEvent) => {
+    const handleLanguageChange = () => {
       // 言語変更時に強制的に再レンダリング
       setLanguageChangeKey(prev => prev + 1);
       // リロードも実行（確実に反映させるため）
@@ -198,18 +228,32 @@ function AppContent() {
   }, []);
 
   // 画面遷移イベントをリッスン（ProfileScreenからUI設定画面への遷移など）
+  const setScreenRef = useRef(setCurrentScreen);
+  setScreenRef.current = setCurrentScreen;
   useEffect(() => {
     const handleNavigate = (event: CustomEvent<string>) => {
       const screen = event.detail as Screen;
+      if (screen === 'streakTracker') {
+        setStatsInitialTab('streak');
+        setScreenRef.current('stats');
+        window.dispatchEvent(new CustomEvent('screenChanged'));
+        return;
+      }
+      if (screen === 'stats') setStatsInitialTab(undefined);
       if (['home', 'profile', 'history', 'labs', 'settings', 'userSettings', 'streakTracker', 'customFood', 'community', 'diary', 'stats', 'auth', 'privacy', 'terms', 'dataExport', 'dataImport', 'dataDelete', 'feedback', 'consent', 'onboarding', 'language', 'salt', 'carbTarget', 'nutrientCustom', 'gift', 'shop', 'recipe', 'healthDevice', 'input'].includes(screen)) {
-        setCurrentScreen(screen);
-        // 画面遷移時にデータ更新を通知（各画面で再計算を促す）
+        setScreenRef.current(screen);
         window.dispatchEvent(new CustomEvent('screenChanged'));
       }
     };
 
+    (window as unknown as { __navigateToScreen?: (s: Screen) => void }).__navigateToScreen = (screen: Screen) => {
+      setScreenRef.current(screen);
+      window.dispatchEvent(new CustomEvent('screenChanged'));
+    };
+
     window.addEventListener('navigateToScreen', handleNavigate as EventListener);
     return () => {
+      delete (window as unknown as { __navigateToScreen?: (s: Screen) => void }).__navigateToScreen;
       window.removeEventListener('navigateToScreen', handleNavigate as EventListener);
     };
   }, []);
@@ -225,6 +269,27 @@ function AppContent() {
 
   return (
     <>
+      {/* オフラインバナー（Task 3-6: オフライン時は画面上部に表示） */}
+      {!isOnline && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#fef3c7',
+            color: '#92400e',
+            padding: '0.5rem 1rem',
+            textAlign: 'center',
+            fontSize: '14px',
+            zIndex: 1999,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          }}
+        >
+          📡 オフラインです。一部の機能（AIチャット等）は利用できません。
+        </div>
+      )}
+
       {/* エラー通知 */}
       {error && (
         <div
@@ -299,15 +364,27 @@ function AppContent() {
         <div className="app-content">
           {currentScreen === 'consent' && (
             <ConsentScreen
-              onAccept={() => setCurrentScreen('onboarding')}
+              onAccept={() => setCurrentScreen('paywall')}
               onDecline={() => {
-                alert('プライバシーポリシーと利用規約に同意していただく必要があります。');
+                alert(t('consent.declineAlert'));
               }}
+            />
+          )}
+          {currentScreen === 'paywall' && (
+            <PaywallScreen
+              onGoToAuth={() => setCurrentScreen('auth')}
+              onContinue={() => setCurrentScreen('auth')}
             />
           )}
           {currentScreen === 'onboarding' && (
             <OnboardingScreen
-              onComplete={() => setCurrentScreen('home')}
+              onComplete={() => {
+                if (session) {
+                  setCurrentScreen('home');
+                } else {
+                  setCurrentScreen('auth');
+                }
+              }}
             />
           )}
           {currentScreen === 'home' && (
@@ -334,11 +411,6 @@ function AppContent() {
             </Suspense>
           )}
           {currentScreen === 'labs' && <OthersScreen />}
-          {currentScreen === 'streakTracker' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyStreakTrackerScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
-          )}
           {currentScreen === 'customFood' && (
             <CustomFoodScreen
               onClose={() => setCurrentScreen('home')}
@@ -364,7 +436,19 @@ function AppContent() {
             </Suspense>
           )}
           {currentScreen === 'auth' && (
-            <AuthScreen onAuthSuccess={() => setCurrentScreen('home')} />
+            <AuthScreen
+              onAuthSuccess={() => {
+                const choice = getPaywallChoice();
+                clearPaywallChoice();
+                // paywallで「スキップ/購入」を選んだ新規のみオンボーディングへ。ログイン or 未設定（既存ユーザー）はホーム
+                if (choice === 'signup') {
+                  setCurrentScreen('onboarding');
+                } else {
+                  localStorage.setItem('primal_logic_onboarding_completed', 'true');
+                  setCurrentScreen('home');
+                }
+              }}
+            />
           )}
           {currentScreen === 'privacy' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
@@ -445,43 +529,50 @@ function AppContent() {
           )}
         </div>
 
-        {/* Bottom Navigation */}
-        <nav className="app-navigation" role="navigation" aria-label={t('nav.mainNavigationAriaLabel')}>
-          <button
-            className={`app-nav-button ${currentScreen === 'home' ? 'active' : ''}`}
-            onClick={() => setCurrentScreen('home')}
-            aria-label={t('nav.homeAriaLabel')}
-            aria-current={currentScreen === 'home' ? 'page' : undefined}
-          >
-            <span style={{ fontSize: '20px' }} aria-hidden="true">🏠</span>
-            <span>{t('nav.home')}</span>
-          </button>
-          <button
-            className={`app-nav-button ${currentScreen === 'history' ? 'active' : ''}`}
-            onClick={() => setCurrentScreen('history')}
-            aria-label={t('nav.historyAriaLabel')}
-            aria-current={currentScreen === 'history' ? 'page' : undefined}
-          >
-            <span style={{ fontSize: '20px' }} aria-hidden="true">📊</span>
-            <span>{t('nav.history')}</span>
-          </button>
-          <button
-            className={`app-nav-button ${currentScreen === 'labs' ? 'active' : ''}`}
-            onClick={() => setCurrentScreen('labs')}
-            aria-label={t('nav.othersAriaLabel')}
-            aria-current={currentScreen === 'labs' ? 'page' : undefined}
-          >
-            <span style={{ fontSize: '20px' }} aria-hidden="true">📑</span>
-            <span>{t('nav.others')}</span>
-          </button>
-        </nav>
+
+        {/* Bottom Navigation - Only show when NOT in restricted screens */}
+        {!['auth', 'consent', 'paywall', 'onboarding'].includes(currentScreen) && (
+          <nav className="app-navigation" role="navigation" aria-label={t('nav.mainNavigationAriaLabel')}>
+            <button
+              data-testid="nav-home"
+              className={`app-nav-button ${currentScreen === 'home' ? 'active' : ''}`}
+              onClick={() => setCurrentScreen('home')}
+              aria-label={t('nav.homeAriaLabel')}
+              aria-current={currentScreen === 'home' ? 'page' : undefined}
+            >
+              <span style={{ fontSize: '20px' }} aria-hidden="true">🏠</span>
+              <span>{t('nav.home')}</span>
+            </button>
+            <button
+              data-testid="nav-history"
+              className={`app-nav-button ${currentScreen === 'history' ? 'active' : ''}`}
+              onClick={() => setCurrentScreen('history')}
+              aria-label={t('nav.historyAriaLabel')}
+              aria-current={currentScreen === 'history' ? 'page' : undefined}
+            >
+              <span style={{ fontSize: '20px' }} aria-hidden="true">📊</span>
+              <span>{t('nav.history')}</span>
+            </button>
+            <button
+              data-testid="nav-others"
+              className={`app-nav-button ${currentScreen === 'labs' ? 'active' : ''}`}
+              onClick={() => setCurrentScreen('labs')}
+              aria-label={t('nav.othersAriaLabel')}
+              aria-current={currentScreen === 'labs' ? 'page' : undefined}
+            >
+              <span style={{ fontSize: '20px' }} aria-hidden="true">📑</span>
+              <span>{t('nav.others')}</span>
+            </button>
+          </nav>
+        )}
       </div>
-      {getFeatureDisplaySettings().aiSpeedDial && (
-        <AISpeedDial
-          onOpenFatTab={openFatTabCallback || undefined}
-          onAddFood={addFoodCallback || undefined}
-        />
-      )}
+      {getFeatureDisplaySettings().aiSpeedDial &&
+        !['consent', 'paywall', 'auth', 'onboarding'].includes(currentScreen) && (
+          <AISpeedDial
+            onOpenFatTab={openFatTabCallback || undefined}
+            onAddFood={addFoodCallback || undefined}
+          />
+        )}
 
       {/* ペイウォールモーダル（トライアル期限切れ時） */}
       {trialStatus && trialStatus.isExpired && !trialStatus.hasSubscription && (
@@ -515,7 +606,7 @@ function AppContent() {
                 throw new Error('Checkout URLの取得に失敗しました');
               }
             } catch (err) {
-              logError(err, { component: 'App', action: 'subscribe' });
+              console.error('Subscription error:', err);
               alert('決済画面への遷移に失敗しました。設定画面から再度お試しください。');
             }
           }}
@@ -528,9 +619,11 @@ function AppContent() {
 export default function App() {
   return (
     <AppProvider>
-      <NutritionProvider>
-        <AppContent />
-      </NutritionProvider>
+      <AuthProvider>
+        <NutritionProvider>
+          <AppContent />
+        </NutritionProvider>
+      </AuthProvider>
     </AppProvider>
   );
 }

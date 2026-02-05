@@ -22,8 +22,8 @@ export default function NutrientGauge({
   current,
   target,
   unit,
-  status = 'optimal',
-  nutrient,
+  status: _status = 'optimal',
+  nutrient: _nutrient,
   onPress,
 }: NutrientGaugeProps) {
   const percentage = target > 0 ? Math.min((current / target) * 100, 200) : 0; // 200%まで表示可能
@@ -40,14 +40,14 @@ export default function NutrientGauge({
     } else if (percent < 100) {
       // 50-100%: オレンジから緑へのグラデーション
       const ratio = (percent - 50) / 50;
-      return `linear-gradient(to right, #f97316 0%, #22c55e ${ratio * 100}%)`;
+      return `linear-gradient(to right, #f97316 0%, #f43f5e ${ratio * 100}%)`;
     } else if (percent < 120) {
       // 100-120%: 緑から紫へのグラデーション
       const ratio = (percent - 100) / 20;
-      return `linear-gradient(to right, #22c55e 0%, #a855f7 ${ratio * 100}%)`;
+      return `linear-gradient(to right, #f43f5e 0%, #f43f5e ${ratio * 100}%)`;
     } else {
       // 120%以上: 紫
-      return '#a855f7';
+      return '#f43f5e';
     }
   };
 

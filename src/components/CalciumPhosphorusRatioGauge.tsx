@@ -66,7 +66,7 @@ export default function CalciumPhosphorusRatioGauge({
               <>
                 {ratio.toFixed(2)}:1 (Ca:P)
                 {(previewCalcium > 0 || previewPhosphorus > 0) && (
-                  <span style={{ color: '#3b82f6', marginLeft: '8px', fontSize: '0.9em' }}>
+                  <span style={{ color: '#f43f5e', marginLeft: '8px', fontSize: '0.9em' }}>
                     ({calcium.toFixed(0)}mg / {phosphorus.toFixed(0)}mg)
                   </span>
                 )}
@@ -75,7 +75,7 @@ export default function CalciumPhosphorusRatioGauge({
               <>
                 {totalCalcium.toFixed(0)}mg / {totalPhosphorus.toFixed(0)}mg
                 {(previewCalcium > 0 || previewPhosphorus > 0) && (
-                  <span style={{ color: '#3b82f6', marginLeft: '8px', fontSize: '0.9em' }}>
+                  <span style={{ color: '#f43f5e', marginLeft: '8px', fontSize: '0.9em' }}>
                     (+{previewCalcium.toFixed(0)}mg / +{previewPhosphorus.toFixed(0)}mg)
                   </span>
                 )}

@@ -5,7 +5,7 @@
  */
 
 import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
-import type { DailyLog, FoodItem, DailyStatus, RecoveryProtocol, UserProfile, CalculatedMetrics } from '../types';
+import type { DailyLog, FoodItem, DailyStatus, RecoveryProtocol, UserProfile } from '../types';
 import { calculateAllMetrics } from '../utils/nutrientCalculator';
 import { generateRecoveryProtocol, detectViolationType } from '../utils/recoveryAlgorithm';
 import { generateRecoveryProtocolWithAI } from '../utils/openaiApi';
@@ -31,6 +31,7 @@ interface AppContextType {
   updateStatus: (status: DailyStatus) => void;
   updateDiary: (diary: string) => void;
   updateWeight: (weight: number | undefined, bodyFatPercentage?: number | undefined) => void;
+  updateWaterIntake: (addMl: number) => void;
   setRecoveryProtocol: (protocol: RecoveryProtocol) => void;
   clearDailyLog: () => void;
   loadTodayLog: () => Promise<void>;
@@ -582,6 +583,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [userProfile]
   );
 
+  const updateWaterIntake = useCallback((addMl: number) => {
+    setDailyLog((prev) => {
+      const today = new Date().toISOString().split('T')[0];
+      const current = prev?.waterIntake ?? 0;
+      const next = Math.max(0, current + addMl);
+      if (!prev) {
+        return {
+          date: today,
+          status: {
+            sleepScore: 80,
+            sunMinutes: 30,
+            activityLevel: 'moderate',
+          },
+          fuel: [],
+          calculatedMetrics: calculateAllMetrics([], userProfile),
+          waterIntake: next,
+        };
+      }
+      return { ...prev, waterIntake: next };
+    });
+    window.dispatchEvent(new CustomEvent('dailyLogUpdated'));
+  }, []);
+
   const setRecoveryProtocol = useCallback(
     (protocol: RecoveryProtocol) => {
       setDailyLog((prev) => {
@@ -662,6 +686,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         updateStatus,
         updateDiary,
         updateWeight,
+        updateWaterIntake,
         setRecoveryProtocol,
         clearDailyLog,
         loadTodayLog,

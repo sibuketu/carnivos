@@ -1,111 +1,65 @@
-﻿# Capacitorセットアップ手順（2026-01-03）
+# Capacitorセットアップ手順（2026-01-03）
 
-> Webアプリをネイティブアプリ化する手順
+> Webアプリをネイティブアプリ化する手順。コピペするものはすべてコードブロック。パスは絶対パス（CarnivOS）。
 
 ---
 
-## ✅ 完了した作業
+## 完了した作業
 
 1. **Capacitorのインストール**: 完了
-   ```bash
-   npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android --save-dev
-   ```
-
-2. **Capacitorの初期化**: 完了
-   ```bash
-   npx cap init "CarnivOS" "com.primallogic.app" --web-dir="dist"
-   ```
+2. **Capacitorの初期化**: 完了（appId: com.primallogic.app, appName: CarnivOS, webDir: dist）
 
 ---
 
-## 📋 次のステップ
+## 次のステップ（コピペ用）
 
-### 1. Webアプリをビルド
+### ビルド → Android 同期 → Android Studio で開く（1ブロック）
 
-```bash
-cd primal-logic-web
-npm run build
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npm run build; npx cap sync android; npx cap open android
 ```
 
-これで`dist`ディレクトリにビルドされたファイルが生成されます。
+### Android Studio で開くだけ（1ブロック）
 
-### 2. iOS/Androidプラットフォームを追加
-
-**Android（Windowsでも可能）:**
-```bash
-npx cap add android
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npx cap open android
 ```
 
-**iOS（macOSが必要）:**
-```bash
-npx cap add ios
+### コードを変えたあと（ビルドと同期のみ・1ブロック）
+
+```powershell
+Set-Location "C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web"; npm run build; npx cap sync android
 ```
 
-**注意**: WindowsではiOSプラットフォームの追加はできません。macOSが必要です。
+### エクスプローラーでフォルダを開く（アドレスバーに貼る）
 
-### 3. Capacitorに同期
+primal-logic-web フォルダ:
 
-```bash
-npx cap sync
+```
+C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web
 ```
 
-これで、ビルドされたWebアプリがネイティブプロジェクトにコピーされます。
+android フォルダ（Android Studio で Open する用）:
 
-### 4. 実機でテスト
-
-**Android:**
-```bash
-npx cap open android
 ```
-Android Studioが開くので、実機を接続して実行できます。
-
-**iOS（macOSが必要）:**
-```bash
-npx cap open ios
-```
-Xcodeが開くので、実機を接続して実行できます。
-
----
-
-## 🔧 設定ファイル
-
-### capacitor.config.ts
-
-Capacitorの設定ファイルが作成されているはずです。確認してください。
-
-```typescript
-import { CapacitorConfig } from '@capacitor/cli';
-
-const config: CapacitorConfig = {
-  appId: 'com.primallogic.app',
-  appName: 'CarnivOS',
-  webDir: 'dist',
-  // その他の設定
-};
-
-export default config;
+C:\Users\susam\Downloads\CarnivOS\docs\primal-logic-app\primal-logic-web\android
 ```
 
 ---
 
-## 📝 注意事項
+## 実機でテスト
 
-1. **WindowsでのiOS開発**: WindowsではiOSプラットフォームの追加はできません。macOSが必要です。
-2. **Android開発**: WindowsでもAndroid開発は可能です。
-3. **ビルド**: ネイティブアプリを実行する前に、必ず`npm run build`を実行してください。
-
----
-
-## 🎯 次のアクション
-
-1. Webアプリをビルド: `npm run build`
-2. Androidプラットフォームを追加: `npx cap add android`
-3. Capacitorに同期: `npx cap sync`
-4. Android Studioで開く: `npx cap open android`
-5. 実機でテスト
+- **Android**: 上記で Android Studio を開く → 実機をUSB接続 → デバイス選択 → Run
+- **iOS**: Windowsでは不可。macOS で `npx cap open ios` を実行
 
 ---
 
-最終更新: 2026-01-03
+## 注意事項
 
+- **WindowsでのiOS**: iOS は macOS が必要。Windows では `cap sync` で iOS が失敗するため、`cap sync android` のみ使用すること。
+- **Android**: Windows でも開発可能。Android Studio が必要。
+- **ビルド**: 実行前に必ずビルドと同期を行う（上記ブロック参照）。
 
+---
+
+最終更新: 2026-02-03

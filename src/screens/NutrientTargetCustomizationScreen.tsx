@@ -4,11 +4,10 @@
  * 栄養素目標値のカスタマイズ画面
  */
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { saveUserProfile } from '../utils/storage';
 import { getCarnivoreTargets } from '../data/carnivoreTargets';
-import HelpTooltip from '../components/common/HelpTooltip';
 import type { UserProfile } from '../types';
 import { logError } from '../utils/errorHandler';
 import { useTranslation } from '../utils/i18n';
@@ -77,6 +76,26 @@ export default function NutrientTargetCustomizationScreen({
       );
     }
   }, [userProfile]);
+
+  // AI提案（suggest_target）から遷移した場合、sessionStorage の値を初期値に反映
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('ai_suggest_target');
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { nutrientKey?: string; value?: number; unit?: string; reason?: string };
+      sessionStorage.removeItem('ai_suggest_target');
+      const key = parsed.nutrientKey;
+      const value = parsed.value;
+      if (!key || value == null || !NUTRIENT_KEYS.includes(key as typeof NUTRIENT_KEYS[number])) return;
+      setCustomNutrientTargets((prev) => ({
+        ...prev,
+        [key]: { mode: 'manual', value: Number(value) },
+      }));
+    } catch {
+      /* ignore parse/sessionStorage errors */
+      void 0;
+    }
+  }, []);
 
   // 推奨値を計算
   const autoTargets = useMemo(() => {

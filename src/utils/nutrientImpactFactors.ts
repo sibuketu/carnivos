@@ -68,7 +68,7 @@ export function calculateNutrientImpactFactors(
     undefined, // carnivoreStartDate
     undefined, // forceAdaptationMode
     undefined, // bodyComposition
-    undefined, // weight
+    profile.weight, // weight: 基礎値に体重を含める
     undefined, // metabolicStressIndicators
     undefined // customNutrientTargets
   );
@@ -103,11 +103,11 @@ export function calculateNutrientImpactFactors(
     profile.metabolicStressIndicators,
     profile.customNutrientTargets
       ? Object.fromEntries(
-          Object.entries(profile.customNutrientTargets).map(([key, value]) => [
-            key,
-            typeof value === 'number' ? { mode: 'manual' as const, value } : value,
-          ])
-        )
+        Object.entries(profile.customNutrientTargets).map(([key, value]) => [
+          key,
+          typeof value === 'number' ? { mode: 'manual' as const, value } : value,
+        ])
+      )
       : undefined
   );
 
@@ -121,7 +121,7 @@ export function calculateNutrientImpactFactors(
   }
 
   const unit = getNutrientUnit(nutrient);
-  const nutrientName = getNutrientName(nutrient);
+  const _nutrientName = getNutrientName(nutrient);
 
   // 各要因を個別に計算
   // 1. 性別による影響

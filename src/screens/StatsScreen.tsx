@@ -1,34 +1,45 @@
 /**
  * Stats Screen - 統計・グラフ表示画面
  *
- * 栄養素の推移グラフ、体重推移グラフを表示
+ * 栄養素の推移グラフ、体重推移グラフ、習慣トラッカー（連続記録）を表示
  */
 
 import { useState, useEffect, useMemo } from 'react';
 import { getDailyLogs } from '../utils/storage';
 import { useApp } from '../context/AppContext';
+import { calculateStreak, type StreakData } from '../utils/streakCalculator';
 import NutrientTrendChart from '../components/charts/NutrientTrendChart';
 import WeightTrendChart from '../components/charts/WeightTrendChart';
+import StreakCalendar from '../components/StreakCalendar';
 import { getCarnivoreTargets } from '../data/carnivoreTargets';
 import type { DailyLog } from '../types';
 import './StatsScreen.css';
 
-export default function StatsScreen() {
+type StatsScreenProps = { initialTab?: 'nutrients' | 'weight' | 'streak' };
+
+export default function StatsScreen({ initialTab }: StatsScreenProps) {
   const { userProfile } = useApp();
   const [logs, setLogs] = useState<DailyLog[]>([]);
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [selectedNutrient, setSelectedNutrient] = useState<string>('proteinTotal');
   const [selectedPeriod, setSelectedPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [activeTab, setActiveTab] = useState<'nutrients' | 'weight'>('nutrients');
-
-  useEffect(() => {
-    loadLogs();
-  }, []);
+  const [activeTab, setActiveTab] = useState<'nutrients' | 'weight' | 'streak'>(initialTab ?? 'nutrients');
 
   const loadLogs = async () => {
     const allLogs = await getDailyLogs();
     const sorted = allLogs.sort((a, b) => a.date.localeCompare(b.date));
     setLogs(sorted);
   };
+
+  useEffect(() => {
+    loadLogs();
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'streak') {
+      calculateStreak().then(setStreakData);
+    }
+  }, [activeTab]);
 
   // 動的目標値を取得
   const targets = useMemo(() => {
@@ -92,9 +103,16 @@ export default function StatsScreen() {
           >
             体重
           </button>
+          <button
+            className={`stats-screen-tab ${activeTab === 'streak' ? 'active' : ''}`}
+            onClick={() => setActiveTab('streak')}
+          >
+            習慣
+          </button>
         </div>
 
-        {/* 期間選択 */}
+        {/* 期間選択（栄養素・体重タブのみ） */}
+        {activeTab !== 'streak' && (
         <div
           style={{
             display: 'flex',
@@ -130,6 +148,7 @@ export default function StatsScreen() {
             </button>
           ))}
         </div>
+        )}
 
         {/* 栄養素グラフ */}
         {activeTab === 'nutrients' && (
@@ -203,13 +222,51 @@ export default function StatsScreen() {
                 fontSize: '18px',
                 fontWeight: 'bold',
                 marginBottom: '1rem',
-                color: '#06b6d4',
-                textShadow: '0 0 5px rgba(6, 182, 212, 0.4)',
+                color: '#f43f5e',
+                textShadow: '0 0 5px rgba(244, 63, 94, 0.4)',
               }}
             >
               体重の推移
             </h2>
             <WeightTrendChart logs={logs} period={selectedPeriod} />
+          </div>
+        )}
+
+        {/* 習慣トラッカー（連続記録） */}
+        {activeTab === 'streak' && (
+          <div className="stats-screen-streak-section" style={{ marginTop: '1rem' }}>
+            {streakData === null ? (
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#a1a1aa' }}>読み込み中...</div>
+            ) : (
+              <>
+                <div
+                  style={{
+                    textAlign: 'center',
+                    marginBottom: '1.5rem',
+                    padding: '1.5rem',
+                    backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(244, 63, 94, 0.3)',
+                  }}
+                >
+                  <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#f43f5e', marginBottom: '0.25rem' }}>
+                    {streakData.currentStreak}
+                  </div>
+                  <div style={{ fontSize: '14px', color: '#a1a1aa' }}>日連続</div>
+                  {streakData.longestStreak > 0 && (
+                    <div style={{ marginTop: '0.75rem', fontSize: '13px', color: '#71717a' }}>
+                      最長記録 {streakData.longestStreak}日
+                    </div>
+                  )}
+                </div>
+                <StreakCalendar
+                  logs={logs}
+                  onDayClick={() => {
+                    window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'history' }));
+                  }}
+                />
+              </>
+            )}
           </div>
         )}
       </div>

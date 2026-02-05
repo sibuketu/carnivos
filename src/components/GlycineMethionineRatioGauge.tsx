@@ -29,7 +29,7 @@ export default function GlycineMethionineRatioGauge({
   const ratio =
     totalMethionine > 0 ? totalGlycine / totalMethionine : totalGlycine > 0 ? Infinity : 0;
 
-  // 推奨比率: 1:1以上（Dr. Paul Saladino）
+  // 推奨比率: 1:1以上（カーニボアロジック）
   const optimalRatioMin = 1.0;
 
   // ステータス判定
@@ -74,7 +74,7 @@ export default function GlycineMethionineRatioGauge({
               <>
                 {ratio.toFixed(2)}:1 (Gly:Met)
                 {(previewGlycine > 0 || previewMethionine > 0) && (
-                  <span style={{ color: '#3b82f6', marginLeft: '8px', fontSize: '0.9em' }}>
+                  <span style={{ color: '#f43f5e', marginLeft: '8px', fontSize: '0.9em' }}>
                     ({glycine.toFixed(1)}g / {methionine.toFixed(1)}g)
                   </span>
                 )}
@@ -83,7 +83,7 @@ export default function GlycineMethionineRatioGauge({
               <>
                 {totalGlycine.toFixed(1)}g / {totalMethionine.toFixed(1)}g
                 {(previewGlycine > 0 || previewMethionine > 0) && (
-                  <span style={{ color: '#3b82f6', marginLeft: '8px', fontSize: '0.9em' }}>
+                  <span style={{ color: '#f43f5e', marginLeft: '8px', fontSize: '0.9em' }}>
                     (+{previewGlycine.toFixed(1)}g / +{previewMethionine.toFixed(1)}g)
                   </span>
                 )}

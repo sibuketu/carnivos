@@ -40,7 +40,7 @@ export async function authenticateGoogleCalendar(): Promise<boolean> {
 /**
  * Google Calendarに食事記録を追加
  */
-export async function addMealToCalendar(event: CalendarEvent): Promise<boolean> {
+export async function addMealToCalendar(_event: CalendarEvent): Promise<boolean> {
   try {
     const apiKey = import.meta.env.VITE_GOOGLE_CALENDAR_API_KEY;
     if (!apiKey) {
@@ -66,7 +66,7 @@ export async function addMealToCalendar(event: CalendarEvent): Promise<boolean> 
 /**
  * Google Calendarから食事記録を取得
  */
-export async function getMealsFromCalendar(date: string): Promise<CalendarEvent[]> {
+export async function getMealsFromCalendar(_date: string): Promise<CalendarEvent[]> {
   try {
     const apiKey = import.meta.env.VITE_GOOGLE_CALENDAR_API_KEY;
     if (!apiKey) {

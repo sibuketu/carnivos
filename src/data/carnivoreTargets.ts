@@ -4,7 +4,7 @@
  * カーニボア専用の栄養目標値を定義します。
  * 一般的なRDA（推奨食事摂取基準）ではなく、厳格なカーニボア実践者のための目標値です。
  *
- * Research Basis: Dr. Anthony Chaffee, Dr. Bart Kay, Dr. Ken Berry, LMNT, Dr. Shawn Baker, Dr. Paul Saladino
+ * Research Basis: Dr. Anthony Chaffee, Dr. Bart Kay, Dr. Ken Berry, LMNT, Dr. Shawn Baker
  */
 
 export interface NutrientTarget {
@@ -155,12 +155,12 @@ export const DEFAULT_CARNIVORE_TARGETS: CarnivoreTarget = {
   // カーニボアロジック: 体重1kgあたり1.5-2.0gのタンパク質（Dr. Shawn Baker / Dr. Anthony Chaffee）
   // 70kgの人の場合: 105-140g。デフォルトは110g（中程度の活動量を想定）
   protein: 110, // g/日（体重70kg、1.6g/kgを想定。肉で十分摂取可能）
-  // カーニボアロジック: タンパク質と脂質の比率は1:1から1:1.5が推奨（Dr. Paul Saladino）
+  // カーニボアロジック: タンパク質と脂質の比率は1:1から1:1.5が推奨（Dr. Ken Berry, Dr. Anthony Chaffee）
   // エネルギー源として脂質が重要。デフォルトは150g（タンパク質110gに対して約1.4:1）
   fat: 150, // g/日（タンパク質との比率1:1.4を想定。肉で十分摂取可能）
 
   // ミネラル
-  // カーニボアロジック: 肉類に豊富に含まれ、ヘム鉄による吸収促進により十分摂取可能（Dr. Paul Saladino）
+  // カーニボアロジック: 肉類に豊富に含まれ、ヘム鉄による吸収促進により十分摂取可能（Dr. Ken Berry, Dr. Bart Kay）
   zinc: 11, // mg/日（RDA準拠。肉類に豊富で、ヘム鉄による吸収促進により十分摂取可能）
   magnesium: 600, // mg/日（Phase 1: 基本600mg、移行期間中は800mg）
   iron: 8, // mg/日（男性。女性は18mg推奨。ヘム鉄として肉で十分摂取可能）
@@ -168,11 +168,11 @@ export const DEFAULT_CARNIVORE_TARGETS: CarnivoreTarget = {
   sodium: 5000, // mg/日（CARNIVORE_NUTRIENT_TARGETSから。低インスリン状態では高用量が必要）
 
   // 脂溶性ビタミン
-  // カーニボアロジック: レバーなどの内臓肉に豊富。肉で十分摂取可能（Dr. Paul Saladino）
+  // カーニボアロジック: レバーなどの内臓肉に豊富。肉で十分摂取可能（Dr. Ken Berry）
   vitamin_a: 5000, // IU/日（レチノール。レバーや内臓肉に豊富で、肉で十分摂取可能。過剰摂取に注意）
   // カーニボアロジック: 魚の肝油や卵黄に含まれるが、日光暴露も重要。肉で十分摂取可能な場合もある（Dr. Ken Berry）
   vitamin_d: 2000, // IU/日（D3。日光暴露を考慮。肉や魚で十分摂取可能な場合もある）
-  // カーニボアロジック: 動物性食品（特に内臓肉）に豊富。肉で十分摂取可能（Dr. Paul Saladino）
+  // カーニボアロジック: 動物性食品（特に内臓肉）に豊富。肉で十分摂取可能（Dr. Ken Berry）
   vitamin_k2: 200, // μg/日（MK-4。内臓肉や発酵食品に豊富で、肉で十分摂取可能）
 
   // ビタミンB群
@@ -180,7 +180,7 @@ export const DEFAULT_CARNIVORE_TARGETS: CarnivoreTarget = {
   vitamin_b12: 2.4, // μg/日（RDA準拠。肉類に豊富で、肉で十分摂取可能）
 
   // その他
-  // カーニボアロジック: レバーや卵に豊富。肉で十分摂取可能（Dr. Paul Saladino）
+  // カーニボアロジック: レバーや卵に豊富。肉で十分摂取可能（Dr. Ken Berry）
   choline: 450, // mg/日（RDA準拠。レバーや卵に豊富で、肉で十分摂取可能）
 };
 
@@ -208,9 +208,7 @@ export function getCarnivoreTargets(
   supplementIodine?: boolean,
   alcoholFrequency?: 'none' | 'rare' | 'weekly' | 'daily',
   caffeineIntake?: 'none' | 'low' | 'moderate' | 'high',
-  daysOnCarnivore?: number, // Phase 1: 移行期間判定用
-  carnivoreStartDate?: string, // Phase 1: 移行期間判定用（ISO date string）
-  forceAdaptationMode?: boolean | null, // Phase 1: 手動オーバーライド（true: 強制ON, false: 強制OFF, null/undefined: 自動判定）
+  // Phase 1 related params removed
   bodyComposition?: 'muscular' | 'average' | 'high_fat' | { bodyFatPercentage: number }, // Phase 3: 体組成設定
   weight?: number, // Phase 3: 体重（LBM計算用）
   metabolicStressIndicators?: string[], // Phase 4: 代謝ストレス指標
@@ -218,26 +216,14 @@ export function getCarnivoreTargets(
 ): CarnivoreTarget {
   const targets = { ...DEFAULT_CARNIVORE_TARGETS };
 
-  // Phase 1: 移行期間判定（30日未満を移行期間とする）
-  let isAdaptationPhase = false;
+  // Phase 1: Transition Phase Logic Removed
 
-  // 手動オーバーライドが設定されている場合はそれを使用
-  if (forceAdaptationMode === true) {
-    isAdaptationPhase = true;
-  } else if (forceAdaptationMode === false) {
-    isAdaptationPhase = false;
-  } else {
-    // 自動判定: daysOnCarnivore < 30 または carnivoreStartDateから30日以内
-    if (daysOnCarnivore !== undefined) {
-      isAdaptationPhase = daysOnCarnivore < 30;
-    } else if (carnivoreStartDate) {
-      const startDate = new Date(carnivoreStartDate);
-      const today = new Date();
-      const daysSinceStart = Math.floor(
-        (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      isAdaptationPhase = daysSinceStart < 30;
-    }
+  // 基本計算: 体重がある場合は体重からタンパク質目標を算出 (1.6g/kg)
+  if (weight) {
+    // デフォルトの110gではなく、個人の体重に基づいた数値をベースにする
+    targets.protein = Math.round(weight * 1.6);
+    // 脂質はタンパク質の1.2倍に設定 (1:1.2 ~ 1:1.4 ratio)
+    targets.fat = Math.round(targets.protein * 1.2);
   }
 
   // 性別による調整
@@ -262,16 +248,7 @@ export function getCarnivoreTargets(
     targets.magnesium = Math.max(targets.magnesium, 700);
   }
 
-  // Phase 1: 移行期間サポート - 動的栄養素調整システム
-  // 判定ロジック: daysOnCarnivore < 30 または carnivoreStartDateから30日以内
-  if (isAdaptationPhase) {
-    // 移行期間中の調整内容（要件定義に基づく）
-    targets.sodium = Math.max(targets.sodium, 7000); // ナトリウム: +2000mg（5000mg → 7000mg）
-    targets.magnesium = Math.max(targets.magnesium, 800); // マグネシウム: +200mg（600mg → 800mg）
-    targets.potassium = Math.max(targets.potassium, 5000); // カリウム: +500mg（4500mg → 5000mg）
-    // 導入期は脂質も増量（エネルギー不足防止）
-    targets.fat = Math.max(targets.fat, targets.fat * 1.5);
-  }
+  // Phase 1: Transition Phase Logic Removed (Dynamic adjustments for adaptation)
 
   // 活動量による調整
   if (activityLevel === 'active') {
@@ -279,9 +256,8 @@ export function getCarnivoreTargets(
     targets.fat = Math.max(targets.fat, 180); // 脂質も増量
     targets.magnesium = Math.max(targets.magnesium, 700); // マグネシウム増量
     // Gemini提案：活動レベル高（汗をかく）はナトリウム+1000mg
-    if (!isAdaptationPhase) {
-      targets.sodium = Math.max(targets.sodium, targets.sodium + 1000);
-    }
+    // Gemini提案：活動レベル高（汗をかく）はナトリウム+1000mg
+    targets.sodium = Math.max(targets.sodium, targets.sodium + 1000);
   } else if (activityLevel === 'moderate') {
     targets.protein = Math.max(targets.protein, 110);
     targets.fat = Math.max(targets.fat, 160);

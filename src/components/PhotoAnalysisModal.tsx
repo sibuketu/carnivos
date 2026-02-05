@@ -3,7 +3,8 @@ import type { FoodItem } from '../types';
 import { refineFoodAnalysis } from '../services/aiService';
 import MiniNutrientGauge from './MiniNutrientGauge';
 import type { CarnivoreTarget } from '../data/carnivoreTargets';
-import { getSequentialTip, getNextTip, getPrevTip, TIPS_DATA, type Tip } from '../data/tips';
+import { getSequentialTip, type Tip, saveTip, unsaveTip, isTipSaved } from '../data/tips';
+import { useNutrition } from '../hooks/useNutrition';
 
 interface PhotoAnalysisModalProps {
   isOpen: boolean;
@@ -32,8 +33,21 @@ export default function PhotoAnalysisModal({
   const [followupAnswers, setFollowupAnswers] = useState<Record<string, string>>({});
   const [isAIProcessing, setIsAIProcessing] = useState(false);
   const [loadingTip, setLoadingTip] = useState<Tip | null>(null); // ローディング中のTips
-  const [loadingTipIndex, setLoadingTipIndex] = useState<number>(0);
   const [isTipSavedState, setIsTipSavedState] = useState(false); // Tipsの保存状態
+  const [showChargeAnim, setShowChargeAnim] = useState(false);
+  const { todayLog } = useNutrition();
+
+  // 現在の摂取合計を計算
+  const currentDailyTotals = {
+    protein: todayLog?.calculatedMetrics?.effectiveProtein || 0,
+    fat: todayLog?.calculatedMetrics?.fatTotal || 0,
+    sodium: todayLog?.calculatedMetrics?.sodiumTotal || 0,
+    magnesium: todayLog?.calculatedMetrics?.magnesiumTotal || 0,
+    potassium: todayLog?.calculatedMetrics?.potassiumTotal || 0,
+    zinc: todayLog?.calculatedMetrics?.effectiveZinc || 0,
+    iron: todayLog?.calculatedMetrics?.effectiveIron || 0,
+    vitaminD: todayLog?.calculatedMetrics?.vitaminDTotal || 0,
+  };
 
   // analysisResultが更新されたらローカルも更新（初期化）
   useEffect(() => {
@@ -41,16 +55,57 @@ export default function PhotoAnalysisModal({
     setFollowupAnswers({});
     // 写真解析中にTipsを1つ表示（順番表示）
     if (isOpen && !loadingTip) {
-      const { tip, index } = getSequentialTip();
+      const { tip } = getSequentialTip();
       setLoadingTip(tip);
-      setLoadingTipIndex(index);
       setIsTipSavedState(isTipSaved(tip.id));
     }
-  }, [analysisResult, isOpen]);
+  }, [analysisResult, isOpen, loadingTip]);
 
   if (!isOpen || !currentResult) return null;
 
-  // 栄養素計算（現在の重量に基づく）
+  const handleAccept = () => {
+    // Show charge animation before closing or adding
+    setShowChargeAnim(true);
+
+    setTimeout(() => {
+      const ratio = currentResult.estimatedWeight / 100;
+      const nutrients: Record<string, number> = {};
+      if (currentResult.nutrients) {
+        Object.entries(currentResult.nutrients).forEach(([key, value]) => {
+          nutrients[key] = (value as number) * ratio;
+        });
+      }
+      const foodItem: FoodItem = {
+        item: currentResult.foodName,
+        amount: currentResult.estimatedWeight,
+        unit: 'g' as const,
+        type: (currentResult.type as 'animal' | 'dairy' | 'fish' | undefined) || 'animal',
+        nutrients: Object.keys(nutrients).length > 0 ? nutrients : undefined,
+      };
+      onConfirm(foodItem);
+      setShowChargeAnim(false);
+    }, 1500); // Wait for animation
+  };
+
+  if (showChargeAnim) {
+    return (
+      <div className="fixed inset-0 z-[10000] bg-black flex flex-col items-center justify-center">
+        <div className="text-6xl mb-6 animate-bounce">⚡</div>
+        <div className="text-3xl font-bold text-rose-500 font-mono tracking-widest animate-pulse">
+          NUTRIENT CHARGED
+        </div>
+        <div className="w-64 h-4 bg-stone-800 rounded-full mt-6 overflow-hidden border border-rose-900">
+          <div className="h-full bg-rose-500 animate-[fillBar_1s_ease-out_forwards]" style={{ width: '100%', transition: 'width 1s ease-out' }} />
+        </div>
+        <style>{`
+          @keyframes fillBar {
+            from { width: 0%; }
+            to { width: 100%; }
+          }
+        `}</style>
+      </div>
+    );
+  }
   const ratio = currentResult.estimatedWeight / 100;
   const nutrients = currentResult.nutrients || {};
 
@@ -168,7 +223,7 @@ export default function PhotoAnalysisModal({
                       nutrients: result.nutrients,
                       type: result.type,
                     }));
-                  } catch (e) {
+                  } catch {
                     alert('検索に失敗しました');
                   } finally {
                     setIsAIProcessing(false);
@@ -262,7 +317,7 @@ export default function PhotoAnalysisModal({
             >
               <MiniNutrientGauge
                 label="タンパク質"
-                currentDailyTotal={0}
+                currentDailyTotal={currentDailyTotals.protein}
                 previewAmount={p}
                 target={pTarget}
                 unit="g"
@@ -271,29 +326,29 @@ export default function PhotoAnalysisModal({
               />
               <MiniNutrientGauge
                 label="脂質"
-                currentDailyTotal={0}
+                currentDailyTotal={currentDailyTotals.fat}
                 previewAmount={f}
                 target={fTarget}
                 unit="g"
-                color="#eab308"
+                color="#f43f5e"
                 nutrientKey="fat"
               />
               {/* 電解質（重要） */}
               {(sodium > 0 || nutrients.sodium) && (
                 <MiniNutrientGauge
                   label="ナトリウム"
-                  currentDailyTotal={0}
+                  currentDailyTotal={currentDailyTotals.sodium}
                   previewAmount={sodium}
                   target={sodiumTarget}
                   unit="mg"
-                  color="#3b82f6"
+                  color="#f43f5e"
                   nutrientKey="sodium"
                 />
               )}
               {(magnesium > 0 || nutrients.magnesium) && (
                 <MiniNutrientGauge
                   label="マグネシウム"
-                  currentDailyTotal={0}
+                  currentDailyTotal={currentDailyTotals.magnesium}
                   previewAmount={magnesium}
                   target={magnesiumTarget}
                   unit="mg"
@@ -304,11 +359,11 @@ export default function PhotoAnalysisModal({
               {(potassium > 0 || nutrients.potassium) && (
                 <MiniNutrientGauge
                   label="カリウム"
-                  currentDailyTotal={0}
+                  currentDailyTotal={currentDailyTotals.potassium}
                   previewAmount={potassium}
                   target={potassiumTarget}
                   unit="mg"
-                  color="#10b981"
+                  color="#f43f5e"
                   nutrientKey="potassium"
                 />
               )}
@@ -316,7 +371,7 @@ export default function PhotoAnalysisModal({
               {(zinc > 0 || nutrients.zinc) && (
                 <MiniNutrientGauge
                   label="亜鉛"
-                  currentDailyTotal={0}
+                  currentDailyTotal={currentDailyTotals.zinc}
                   previewAmount={zinc}
                   target={zincTarget}
                   unit="mg"
@@ -327,7 +382,7 @@ export default function PhotoAnalysisModal({
               {(iron > 0 || nutrients.iron) && (
                 <MiniNutrientGauge
                   label="鉄分"
-                  currentDailyTotal={0}
+                  currentDailyTotal={currentDailyTotals.iron}
                   previewAmount={iron}
                   target={ironTarget}
                   unit="mg"
@@ -339,7 +394,7 @@ export default function PhotoAnalysisModal({
               {(vitaminD > 0 || nutrients.vitaminD) && (
                 <MiniNutrientGauge
                   label="ビタミンD"
-                  currentDailyTotal={0}
+                  currentDailyTotal={currentDailyTotals.vitaminD}
                   previewAmount={vitaminD}
                   target={vitaminDTarget}
                   unit="IU"
@@ -479,7 +534,7 @@ export default function PhotoAnalysisModal({
                       followupAnswers
                     );
                     setCurrentResult({ ...refined, followupQuestions: [] });
-                  } catch (e) {
+                  } catch {
                     alert('再計算に失敗しました');
                   } finally {
                     setIsAIProcessing(false);
@@ -534,36 +589,23 @@ export default function PhotoAnalysisModal({
             キャンセル
           </button>
           <button
-            onClick={() => {
-              const ratio = currentResult.estimatedWeight / 100;
-              const nutrients: Record<string, number> = {};
-              if (currentResult.nutrients) {
-                Object.entries(currentResult.nutrients).forEach(([key, value]) => {
-                  nutrients[key] = (value as number) * ratio;
-                });
-              }
-              const foodItem: FoodItem = {
-                item: currentResult.foodName,
-                amount: currentResult.estimatedWeight,
-                unit: 'g' as const,
-                type: (currentResult.type as any) || 'animal',
-                nutrients: Object.keys(nutrients).length > 0 ? nutrients : undefined,
-              };
-              onConfirm(foodItem);
-            }}
+            onClick={handleAccept}
             style={{
               padding: '0.75rem 2rem',
-              backgroundColor: '#dc2626',
+              backgroundColor: '#16a34a', // Green-600
               color: 'white',
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: '16px',
               fontWeight: 'bold',
-              boxShadow: '0 4px 6px rgba(220, 38, 38, 0.4)',
+              boxShadow: '0 0 15px rgba(22, 163, 74, 0.5)', // Neon glow
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
             }}
           >
-            追加する
+            <span>⚡</span> CHARGE
           </button>
         </div>
       </div>

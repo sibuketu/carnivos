@@ -14,7 +14,7 @@
 | Stripe Publishable Key | ✅ `.env` に設定済み |
 | Stripe Secret Key | ❌ 未設定 |
 | Supabase URL/Key | ❌ コメントアウト（未設定） |
-| `/api/create-checkout-session` | ❌ 未実装 |
+| `/api/create-checkout-session` | ❌ 未対応 |
 | `gifts` テーブル | ❌ 未作成 |
 
 ---

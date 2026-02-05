@@ -5,7 +5,6 @@
  */
 
 import { getDailyLogs } from './storage';
-import type { DailyLog } from '../types';
 import { logError } from './errorHandler';
 
 interface FoodHistoryEntry {

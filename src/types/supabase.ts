@@ -22,6 +22,7 @@ export interface DailyLogRow {
       bristol_scale?: number;
       notes?: string;
     };
+    water_intake?: number; // 飲んだ水（ml）
   };
   fuel: Array<{
     item: string;

@@ -93,22 +93,30 @@ export default function PFRatioGauge({
       <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%', pointerEvents: 'auto' }}>
         {/* Protein Bar Row */}
         <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] font-bold text-stone-500 w-8">PRO</span>
           <div className="flex-1 h-3 bg-stone-200 rounded-full overflow-hidden relative shadow-inner">
             <div
               style={{ width: `${Math.min(pPercent, 100)}%` }}
               className={`h-full bg-gradient-to-r ${pSufficient ? 'from-green-600 to-green-400' : 'from-red-900 to-red-500'} shadow-[0_0_10px_rgba(239,68,68,0.6)] transition-all duration-300`}
             />
           </div>
+          <span className="text-[10px] font-mono text-stone-500 w-24 text-right">
+            {Math.round(protein)}/{P_GOAL}g ({Math.round(pPercent)}%)
+          </span>
         </div>
 
         {/* Fat Bar Row */}
         <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold text-stone-500 w-8">FAT</span>
           <div className="flex-1 h-3 bg-stone-200 rounded-full overflow-hidden relative shadow-inner">
             <div
               style={{ width: `${Math.min(fPercent, 100)}%` }}
               className={`h-full bg-gradient-to-r ${fSufficient ? 'from-green-600 to-green-400' : 'from-yellow-700 to-yellow-400'} shadow-[0_0_10px_rgba(234,179,8,0.6)] transition-all duration-300`}
             />
           </div>
+          <span className="text-[10px] font-mono text-stone-500 w-24 text-right">
+            {Math.round(fat)}/{F_GOAL}g ({Math.round(fPercent)}%)
+          </span>
         </div>
       </div>
     </div>

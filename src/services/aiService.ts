@@ -4,7 +4,7 @@
  * Google Generative AI SDKを使用したAI機能の実装
  */
 
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { REMEDY_LOGIC } from '../data/remedyLogic';
 import { logError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
 
@@ -283,13 +283,14 @@ export async function chatWithAI(
 }
 
 // Deprecated: Internal implementation retained for reference
-async function original_chatWithAI(
+async function _original_chatWithAI(
   userMessage: string,
   chatHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [],
   enableVerification: boolean = false,
   enableCitations: boolean = true
 ): Promise<string> {
   if (import.meta.env.DEV) {
+    void 0; // DEV only placeholder
   }
 
   if (!isGeminiAvailable()) {
@@ -302,6 +303,7 @@ async function original_chatWithAI(
 
   try {
     if (import.meta.env.DEV) {
+      void 0; // DEV only
     }
     // Stableモデルを使用（公式ドキュメントより: gemini-2.5-flash）
     const model = genAI!.getGenerativeModel({ model: 'gemini-2.5-flash' });
@@ -471,6 +473,10 @@ ${remedyContext}
 ${historyContext}
 </conversation_history>
 
+<current_context>
+  <current_date>${new Date().toISOString()}</current_date>
+</current_context>
+
 <input_data>
   <user_query>${userMessage}</user_query>
 </input_data>
@@ -589,6 +595,7 @@ ${historyContext}
   - set_protocol: リカバリープロトコル設定
   - open_screen: 画面を開く（例：設定画面）
   - update_input: 日次入力データの更新（例：睡眠、太陽光、排泄状態など）
+  - suggest_target: 栄養素目標値の変更を推奨（params: nutrientKey, value, unit, reason）
   - custom: カスタムアクション
   
   **【最重要】食品摂取の報告を自動検出**:
@@ -613,15 +620,15 @@ ${historyContext}
   肉300g食べた||add_food|{"item":"肉","amount":300,"unit":"g"}
   卵3個食べた||add_food|{"item":"卵","amount":3,"unit":"個"}
   リカバリープロトコルを設定|糖質摂取後の回復のため|set_protocol|{"violationType":"sugar_carbs"}
-  日次入力を更新|睡眠・太陽光・排泄状態を記録|update_input|{"sleepScore":95,"sleepHours":8,"sunMinutes":30,"bowelMovement":{"status":"normal"},"activityLevel":"moderate"}]
+  日次入力を更新|睡眠・太陽光・排泄状態を記録|update_input|{"sleepScore":95,"sleepHours":8,"sunMinutes":30,"bowelMovement":{"status":"normal"},"activityLevel":"moderate"}
+  ナトリウム目標値を変更|移行期のため7000mgを推奨|suggest_target|{"nutrientKey":"sodium","value":7000,"unit":"mg","reason":"移行期のため"}]
   </todos>
 </instruction>`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    if (import.meta.env.DEV) {
-    }
+    if (import.meta.env.DEV) void 0;
 
     if (!text || text.trim().length === 0) {
       throw new Error('AIからの応答が空でした。');
@@ -632,10 +639,13 @@ ${historyContext}
 
     if (import.meta.env.DEV) {
       if (parsedResponse.thinking) {
+        void 0; // DEV: could log thinking
       }
       if (parsedResponse.verification) {
+        void 0; // DEV: could log verification
       }
       if (parsedResponse.citations && parsedResponse.citations.length > 0) {
+        void 0; // DEV: could log citations
       }
     }
 
@@ -666,6 +676,7 @@ ${historyContext}
     if (parsedResponse.answer && parsedResponse.answer.length > 0) {
       if (import.meta.env.DEV) {
         if (parsedResponse.todos && parsedResponse.todos.length > 0 && import.meta.env.DEV) {
+          void 0; // DEV: could log todos
         }
       }
       // <thinking>タグやその他のタグを削除して返す
@@ -681,6 +692,7 @@ ${historyContext}
     // <answer>タグが見つからない場合、または空の場合は元のテキストを返す（後方互換性）
     // ただし、<thinking>タグなどは削除する
     if (import.meta.env.DEV) {
+      void 0; // DEV only
     }
     const cleanText = text
       .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
@@ -705,7 +717,7 @@ ${historyContext}
 export async function chatWithAIStructured(
   userMessage: string,
   chatHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [],
-  enableVerification: boolean = false,
+  _enableVerification: boolean = false,
   enableCitations: boolean = true,
   aiMode: 'purist' | 'realist' = 'purist',
   thinkingMode: 'fast' | 'auto' | 'deep' = 'auto',
@@ -719,6 +731,7 @@ export async function chatWithAIStructured(
   } // ユーザープロファイル
 ): Promise<ChatAIResponse> {
   if (import.meta.env.DEV) {
+    void 0; // DEV only
   }
 
   if (!isGeminiAvailable()) {
@@ -776,7 +789,7 @@ ${userProfile.daysOnCarnivore ? `- カーニボア開始からの日数: ${userP
       : '';
 
     // ソーシャルプロトコルの定義を追加
-    const socialProtocolContext = `
+    const _socialProtocolContext = `
 【ソーシャルプロトコル（Social Protocols）】
 - **孤独 vs 毒**: 過度な孤独によるコルチゾール上昇は、たまの「不適切な食事（ピザ等）」よりも代謝に悪影響を与える可能性がある。
 - **戦略的逸脱**: 友人との食事（ピザ等）は「失敗」ではなく「戦略的コスト」として扱う。
@@ -797,7 +810,7 @@ ${userProfile.daysOnCarnivore ? `- カーニボア開始からの日数: ${userP
 **データ期間**: 過去${diaryAndFoodData.logs.length}日分のデータを分析します。
 
 ${diaryAndFoodData.logs
-          .map((log, idx) => {
+          .map((log, _idx) => {
             const date = new Date(log.date);
             const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
             const foods = log.foods.join('、');
@@ -887,11 +900,20 @@ ${diaryAndFoodData.logs
 - **AIチャット**: カーニボアダイエットに関する質問や、アプリの使い方について質問できます。
 
 **アプリの使い方に関する質問への回答:**
-- ユーザーがアプリの使い方について質問した場合（例：「食品の追加方法は？」「栄養素の目標値を変更するには？」「履歴を確認するには？」など）、**必ずナンバリングしてステップバイステップで説明してください**。
-- **形式**: 
+- ユーザーがアプリの使い方について質問した場合（例：「アプリの使い方を教えて」「食品の追加方法は？」「栄養素の目標値を変更するには？」など）、**必ず以下の形式ルールに従って説明してください**。
+- **【必須】機能説明の形式ルール**:
   - 機能ごとに記号ナンバリング（1⃣、2⃣、3⃣など）を使用
   - 各機能内の手順は数字（1、2、3...）で番号付け
   - 機能名には絵文字を付ける（例：🍽️ 食品追加方法、📊 統計確認方法）
+  - 例:
+    1⃣ 食品追加方法
+    1. ホーム画面の「+ 食品を追加」をタップ
+    2. 食品名を入力して「AI推測」をタップ、または動物タブから部位を選択
+    3. 栄養素を確認・修正して「保存」をタップ
+    2⃣ 写真解析方法
+    1. 食品追加画面で「📷 写真」をタップ
+    2. 食べ物の写真を撮影またはアップロード
+    3. AIが自動で栄養素を計算します
 - 画面名や機能名は正確に伝えてください。
 - 操作手順は簡潔に、各ステップを1行で説明してください。
 - **例**: 
@@ -1008,6 +1030,7 @@ ${diaryAndFoodData && diaryAndFoodData.logs.length > 0
   - set_protocol: リカバリープロトコル設定
   - open_screen: 画面を開く（例：設定画面）
   - update_input: 日次入力データの更新（例：睡眠、太陽光、排泄状態など）
+  - suggest_target: 栄養素目標値の変更を推奨（params: nutrientKey, value, unit, reason）
   - custom: カスタムアクション
   
   **【最重要】食品摂取の報告を自動検出**:
@@ -1032,7 +1055,8 @@ ${diaryAndFoodData && diaryAndFoodData.logs.length > 0
   肉300g食べた||add_food|{"item":"肉","amount":300,"unit":"g"}
   卵3個食べた||add_food|{"item":"卵","amount":3,"unit":"個"}
   リカバリープロトコルを設定|糖質摂取後の回復のため|set_protocol|{"violationType":"sugar_carbs"}
-  日次入力を更新|睡眠・太陽光・排泄状態を記録|update_input|{"sleepScore":95,"sleepHours":8,"sunMinutes":30,"bowelMovement":{"status":"normal"},"activityLevel":"moderate"}]
+  日次入力を更新|睡眠・太陽光・排泄状態を記録|update_input|{"sleepScore":95,"sleepHours":8,"sunMinutes":30,"bowelMovement":{"status":"normal"},"activityLevel":"moderate"}
+  ナトリウム目標値を変更|移行期のため7000mgを推奨|suggest_target|{"nutrientKey":"sodium","value":7000,"unit":"mg","reason":"移行期のため"}]
   </todos>
 </instruction>`;
 
@@ -1080,6 +1104,7 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
   foodName: string;
   estimatedWeight: number;
   type?: 'animal' | 'plant' | 'trash' | 'ruminant' | 'dairy';
+  confidence?: number;
   nutrients?: Record<string, number>;
   followupQuestions?: string[];
 }> {
@@ -1088,11 +1113,11 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
   }
 
   try {
-    // Stableモデルを使用（公式ドキュメントより: gemini-2.5-flash）
     const model = genAI!.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-    // 画像をBase64に変換
-    const base64Image = await fileToBase64(imageFile);
+    // #33: 画像リサイズで転送量削減・速度改善
+    const resized = await resizeImageForAnalysis(imageFile);
+    const base64Image = await fileToBase64(resized);
 
     const prompt = `この写真に写っている食品を分析してください。カーニボアダイエットで推奨される食品（肉、魚、卵、内臓など）を優先的に識別してください。
 特に「隠れた脂質（バター、ラード、調理油）」や「判断しにくい部位（バラ肉かロースか）」、または「個数」に注目してください。
@@ -1102,6 +1127,7 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
   "foodName": "食品名（日本語、具体的に。例: リブアイステーキ、サーモン、卵など）",
   "estimatedWeight": 推定重量（g、視覚的なサイズから推定）,
   "type": "animal" | "plant" | "trash" | "ruminant" | "dairy",
+  "confidence": 自信度（0.0〜1.0の数値。0.8以上は確信あり）,
   "nutrients": {
     "protein": タンパク質（g/100g）,
     "fat": 脂質（g/100g）,
@@ -1149,13 +1175,14 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
 重要:
 - 食品名は具体的に（例: "牛肉"ではなく"リブアイステーキ"）
 - 重量は視覚的なサイズから推定（10g単位で丸める）
+- confidence（自信度）は、画像が鮮明で食品が明確な場合は高く(0.8-1.0)、不鮮明・不明瞭な場合は低く(0.1-0.7)設定してください。
 - 栄養素は100gあたりの値で返す
 - 不明な栄養素は省略（nullではなく、キー自体を省略）
 - 一般的な食品データベース（USDA FoodData Centralなど）の値を参考にする
 - カーニボアダイエットで重要な栄養素（タンパク質、脂質、ナトリウム、マグネシウム、ビタミンB12、オメガ3/6比率など）を優先的に含める
 - 可能な限り多くの栄養素を含める（特にビタミンB群、ミネラル、アミノ酸）
 - 写真から判断しにくい場合（調理油の使用有無、ソースの中身、肉の具体的な部位、隠し味、付け合わせの下にあるものなど）は必ずfollowupQuestionsに質問を追加してください。
-- **最重要**: 食品名が「肉」や「魚」など曖昧な場合は、必ずfollowupQuestionsに具体的な種類を尋ねる質問を追加してください（例：「これは牛肉ですか？豚肉ですか？鶏肉ですか？」「これはサーモンですか？マグロですか？」）。
+- **最重要**: 食品名が「肉」や「魚」など曖昧な場合は、confidenceを下げ(0.6以下)、必ずfollowupQuestionsに具体的な種類を尋ねる質問を追加してください（例：「これは牛肉ですか？豚肉ですか？鶏肉ですか？」「これはサーモンですか？マグロですか？」）。
 - 質問は「バターや油を使いましたか？」だけでなく、文脈に合わせて多様に生成してください（例：「このソースは自家製ですか？砂糖は入っていますか？」「肉の部位はバラ肉ですか、ロースですか？」「卵はLサイズですか？」「衣に小麦粉を使っていますか？」など）。
 - 質問は最大3つまでとしてください。`;
 
@@ -1181,6 +1208,7 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
           foodName: parsed.foodName || '不明な食品',
           estimatedWeight: Math.round((parsed.estimatedWeight || 300) / 10) * 10, // 10g単位で丸める
           type: parsed.type || 'animal',
+          confidence: parsed.confidence || 0.8, // デフォルト0.8
           nutrients: parsed.nutrients || {},
           followupQuestions: parsed.followupQuestions || [],
         };
@@ -1290,6 +1318,45 @@ ${Object.entries(userAnswers)
     logError(error, { component: 'aiService', action: 'refineFoodAnalysis' });
     throw new Error('再計算に失敗しました。');
   }
+}
+
+const PHOTO_ANALYSIS_MAX_SIZE = 1024; // #33: 転送量削減・速度改善
+
+/**
+ * 画像をリサイズしてBlobを返す（#33: 写真解析速度改善）
+ */
+async function resizeImageForAnalysis(file: File | Blob): Promise<Blob> {
+  const blob = file instanceof File ? file : file;
+  const img = await createImageBitmap(blob);
+  const { width, height } = img;
+
+  if (width <= PHOTO_ANALYSIS_MAX_SIZE && height <= PHOTO_ANALYSIS_MAX_SIZE) {
+    img.close();
+    return blob;
+  }
+
+  const scale = PHOTO_ANALYSIS_MAX_SIZE / Math.max(width, height);
+  const newW = Math.round(width * scale);
+  const newH = Math.round(height * scale);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = newW;
+  canvas.height = newH;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    img.close();
+    return blob;
+  }
+  ctx.drawImage(img, 0, 0, newW, newH);
+  img.close();
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error('resize failed'))),
+      'image/jpeg',
+      0.85
+    );
+  });
 }
 
 /**

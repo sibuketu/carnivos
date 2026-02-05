@@ -9,7 +9,7 @@ http://localhost:5173
 
 ## Gemini API（AIチャット）の状態
 
-✅ **APIキーは設定済み**: `.env`ファイルに `VITE_GEMINI_API_KEY=AIzaSyDaQPkQ3vsY_NbtgtLyWRTXaUNHHxI60-Y`
+✅ **APIキー**: `.env` に `VITE_GEMINI_API_KEY=` を設定（未設定時はAIチャットは動作しません）
 
 **動作確認:**
 1. ブラウザで `http://localhost:5173` を開く

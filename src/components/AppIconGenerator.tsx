@@ -85,7 +85,7 @@ export function AppIconGenerator() {
         <button
           onClick={handleGenerateAll}
           disabled={isGenerating}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isGenerating ? '生成中...' : '10個一括生成'}
         </button>
@@ -93,7 +93,7 @@ export function AppIconGenerator() {
         <button
           onClick={() => handleGenerateSingle(1, 1)}
           disabled={isGenerating}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+          className="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-700 disabled:opacity-50"
         >
           スタイル1-1を生成
         </button>
@@ -101,7 +101,7 @@ export function AppIconGenerator() {
         <button
           onClick={() => handleGenerateSingle(2, 1)}
           disabled={isGenerating}
-          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+          className="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-700 disabled:opacity-50"
         >
           スタイル2-1を生成
         </button>
@@ -116,7 +116,7 @@ export function AppIconGenerator() {
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded whitespace-pre-line">
+        <div className="mb-4 p-4 bg-rose-100 border border-rose-400 text-rose-800 rounded whitespace-pre-line">
           <div className="font-bold mb-2">📋 画像生成プロンプト（無料版）</div>
           <div className="mb-3">{error}</div>
           <div className="text-sm">
@@ -127,7 +127,7 @@ export function AppIconGenerator() {
                   href="https://replicate.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-rose-600 hover:underline"
                 >
                   Replicate (Stable Diffusion)
                 </a>{' '}
@@ -138,7 +138,7 @@ export function AppIconGenerator() {
                   href="https://huggingface.co/spaces/stabilityai/stable-diffusion"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-rose-600 hover:underline"
                 >
                   Hugging Face
                 </a>{' '}
@@ -149,7 +149,7 @@ export function AppIconGenerator() {
                   href="https://www.craiyon.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-rose-600 hover:underline"
                 >
                   Craiyon
                 </a>{' '}
@@ -179,7 +179,7 @@ export function AppIconGenerator() {
                 href={result.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-sm"
+                className="text-rose-600 hover:underline text-sm"
               >
                 新しいタブで開く
               </a>

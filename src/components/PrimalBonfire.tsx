@@ -17,12 +17,20 @@ export default function PrimalBonfire({ score, label }: PrimalBonfireProps) {
   // スパークの数を決定
   const sparks = useMemo(() => {
     const count = score < 30 ? 2 : score < 70 ? 5 : 8;
-    return Array.from({ length: count }).map((_, i) => ({
-      id: i,
-      left: `${20 + Math.random() * 60}%`,
-      delay: `${Math.random() * 2}s`,
-      duration: `${2 + Math.random() * 2}s`,
-    }));
+    return Array.from({ length: count }).map((_, i) => {
+      // Deterministic pseudo-random based on score and index
+      const seed = score * 100 + i;
+      const r1 = (Math.sin(seed * 12.9898) + 1) / 2;
+      const r2 = (Math.sin(seed * 78.233) + 1) / 2;
+      const r3 = (Math.sin(seed * 43.765) + 1) / 2;
+
+      return {
+        id: i,
+        left: `${20 + r1 * 60}%`,
+        delay: `${r2 * 2}s`,
+        duration: `${2 + r3 * 2}s`,
+      };
+    });
   }, [score]);
 
   return (

@@ -4,7 +4,7 @@
  * 言語設定画面
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { setLanguage, getLanguage, useTranslation, type Language } from '../utils/i18n';
 import { logError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
 import './LanguageSettingsScreen.css';
@@ -28,6 +28,7 @@ export default function LanguageSettingsScreen({ onBack }: LanguageSettingsScree
   const handleLanguageChange = (lang: Language) => {
     try {
       if (import.meta.env.DEV) {
+        void 0;
       }
       // 言語を保存
       setLanguage(lang);

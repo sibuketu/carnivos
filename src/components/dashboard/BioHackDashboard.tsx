@@ -249,7 +249,7 @@ export default function BioHackDashboard() {
             '#ef4444',
             '🥩'
           )}
-          {renderGauge('DAILY FAT', fatCurrent, fatTarget, fatPercent, '#3b82f6', '💧')}
+          {renderGauge('DAILY FAT', fatCurrent, fatTarget, fatPercent, '#f43f5e', '💧')}
         </div>
 
         {/* 中央カラム: 心臓/コア */}
@@ -309,8 +309,8 @@ export default function BioHackDashboard() {
             >
               KETOGENIC
             </div>
-            <div style={{ fontSize: '10px', color: '#3b82f6' }}>FAT ADAPTATION: 92%</div>
-            <div style={{ fontSize: '10px', color: '#22c55e', marginTop: '4px' }}>
+            <div style={{ fontSize: '10px', color: '#f43f5e' }}>FAT ADAPTATION: 92%</div>
+            <div style={{ fontSize: '10px', color: '#f43f5e', marginTop: '4px' }}>
               CELLULAR REPAIR: OPTIMAL
             </div>
           </div>
@@ -333,8 +333,8 @@ export default function BioHackDashboard() {
               {renderHex('IRON', '95%', '#ef4444', 'HEME')}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '35px' }}>
-              {renderHex('ZINC', '88%', '#3b82f6', 'COMPLETE')}
-              {renderHex('Vit-A', '105%', '#3b82f6', 'RETINOL')}
+              {renderHex('ZINC', '88%', '#f43f5e', 'COMPLETE')}
+              {renderHex('Vit-A', '105%', '#f43f5e', 'RETINOL')}
             </div>
           </div>
         </div>

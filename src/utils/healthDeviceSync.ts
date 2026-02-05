@@ -15,6 +15,8 @@ export interface HealthData {
   heartRate?: number; // 心拍数（bpm）
   activeMinutes?: number; // 活動時間（分）
   caloriesBurned?: number; // 消費カロリー（kcal）
+  weight?: number; // 体重（kg）- 体重計連携用
+  bodyFatPercentage?: number; // 体脂肪率（%）- 体組成計連携用
   date: string; // ISO date string (YYYY-MM-DD)
 }
 
@@ -81,21 +83,11 @@ export function deleteHealthData(date: string): boolean {
  * モバイルアプリ（Expo）で実装予定。
  */
 export async function syncWithAppleHealth(): Promise<HealthData | null> {
-  // 将来実装予定
-  if (import.meta.env.DEV) {
-  }
+  if (import.meta.env.DEV) void 0;
   return null;
 }
 
-/**
- * Google Fit連携（将来実装予定）
- *
- * 注意: Webアプリでは直接的な連携は不可能。
- * モバイルアプリ（Expo）で実装予定。
- */
 export async function syncWithGoogleFit(): Promise<HealthData | null> {
-  // 将来実装予定
-  if (import.meta.env.DEV) {
-  }
+  if (import.meta.env.DEV) void 0;
   return null;
 }

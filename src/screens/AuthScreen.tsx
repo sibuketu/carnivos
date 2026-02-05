@@ -4,13 +4,17 @@
  * ログイン・登録・パスワードリセット機能
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase, isSupabaseAvailable } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../utils/i18n';
 import './AuthScreen.css';
 
 type AuthMode = 'login' | 'signup' | 'reset';
 
 export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
+  const { t } = useTranslation();
+  const { signInAsGuest } = useAuth();
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,27 +22,22 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [session, setSession] = useState<any>(null);
 
-  useEffect(() => {
-    // セッション確認
-    if (isSupabaseAvailable() && supabase) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        if (session && onAuthSuccess) {
-          onAuthSuccess();
-        }
-      });
+  const validateEmail = (email: string): boolean => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
 
-      // 認証状態の変更をリッスン
-      supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
-        if (session && onAuthSuccess) {
-          onAuthSuccess();
-        }
-      });
-    }
-  }, [onAuthSuccess]);
+  const validatePassword = (password: string): boolean => {
+    // Spec: Min 8 chars, 1 alphanumeric, 1 symbol (Actually spec says "alphanumeric + symbol", usually implies regex check)
+    // Requirement 1.1: 最低8文字、英数字+記号を1つ以上含む
+    return password.length >= 8 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
+  };
+
+  const handleGuestLogin = () => {
+    signInAsGuest();
+    if (onAuthSuccess) onAuthSuccess();
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +46,7 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
     setLoading(true);
 
     if (!isSupabaseAvailable() || !supabase) {
-      setError('認証機能が利用できません。Supabaseの設定を確認してください。');
+      setError(t('auth.errorSupabase'));
       setLoading(false);
       return;
     }
@@ -60,13 +59,17 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
 
       if (error) throw error;
 
-      setMessage('ログインに成功しました');
+      setMessage(t('auth.successLogin'));
       if (onAuthSuccess) {
         setTimeout(() => onAuthSuccess(), 500);
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'ログインに失敗しました';
-      setError(errorMessage);
+      const errorMessage = err instanceof Error ? err.message : t('auth.errorLogin');
+      if (errorMessage === 'Invalid login credentials') {
+        setError(t('auth.errorInvalidCredentials'));
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -77,20 +80,26 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
     setError(null);
     setMessage(null);
 
-    if (password !== confirmPassword) {
-      setError('パスワードが一致しません');
+    // Validation
+    if (!validateEmail(email)) {
+      setError(t('auth.errorInvalidEmail'));
       return;
     }
 
-    if (password.length < 6) {
-      setError('パスワードは6文字以上で入力してください');
+    if (password !== confirmPassword) {
+      setError(t('auth.errorPasswordMismatch'));
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError(t('auth.errorPasswordRequirements'));
       return;
     }
 
     setLoading(true);
 
     if (!isSupabaseAvailable() || !supabase) {
-      setError('認証機能が利用できません。Supabaseの設定を確認してください。');
+      setError(t('auth.errorSupabase'));
       setLoading(false);
       return;
     }
@@ -103,10 +112,16 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
 
       if (error) throw error;
 
-      setMessage('登録に成功しました。確認メールを送信しました。');
+      setMessage(t('auth.successSignup'));
       setMode('login');
-    } catch (err: any) {
-      setError(err.message || '登録に失敗しました');
+      // Spec requirement: Transition to email check view or stay on login with message
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '';
+      if (String(msg).includes('already registered')) {
+        setError(t('auth.errorAlreadyRegistered'));
+      } else {
+        setError(msg || t('auth.errorSignup'));
+      }
     } finally {
       setLoading(false);
     }
@@ -119,79 +134,41 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
     setLoading(true);
 
     if (!isSupabaseAvailable() || !supabase) {
-      setError('認証機能が利用できません。Supabaseの設定を確認してください。');
+      setError(t('auth.errorSupabase'));
       setLoading(false);
       return;
     }
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}/auth?mode=reset`,
       });
 
       if (error) throw error;
 
-      setMessage('パスワードリセットメールを送信しました');
-    } catch (err: any) {
-      setError(err.message || 'パスワードリセットに失敗しました');
+      setMessage(t('auth.successReset'));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('auth.errorReset');
+      setError(message || t('auth.errorReset'));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = async () => {
-    if (!isSupabaseAvailable() || !supabase) return;
-
-    await supabase.auth.signOut();
-    setSession(null);
-  };
-
-  // 既にログインしている場合
-  if (session) {
-    return (
-      <div className="auth-screen">
-        <div className="auth-container">
-          <h2 className="auth-title">ログイン中</h2>
-          <p className="auth-message">メールアドレス: {session.user.email}</p>
-          <button onClick={handleLogout} className="auth-button auth-button-secondary">
-            ログアウト
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Supabaseが利用できない場合（ゲストモード）
-  if (!isSupabaseAvailable()) {
-    return (
-      <div className="auth-screen">
-        <div className="auth-container">
-          <h2 className="auth-title">ゲストモード</h2>
-          <p className="auth-message">
-            Supabaseが設定されていないため、ゲストモードで使用しています。
-            データはローカルに保存されます。
-          </p>
-          {onAuthSuccess && (
-            <button onClick={onAuthSuccess} className="auth-button auth-button-primary">
-              続ける
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="auth-screen">
       <div className="auth-container">
-        <h2 className="auth-title">
-          {mode === 'login' && 'ログイン'}
-          {mode === 'signup' && '新規登録'}
-          {mode === 'reset' && 'パスワードリセット'}
-        </h2>
+        {/* Logo/Title Area */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{ fontFamily: '"Press Start 2P", cursive', color: '#f43f5e', marginBottom: '1rem' }}>CarnivOS</h1>
+          <h2 className="auth-title">
+            {mode === 'login' && t('auth.login')}
+            {mode === 'signup' && t('auth.signup')}
+            {mode === 'reset' && t('auth.reset')}
+          </h2>
+        </div>
 
         {error && <div className="auth-error">{error}</div>}
-
         {message && <div className="auth-message">{message}</div>}
 
         <form
@@ -202,10 +179,11 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
         >
           <div className="auth-form-group">
             <label htmlFor="email" className="auth-label">
-              メールアドレス
+              Email
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -218,47 +196,54 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
           {mode !== 'reset' && (
             <div className="auth-form-group">
               <label htmlFor="password" className="auth-label">
-                パスワード
+                Password
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="auth-input"
-                placeholder="6文字以上"
-                minLength={6}
+                placeholder={mode === 'signup' ? t('auth.passwordHint') : 'Password'}
+                minLength={mode === 'signup' ? 8 : 1}
               />
+              {mode === 'signup' && (
+                <p style={{ fontSize: '0.7rem', color: '#888', marginTop: '0.25rem' }}>
+                  最低8文字、英数字+記号
+                </p>
+              )}
             </div>
           )}
 
           {mode === 'signup' && (
             <div className="auth-form-group">
               <label htmlFor="confirmPassword" className="auth-label">
-                パスワード（確認）
+                {t('auth.confirmPassword')}
               </label>
               <input
                 id="confirmPassword"
+                name="confirmPassword"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 className="auth-input"
-                placeholder="パスワードを再入力"
-                minLength={6}
+                placeholder={t('auth.confirmPasswordPlaceholder')}
+                minLength={8}
               />
             </div>
           )}
 
           <button type="submit" disabled={loading} className="auth-button auth-button-primary">
             {loading
-              ? '処理中...'
+              ? t('auth.processing')
               : mode === 'login'
-                ? 'ログイン'
+                ? t('auth.login')
                 : mode === 'signup'
-                  ? '登録'
-                  : '送信'}
+                  ? t('auth.register')
+                  : t('auth.send')}
           </button>
         </form>
 
@@ -266,23 +251,31 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
           {mode === 'login' && (
             <>
               <button onClick={() => setMode('signup')} className="auth-link-button">
-                新規登録
+                {t('auth.signup')}
               </button>
               <button onClick={() => setMode('reset')} className="auth-link-button">
-                パスワードを忘れた場合
+                {t('auth.forgotPassword')}
+              </button>
+              <div style={{ margin: '1rem 0', borderTop: '1px solid #333' }}></div>
+              <button onClick={handleGuestLogin} className="auth-link-button" style={{ color: '#aaa' }}>
+                {t('auth.guest')}
               </button>
             </>
           )}
           {mode === 'signup' && (
             <button onClick={() => setMode('login')} className="auth-link-button">
-              ログインに戻る
+              {t('auth.backToLogin')}
             </button>
           )}
           {mode === 'reset' && (
             <button onClick={() => setMode('login')} className="auth-link-button">
-              ログインに戻る
+              {t('auth.backToLogin')}
             </button>
           )}
+        </div>
+        <div className="auth-footer" style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.8rem' }}>
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#888', marginRight: '1rem' }}>{t('auth.privacy')}</a>
+          <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#888' }}>{t('auth.terms')}</a>
         </div>
       </div>
     </div>

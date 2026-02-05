@@ -61,7 +61,7 @@ npx cap open ios
 - ✅ iOS Safariで「ホーム画面に追加」可能
 - ⚠️ ただし、App Storeには出せない
 
-**PWA対応は既に実装済み**（`manifest.json`、Service Worker等）
+**PWA対応は既に完了**（`manifest.json`、Service Worker等）
 
 ---
 

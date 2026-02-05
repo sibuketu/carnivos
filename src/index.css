@@ -1,9 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
   /* Color Palette - "Toxic Neon" */
@@ -76,6 +76,8 @@ body {
   overflow-y: auto;
   /* Force scroll */
   height: 100vh;
+  /* Fallback */
+  height: 100dvh;
   /* Constraint height to viewport to enable internal scroll */
   -webkit-overflow-scrolling: touch;
   /* Smooth scroll on iOS */
@@ -252,4 +254,10 @@ select:focus-visible {
   /* IE and Edge */
   scrollbar-width: none;
   /* Firefox */
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }

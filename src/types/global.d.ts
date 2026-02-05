@@ -1,10 +1,11 @@
+// Web Speech API (ブラウザ組み込みの型が無いため object で宣言)
 interface Window {
-  SpeechRecognition: any;
-  webkitSpeechRecognition: any;
+  SpeechRecognition?: object;
+  webkitSpeechRecognition?: object;
 }
 
-declare let SpeechRecognition: any;
-declare let webkitSpeechRecognition: any;
+declare let SpeechRecognition: object;
+declare let webkitSpeechRecognition: object;
 
 declare class BarcodeDetector {
   constructor(options?: { formats: string[] });

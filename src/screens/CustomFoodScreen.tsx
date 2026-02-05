@@ -29,7 +29,7 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
   const [displayName, setDisplayName] = useState(''); // 登録名
   const [type, setType] = useState<'animal' | 'trash' | 'ruminant' | 'dairy'>('animal');
   const [nutrients, setNutrients] = useState<MyFoodItem['nutrients']>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, _setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAdvancedNutrients, setShowAdvancedNutrients] = useState(false); // UI表示ON/OFF（デフォルトOFF）
@@ -554,7 +554,7 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
           >
             <span
               style={{
-                backgroundColor: '#3b82f6',
+                backgroundColor: '#f43f5e',
                 color: 'white',
                 borderRadius: '50%',
                 width: '24px',
@@ -613,7 +613,7 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
           >
             <span
               style={{
-                backgroundColor: '#3b82f6',
+                backgroundColor: '#f43f5e',
                 color: 'white',
                 borderRadius: '50%',
                 width: '24px',
@@ -767,7 +767,7 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span
                 style={{
-                  backgroundColor: '#3b82f6',
+                  backgroundColor: '#f43f5e',
                   color: 'white',
                   borderRadius: '50%',
                   width: '24px',
@@ -856,7 +856,7 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
                       {config.target > 0 && (
                         <MiniNutrientGauge
                           label=""
-                          currentDailyTotal={(nutrients as any)?.[config.key] || 0}
+                          currentDailyTotal={(nutrients as Record<string, number>)?.[config.key] || 0}
                           previewAmount={0}
                           target={config.target}
                           color={getNutrientColor(config.nutrientKey)}
@@ -870,10 +870,10 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
                     </div>
                     <input
                       type="number"
-                      value={(nutrients as any)?.[config.key] || ''}
+                      value={(nutrients as Record<string, number>)?.[config.key] || ''}
                       onChange={(e) =>
                         updateNutrient(
-                          config.key as any,
+                          config.key,
                           e.target.value ? parseFloat(e.target.value) : undefined
                         )
                       }
@@ -944,7 +944,7 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
             >
               <span
                 style={{
-                  backgroundColor: '#3b82f6',
+                  backgroundColor: '#f43f5e',
                   color: 'white',
                   borderRadius: '50%',
                   width: '24px',
@@ -1092,7 +1092,7 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span
                   style={{
-                    backgroundColor: '#3b82f6',
+                    backgroundColor: '#f43f5e',
                     color: 'white',
                     borderRadius: '50%',
                     width: '24px',

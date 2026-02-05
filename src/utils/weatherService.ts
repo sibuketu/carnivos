@@ -27,6 +27,7 @@ export async function getCurrentLocation(): Promise<{ lat: number; lon: number }
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
       if (import.meta.env.DEV) {
+        void 0;
       }
       resolve(null);
       return;
@@ -60,6 +61,7 @@ export async function getCityName(lat: number, lon: number): Promise<string | nu
     const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
     if (!apiKey) {
       if (import.meta.env.DEV) {
+        void 0;
       }
       return null;
     }
@@ -105,6 +107,7 @@ export async function getWeatherData(lat?: number, lon?: number): Promise<Weathe
 
     if (!location) {
       if (import.meta.env.DEV) {
+        void 0;
       }
       return null;
     }
@@ -141,9 +144,10 @@ export async function getWeatherData(lat?: number, lon?: number): Promise<Weathe
         const uvData = await uvResponse.json();
         uvIndex = uvData.value || 0;
       }
-    } catch (error) {
+    } catch {
       // UV指数の取得に失敗しても続行
       if (import.meta.env.DEV) {
+        void 0;
       }
     }
 
@@ -206,7 +210,7 @@ function getCachedWeatherData(): WeatherData | null {
     }
 
     // キャッシュからtimestampを削除して返す
-    const { cachedAt, ...weatherData } = data;
+    const { cachedAt: _cachedAt, ...weatherData } = data;
     return weatherData;
   } catch (error) {
     logError(error, { component: 'weatherService', action: 'getCachedWeatherData' });
