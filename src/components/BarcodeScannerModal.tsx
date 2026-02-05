@@ -216,7 +216,9 @@ export default function BarcodeScannerModal({
               <p>
                 {isBarcodeDetectorAvailable()
                   ? 'バーコードを読み取る準備ができました。'
-                  : 'カメラには対応していません。画像をアップロードしてバーコードを読み取れます。'}
+                  : /iPhone|iPad|iPod/i.test(navigator.userAgent)
+                    ? 'iPhone/iPadではカメラに未対応です。写真を撮って「画像を選択」からバーコードを読み取れます。'
+                    : 'この端末ではカメラに未対応です。画像をアップロードしてバーコードを読み取れます。'}
               </p>
               {isBarcodeDetectorAvailable() && (
                 <button onClick={handleStartScan} className="barcode-scanner-modal-start-button">

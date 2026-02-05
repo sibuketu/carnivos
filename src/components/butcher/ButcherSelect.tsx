@@ -1101,13 +1101,13 @@ export default function ButcherSelect({
               onClick={() => handlePartSelect(part.id)}
               className="py-4 px-4 rounded-2xl text-sm font-bold transition-all duration-200 flex items-center justify-between group"
               style={{
-                backgroundColor: isPartActive ? '#ef4444' : isRecommended ? 'rgba(76, 175, 80, 0.15)' : '#292524',
-                color: isPartActive ? 'white' : isRecommended ? '#86efac' : '#d6d3d1',
-                border: isPartActive ? 'none' : isRecommended ? '2px solid #4CAF50' : '1px solid #44403c',
+                backgroundColor: isPartActive ? '#ef4444' : isRecommended ? 'rgba(244, 63, 94, 0.15)' : '#292524',
+                color: isPartActive ? 'white' : isRecommended ? '#fda4af' : '#d6d3d1',
+                border: isPartActive ? 'none' : isRecommended ? '2px solid #f43f5e' : '1px solid #44403c',
                 boxShadow: isPartActive
                   ? '0 10px 15px -3px rgba(239, 68, 68, 0.3)'
                   : isRecommended
-                    ? '0 0 0 1px rgba(76, 175, 80, 0.4), 0 4px 6px -1px rgba(0, 0, 0, 0.2)'
+                    ? '0 0 0 1px rgba(244, 63, 94, 0.4), 0 4px 6px -1px rgba(0, 0, 0, 0.2)'
                     : '0 4px 6px -1px rgba(0, 0, 0, 0.2)',
                 transform: isPartActive ? 'scale(1.02)' : 'scale(1)',
                 cursor: 'pointer',

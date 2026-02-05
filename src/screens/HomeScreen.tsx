@@ -46,6 +46,7 @@ import type { AnimalType } from '../data/deepNutritionData';
 import type { FoodItem } from '../types';
 import { logError } from '../utils/errorHandler';
 import PhotoAnalysisModal from '../components/PhotoAnalysisModal';
+import { getRandomTip, type Tip } from '../data/tips';
 import FoodEditModal from '../components/dashboard/FoodEditModal';
 import './HomeScreen.css';
 
@@ -132,6 +133,9 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
 
   // AI写真解析確認モーダル用ステート
   const [showPhotoConfirmation, setShowPhotoConfirmation] = useState(false);
+  const [isPhotoAnalyzing, setIsPhotoAnalyzing] = useState(false);
+  const [photoAnalysisProgress, setPhotoAnalysisProgress] = useState(0);
+  const [photoAnalyzingTip, setPhotoAnalyzingTip] = useState<Tip | null>(null);
   const [photoAnalysisResult, setPhotoAnalysisResult] = useState<{
     foodName: string;
     estimatedWeight: number;
@@ -2045,6 +2049,67 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       </div>
 
       {/* AI写真解析確認モーダル */}
+      {/* 写真解析中のオーバーレイ（Tips表示） */}
+      {isPhotoAnalyzing && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 10000,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1.5rem',
+            gap: '1rem',
+          }}
+        >
+          <p style={{ color: '#fda4af', fontWeight: 600, margin: 0 }}>写真を解析中...</p>
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '280px',
+              height: '8px',
+              backgroundColor: '#27272a',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${photoAnalysisProgress}%`,
+                height: '100%',
+                backgroundColor: '#f43f5e',
+                transition: 'width 0.3s ease',
+              }}
+            />
+          </div>
+          <p style={{ color: '#a1a1aa', fontSize: '14px', margin: 0 }}>
+            解析中... {photoAnalysisProgress}%
+          </p>
+          {photoAnalyzingTip && (
+            <div
+              style={{
+                maxWidth: '360px',
+                padding: '1rem',
+                backgroundColor: 'rgba(254, 243, 199, 0.95)',
+                borderRadius: '12px',
+                border: '1px solid #fbbf24',
+              }}
+            >
+              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#92400e', marginBottom: '0.5rem' }}>
+                💡 {photoAnalyzingTip.title}
+              </div>
+              <p style={{ fontSize: '13px', color: '#78350f', lineHeight: 1.6, margin: 0 }}>
+                {photoAnalyzingTip.content.substring(0, 200)}
+                {photoAnalyzingTip.content.length > 200 ? '...' : ''}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       <PhotoAnalysisModal
         isOpen={showPhotoConfirmation}
         onClose={() => setShowPhotoConfirmation(false)}
@@ -2131,32 +2196,33 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
                         return;
                       }
 
+                      let progressInterval: ReturnType<typeof setInterval> | null = null;
                       try {
-                        // ローディング表示
-                        const loadingMessage = document.createElement('div');
-                        loadingMessage.textContent = '写真を解析中...';
-                        loadingMessage.style.cssText =
-                          'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 1rem 2rem; border-radius: 8px; z-index: 10000;';
-                        document.body.appendChild(loadingMessage);
+                        setPhotoAnalyzingTip(getRandomTip());
+                        setIsPhotoAnalyzing(true);
+                        setPhotoAnalysisProgress(0);
+
+                        progressInterval = setInterval(() => {
+                          setPhotoAnalysisProgress((prev) => (prev >= 90 ? prev : prev + 10));
+                        }, 500);
 
                         const { analyzeFoodImage } = await import('../services/aiService');
                         const result = await analyzeFoodImage(file);
 
-                        // ローディング表示を削除
-                        document.body.removeChild(loadingMessage);
-
-                        // 結果をセットして確認モーダルを表示
+                        if (progressInterval) clearInterval(progressInterval);
+                        setPhotoAnalysisProgress(100);
+                        setIsPhotoAnalyzing(false);
+                        setPhotoAnalyzingTip(null);
                         setPhotoAnalysisResult(result);
                         setFollowupAnswers({});
                         setShowPhotoConfirmation(true);
 
                         document.body.removeChild(input);
                       } catch (error) {
-                        // ローディング表示を削除
-                        const loadingMessage = document.querySelector('div[style*="写真を解析中"]');
-                        if (loadingMessage) {
-                          document.body.removeChild(loadingMessage);
-                        }
+                        if (progressInterval) clearInterval(progressInterval);
+                        setIsPhotoAnalyzing(false);
+                        setPhotoAnalyzingTip(null);
+                        setPhotoAnalysisProgress(0);
 
                         logError(error, { component: 'HomeScreen', action: 'handlePhotoUpload' });
                         const { getUserFriendlyErrorMessage } = await import('../utils/errorHandler');

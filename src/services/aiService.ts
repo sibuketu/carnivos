@@ -1094,6 +1094,65 @@ ${diaryAndFoodData && diaryAndFoodData.logs.length > 0
   }
 }
 
+const FOOD_ANALYSIS_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24時間
+
+/**
+ * 画像の簡易ハッシュを計算（キャッシュキー用）
+ */
+async function getImageHash(blob: Blob): Promise<string> {
+  const sample = blob.size > 4000 ? blob.slice(0, 4000) : blob;
+  const buffer = await sample.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function getCachedAnalysis(imageHash: string): {
+  foodName: string;
+  estimatedWeight: number;
+  type?: 'animal' | 'plant' | 'trash' | 'ruminant' | 'dairy';
+  confidence?: number;
+  nutrients?: Record<string, number>;
+  followupQuestions?: string[];
+} | null {
+  try {
+    const cacheKey = `food_analysis_${imageHash}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (!cached) return null;
+    const parsed = JSON.parse(cached) as { timestamp: number; result: unknown };
+    if (Date.now() - parsed.timestamp > FOOD_ANALYSIS_CACHE_TTL_MS) return null;
+    return parsed.result as {
+      foodName: string;
+      estimatedWeight: number;
+      type?: 'animal' | 'plant' | 'trash' | 'ruminant' | 'dairy';
+      confidence?: number;
+      nutrients?: Record<string, number>;
+      followupQuestions?: string[];
+    };
+  } catch {
+    return null;
+  }
+}
+
+function setCachedAnalysis(
+  imageHash: string,
+  result: {
+    foodName: string;
+    estimatedWeight: number;
+    type?: string;
+    confidence?: number;
+    nutrients?: Record<string, number>;
+    followupQuestions?: string[];
+  }
+): void {
+  try {
+    const cacheKey = `food_analysis_${imageHash}`;
+    localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), result }));
+  } catch {
+    // localStorage容量超過などは無視
+  }
+}
+
 /**
  * 写真解析機能: 食品写真から栄養素を推測
  *
@@ -1112,7 +1171,16 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
     throw new Error('Gemini APIキーが設定されていません。');
   }
 
+  const blob = imageFile instanceof File ? imageFile : imageFile;
+
   try {
+    const imageHash = await getImageHash(blob);
+    const cached = getCachedAnalysis(imageHash);
+    if (cached) {
+      if (import.meta.env.DEV) console.log('Using cached analysis result');
+      return cached;
+    }
+
     const model = genAI!.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // #33: 画像リサイズで転送量削減・速度改善
@@ -1204,7 +1272,7 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
-        return {
+        const result = {
           foodName: parsed.foodName || '不明な食品',
           estimatedWeight: Math.round((parsed.estimatedWeight || 300) / 10) * 10, // 10g単位で丸める
           type: parsed.type || 'animal',
@@ -1212,6 +1280,8 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
           nutrients: parsed.nutrients || {},
           followupQuestions: parsed.followupQuestions || [],
         };
+        setCachedAnalysis(imageHash, result);
+        return result;
       }
     } catch (parseError) {
       logError(parseError, {
@@ -1224,14 +1294,15 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
     // JSONパースに失敗した場合、テキストから情報を抽出
     const extractedFoodName = extractFoodName(text);
     const extractedWeight = extractWeight(text);
-
-    return {
+    const fallbackResult = {
       foodName: extractedFoodName,
       estimatedWeight: Math.round(extractedWeight / 10) * 10, // 10g単位で丸める
       type: 'animal' as const,
       nutrients: {},
       followupQuestions: [],
     };
+    setCachedAnalysis(imageHash, fallbackResult);
+    return fallbackResult;
   } catch (error) {
     logError(error, { component: 'aiService', action: 'analyzeFoodImage' });
     const errorMessage = error instanceof Error ? error.message : '画像解析に失敗しました。';
