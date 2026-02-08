@@ -89,7 +89,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
       setTimeout(() => setSaved(false), 2000);
     } catch (error) {
       logError(error, { component: 'HealthDeviceScreen', action: 'handleSave' });
-      alert('データの保存に失敗しました');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('データの保存に失敗しました');
     }
   };
 

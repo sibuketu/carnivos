@@ -1068,7 +1068,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             onClick={async () => {
               const notificationPermission = 'Notification' in window ? Notification.permission : 'default';
               if (notificationPermission === 'denied') {
-                alert('通知が拒否されています。ブラウザの設定から通知を許可してください。\n\n設定画面からも通知設定を変更できます。');
+                (window as unknown as { showToast?: (msg: string) => void }).showToast?.('通知が拒否されています。ブラウザの設定から通知を許可してください。');
                 const event = new CustomEvent('navigateToScreen', { detail: 'settings' });
                 window.dispatchEvent(event);
                 return;

@@ -68,7 +68,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
   const handleNotificationToggle = async () => {
     if (!('Notification' in window)) {
-      alert('このブラウザは通知をサポートしていません');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('このブラウザは通知をサポートしていません');
       return;
     }
 
@@ -80,7 +80,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
         setNotificationPermission(Notification.permission);
         localStorage.setItem('settings_notification_enabled', JSON.stringify(true));
       } else {
-        alert(t('settings.notificationPermissionRequired'));
+        (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('settings.notificationPermissionRequired'));
       }
     } else {
       // 通知を無効にする場合
@@ -335,7 +335,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                     setNotificationPermission(Notification.permission);
                     localStorage.setItem('settings_notification_enabled', JSON.stringify(true));
                   } else {
-                    alert(t('settings.notificationPermissionRequired'));
+                    (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('settings.notificationPermissionRequired'));
                   }
                 }}
                 style={{

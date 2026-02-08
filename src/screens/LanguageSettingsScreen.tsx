@@ -43,7 +43,7 @@ export default function LanguageSettingsScreen({ onBack }: LanguageSettingsScree
     } catch (error) {
       logError(error, { action: 'handleLanguageChange', language: lang });
       const errorMessage = getUserFriendlyErrorMessage(error);
-      alert(`${t('common.languageChangeFailed')}: ${errorMessage}`);
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(`${t('common.languageChangeFailed')}: ${errorMessage}`);
     }
   };
 

@@ -131,7 +131,7 @@ export default function HistoryScreen() {
     } catch (error) {
       logError(error, { action: 'deleteDailyLog', date });
       const errorMessage = getUserFriendlyErrorMessage(error);
-      alert(`${t('history.deleteFailed')}: ${errorMessage}`);
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(`${t('history.deleteFailed')}: ${errorMessage}`);
     }
   };
 

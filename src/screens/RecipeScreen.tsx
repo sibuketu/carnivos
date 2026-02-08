@@ -252,7 +252,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
   // 材料登録を完了してレシピ登録モードに移行
   const handleFinishIngredients = () => {
     if (recipeFoods.length === 0) {
-      alert(t('recipe.addFood'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('recipe.addFood'));
       return;
     }
     setIsIngredientMode(false);
@@ -261,12 +261,12 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
   // レシピを保存
   const handleSaveRecipe = () => {
     if (!recipeName.trim()) {
-      alert(t('recipe.nameRequired'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('recipe.nameRequired'));
       return;
     }
 
     if (recipeFoods.length === 0) {
-      alert(t('recipe.addFood'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('recipe.addFood'));
       return;
     }
 
@@ -291,7 +291,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
       setIsIngredientMode(true);
     } catch (error) {
       logError(error, { component: 'RecipeScreen', action: 'handleSaveRecipe' });
-      alert(t('recipe.saveFailed'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('recipe.saveFailed'));
     }
   };
 
@@ -305,7 +305,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
       loadRecipes();
     } catch (error) {
       logError(error, { component: 'RecipeScreen', action: 'handleDeleteRecipe' });
-      alert(t('recipe.deleteFailed'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('recipe.deleteFailed'));
     }
   };
 
@@ -313,7 +313,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
     recipe.foods.forEach((food) => {
       addFood(food);
     });
-    alert(t('recipe.added', { name: recipe.name }));
+    (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('recipe.added', { name: recipe.name }));
     onBack();
   };
 
