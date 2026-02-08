@@ -24,6 +24,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Security Audit
+        run: |
+          npm audit --audit-level=high || {
+            echo "⚠️ Security vulnerabilities found"
+            npm audit fix --force
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add package*.json
+            git diff --staged --quiet || git commit -m "fix: auto-fix security vulnerabilities [skip ci]"
+            exit 0
+          }
+
       - name: Run Lint
         run: npm run lint
 
@@ -35,6 +47,12 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun
+        continue-on-error: true
 
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
