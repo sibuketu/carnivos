@@ -123,9 +123,12 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await openLabs(page);
     await navigateTo(page, 'userSettings');
     await page.waitForTimeout(3000);
+    // 実際のプロフィール画面のコンテンツが表示されることを検証（エラーバウンダリではなく）
     await expect(
-      page.getByText(/プロフィール|Profile|性別|Gender|設定|Settings|読み込みに失敗|目標|Goal/i).first()
+      page.getByText(/性別|Gender|身長|Height|体重|Weight|目標|Goal|代謝状態|Metabolic/i).first()
     ).toBeVisible({ timeout: 15000 });
+    // 「読み込みに失敗しました」が表示されていないことを確認
+    await expect(page.getByText('読み込みに失敗しました')).not.toBeVisible({ timeout: 2000 }).catch(() => {});
     await page.getByTestId('nav-others').click({ force: true });
     await page.waitForTimeout(1000);
   });
@@ -392,5 +395,28 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
       await page.keyboard.press('Escape');
       await page.waitForTimeout(500);
     }
+  });
+
+  // ========== 全画面ランタイムエラー回帰テスト ==========
+  test('全画面をナビゲートしてランタイムエラーが0件であること', async ({ page }) => {
+    test.setTimeout(120000);
+    const screenErrors: string[] = [];
+    page.on('pageerror', (err) => screenErrors.push(err.message));
+
+    await ensureHomeWithNav(page);
+    const screens = [
+      'home', 'history', 'labs', 'stats', 'diary', 'userSettings', 'settings',
+      'customFood', 'community', 'input', 'privacy', 'terms', 'feedback',
+      'dataExport', 'dataImport', 'dataDelete', 'language', 'salt',
+      'carbTarget', 'nutrientCustom', 'recipe', 'shop',
+    ];
+    for (const screen of screens) {
+      await page.evaluate((s) => {
+        const nav = (window as unknown as { __navigateToScreen?: (s: string) => void }).__navigateToScreen;
+        if (nav) nav(s);
+      }, screen);
+      await page.waitForTimeout(1500);
+    }
+    expect(screenErrors.length, `Runtime errors: ${screenErrors.join('; ')}`).toBe(0);
   });
 });

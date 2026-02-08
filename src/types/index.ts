@@ -35,8 +35,8 @@ export interface DefrostReminder {
  * Metabolic Status
  */
 export type MetabolicStatus =
-  | typeof METABOLIC_STATUS.ADAPTED;
-// | typeof METABOLIC_STATUS.TRANSITIONING; // Removed Phase 1
+  | typeof METABOLIC_STATUS.ADAPTED
+  | typeof METABOLIC_STATUS.TRANSITIONING;
 
 /**
  * User Goals

@@ -4,7 +4,7 @@
  * ユーザー設定画面: 基本情報、目標、代謝状態など
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { saveUserProfile } from '../utils/storage';
 import { logError } from '../utils/errorHandler';
@@ -31,6 +31,7 @@ import { USER_GOALS, METABOLIC_STATUS, DIET_MODES } from '../constants/carnivore
 import type { UserProfile } from '../types';
 import { calculateCaffeineFromCoffee } from '../utils/coffeeCaffeineCalculator';
 import { calculateProfileCompletion } from '../utils/profileCompletion';
+import HelpTooltip from '../components/common/HelpTooltip';
 // import './ProfileScreen.css'; // Deleted
 
 type FieldPriority = 'required' | 'recommended' | 'optional';
