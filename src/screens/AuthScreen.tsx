@@ -1,16 +1,24 @@
 /**
- * Primal Logic - 認証画面
+ * CarnivOS - 認証画面
  *
- * ログイン・登録・パスワードリセット機能
+ * ログイン・登録・パスワードリセット・Googleログイン
  */
 
 import { useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { supabase, isSupabaseAvailable } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../utils/i18n';
 import './AuthScreen.css';
 
 type AuthMode = 'login' | 'signup' | 'reset';
+
+function getOAuthRedirectUrl(): string {
+  if (Capacitor.isNativePlatform()) {
+    return 'com.CarnivOS.app://auth';
+  }
+  return `${window.location.origin}${window.location.pathname || '/'}`;
+}
 
 export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
   const { t } = useTranslation();
@@ -20,6 +28,7 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -155,6 +164,34 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError(null);
+    setMessage(null);
+    setGoogleLoading(true);
+
+    if (!isSupabaseAvailable() || !supabase) {
+      setError(t('auth.errorSupabase'));
+      setGoogleLoading(false);
+      return;
+    }
+
+    try {
+      const redirectTo = getOAuthRedirectUrl();
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo },
+      });
+
+      if (oauthError) throw oauthError;
+      setMessage(t('auth.redirectToGoogle'));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : t('auth.errorGoogle');
+      setError(msg || t('auth.errorGoogle'));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <div className="auth-screen">
       <div className="auth-container">
@@ -245,6 +282,20 @@ export default function AuthScreen({ onAuthSuccess }: { onAuthSuccess?: () => vo
                   ? t('auth.register')
                   : t('auth.send')}
           </button>
+
+          {mode === 'login' && (
+            <>
+              <div style={{ margin: '0.75rem 0', borderTop: '1px solid #e5e7eb' }} />
+              <button
+                type="button"
+                disabled={googleLoading}
+                onClick={handleGoogleLogin}
+                className="auth-button auth-button-google"
+              >
+                {googleLoading ? t('auth.processing') : t('auth.loginWithGoogle')}
+              </button>
+            </>
+          )}
         </form>
 
         <div className="auth-links">

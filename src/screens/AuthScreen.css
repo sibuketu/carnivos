@@ -88,6 +88,21 @@
   background-color: #d1d5db;
 }
 
+.auth-button-google {
+  background-color: #fff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.auth-button-google:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
 .auth-links {
   display: flex;
   flex-direction: column;

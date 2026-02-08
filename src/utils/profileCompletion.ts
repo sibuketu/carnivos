@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Profile Completion Calculator
+ * CarnivOS - Profile Completion Calculator
  *
  * プロフィール完成度を計算するユーティリティ
  */

@@ -19,11 +19,13 @@ import OnboardingScreen from './screens/OnboardingScreen';
 import AISpeedDial from './components/dashboard/AISpeedDial';
 import Toast from './components/common/Toast';
 import PaywallModal from './components/PaywallModal';
+import ErrorReportButton from './components/ErrorReportButton';
 import { getFeatureDisplaySettings } from './utils/featureDisplaySettings';
 import { startFastingTimerWatcher } from './utils/notificationService';
 import './App.css';
 import './styles/common.css';
 import './styles/pixel-art.css';
+import './styles/buttons.css';
 
 // レイジーローディング（パフォーマンス最適化）
 const LazyHistoryScreen = lazy(() => import('./screens/HistoryScreen'));
@@ -105,6 +107,8 @@ function AppContent() {
   // 認証状態の確認と画面遷移（#29: 初回=サブスク→ログイン→オンボ、既存ユーザー別デバイス=ログイン→ホーム）
   useEffect(() => {
     if (authLoading) return;
+    // 認証画面はユーザーが明示的に開いた場合（その他→アカウント等）は触らない。ゲスト含む。
+    if (currentScreen === 'auth') return;
 
     const consentAccepted = localStorage.getItem('primal_logic_consent_accepted');
     const onboardingCompleted = localStorage.getItem('primal_logic_onboarding_completed');
@@ -114,10 +118,10 @@ function AppContent() {
       return;
     }
 
-    // 既存ユーザー別デバイス: Supabaseログイン済みならオンボーディングをスキップしてホームへ
+    // 既存ユーザー別デバイス: ログイン済みでオンボ未記録ならスキップしてホームへ（その他→アカウントで開いたauthは除外）
     if (session && !onboardingCompleted) {
       localStorage.setItem('primal_logic_onboarding_completed', 'true');
-      if (['paywall', 'auth', 'onboarding'].includes(currentScreen)) setCurrentScreen('home');
+      if (['paywall', 'onboarding'].includes(currentScreen)) setCurrentScreen('home');
       return;
     }
 
@@ -126,12 +130,14 @@ function AppContent() {
       return;
     }
 
+    // 未ログイン時: その他(labs)系では強制でauthに飛ばさない
+    const screensThatRequireAuthRedirect = ['home', 'history', 'profile'];
     if (!session && !isGuest) {
       if (['consent', 'paywall', 'onboarding', 'auth'].includes(currentScreen)) return;
+      if (!screensThatRequireAuthRedirect.includes(currentScreen)) return;
       setCurrentScreen('auth');
-    } else {
-      if (currentScreen === 'auth') setCurrentScreen('home');
     }
+    // ログイン後のauth→homeは onAuthSuccess だけで行う（その他→アカウントタップでホームに飛ばないようにする）
   }, [session, isGuest, authLoading, currentScreen]);
 
   // URLパスまたはパラメータによる画面切り替え（/privacy, /terms, ?screen=privacy など）
@@ -286,7 +292,7 @@ function AppContent() {
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           }}
         >
-          📡 オフラインです。一部の機能（AIチャット等）は利用できません。
+          📡 オフラインです。保存済みデータは閲覧可能です。一部の機能（AIチャット等）は利用できません。
         </div>
       )}
 
@@ -401,9 +407,11 @@ function AppContent() {
             />
           )}
           {currentScreen === 'userSettings' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyUserSettingsScreen />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyUserSettingsScreen />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'history' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
@@ -421,9 +429,11 @@ function AppContent() {
             />
           )}
           {currentScreen === 'community' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyCommunityScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyCommunityScreen onBack={() => setCurrentScreen('labs')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'diary' && (
             <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
@@ -431,9 +441,11 @@ function AppContent() {
             </Suspense>
           )}
           {currentScreen === 'stats' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyStatsScreen />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyStatsScreen />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'auth' && (
             <AuthScreen
@@ -451,81 +463,111 @@ function AppContent() {
             />
           )}
           {currentScreen === 'privacy' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyPrivacyPolicyScreen />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyPrivacyPolicyScreen />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'terms' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyTermsOfServiceScreen />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyTermsOfServiceScreen />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'dataExport' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyDataExportScreen />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('settings')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyDataExportScreen />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'dataImport' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyDataImportScreen onBack={() => setCurrentScreen('settings')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('settings')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyDataImportScreen onBack={() => setCurrentScreen('settings')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'dataDelete' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyDataDeleteScreen />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyDataDeleteScreen />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'feedback' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyFeedbackScreen />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyFeedbackScreen />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'language' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyLanguageSettingsScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyLanguageSettingsScreen onBack={() => setCurrentScreen('labs')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'salt' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazySaltSettingsScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazySaltSettingsScreen onBack={() => setCurrentScreen('labs')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'carbTarget' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyCarbTargetSettingsScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyCarbTargetSettingsScreen onBack={() => setCurrentScreen('labs')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'nutrientCustom' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyNutrientTargetCustomizationScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyNutrientTargetCustomizationScreen onBack={() => setCurrentScreen('labs')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'gift' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyGiftScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyGiftScreen onBack={() => setCurrentScreen('labs')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'shop' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyShopScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyShopScreen onBack={() => setCurrentScreen('labs')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'recipe' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyRecipeScreen onBack={() => setCurrentScreen('home')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('home')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyRecipeScreen onBack={() => setCurrentScreen('home')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'healthDevice' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyHealthDeviceScreen onBack={() => setCurrentScreen('labs')} />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyHealthDeviceScreen onBack={() => setCurrentScreen('labs')} />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
           {currentScreen === 'input' && (
-            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
-              <LazyInputScreen
-                onClose={() => setCurrentScreen('home')}
-              />
-            </Suspense>
+            <ScreenErrorBoundary onBack={() => setCurrentScreen('labs')}>
+              <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>読み込み中...</div>}>
+                <LazyInputScreen
+                  onClose={() => setCurrentScreen('home')}
+                />
+              </Suspense>
+            </ScreenErrorBoundary>
           )}
         </div>
 
@@ -573,6 +615,11 @@ function AppContent() {
             onAddFood={addFoodCallback || undefined}
           />
         )}
+
+      {/* エラー報告ボタン（開発モードまたは全ユーザー向け） */}
+      {!['consent', 'paywall', 'auth', 'onboarding'].includes(currentScreen) && (
+        <ErrorReportButton screenName={currentScreen} />
+      )}
 
       {/* ペイウォールモーダル（トライアル期限切れ時） */}
       {trialStatus && trialStatus.isExpired && !trialStatus.hasSubscription && (

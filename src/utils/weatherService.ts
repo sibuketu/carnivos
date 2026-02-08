@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Weather Service
+ * CarnivOS - Weather Service
  *
  * OpenWeatherMap APIを使用して天気情報を取得
  * ビタミンD合成計算に活用

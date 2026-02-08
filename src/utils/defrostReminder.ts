@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Defrost Reminder Utility (Web版)
+ * CarnivOS - Defrost Reminder Utility (Web版)
  *
  * Phase 5: Defrost Reminder (Inventory Lite)
  * Browser Notification APIを使用

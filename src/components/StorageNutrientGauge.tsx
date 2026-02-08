@@ -92,7 +92,7 @@ const StorageNutrientGauge: React.FC<StorageNutrientGaugeProps> = ({
 
       </div>
 
-      {/* Logic Shield Modal */}
+      {/* Storage Info Modal */}
       {showModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowModal(false)}>
           <div className="bg-stone-900 border border-stone-700 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
@@ -100,7 +100,7 @@ const StorageNutrientGauge: React.FC<StorageNutrientGaugeProps> = ({
             {/* Modal Header */}
             <div className="p-4 border-b border-stone-800 flex justify-between items-center bg-stone-900/50">
               <h3 className="font-bold text-lg text-white flex items-center gap-2">
-                <span>💡</span> Logic Shield: {label}
+                <span>💡</span> {label} ストレージ
               </h3>
               <button onClick={() => setShowModal(false)} className="text-stone-500 hover:text-white text-xl">&times;</button>
             </div>

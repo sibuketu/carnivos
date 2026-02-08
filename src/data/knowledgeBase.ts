@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Knowledge Base (Tips用データ)
+ * CarnivOS - Knowledge Base (Tips用データ)
  *
  * カーニボアダイエットに関する一般的な誤解（Myth）と科学的真実（Truth）を定義します。
  * これにより、ユーザーは「なぜカーニボアが正しいのか」を論理的に説明できるようになります。

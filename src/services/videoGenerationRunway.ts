@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Runway API Integration
+ * CarnivOS - Runway API Integration
  *
  * Runway APIを使用して動画を生成
  * API仕様: https://docs.runwayml.com/ (要確認)

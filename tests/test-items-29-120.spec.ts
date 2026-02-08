@@ -93,6 +93,42 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
     await expect(page.locator('.labs-screen-container, [class*="labs"], [class*="Labs"]').first()).toBeVisible({ timeout: 10000 });
   });
 
+  test('31b: その他でアカウントをタップするとアカウント（認証）画面が表示されホームに飛ばされない', async ({ page }) => {
+    const labsButton = page.locator('button.app-nav-button').filter({ hasText: /その他|🧪/ });
+    await expect(labsButton).toBeVisible({ timeout: 10000 });
+    await labsButton.click();
+    await page.waitForSelector('.labs-screen-container, [class*="labs"]', { timeout: 10000 });
+    await page.waitForTimeout(500);
+    const accountItem = page.locator('.labs-list-item').filter({ hasText: /アカウント|Account|Compte|Konto|账户/ });
+    await expect(accountItem).toBeVisible({ timeout: 5000 });
+    await accountItem.click();
+    await page.waitForTimeout(800);
+    await expect(page.locator('.auth-screen')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('.labs-screen-container')).not.toBeVisible();
+  });
+
+  test('31c: ゲストモードでその他→アカウントをタップしても認証画面が表示されホームに飛ばされない', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.setItem('primal_logic_consent_accepted', 'true');
+      localStorage.setItem('primal_logic_onboarding_completed', 'true');
+      localStorage.setItem('primal_logic_guest_mode', 'true');
+    });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1500);
+    const labsButton = page.locator('button.app-nav-button').filter({ hasText: /その他|🧪/ });
+    await expect(labsButton).toBeVisible({ timeout: 10000 });
+    await labsButton.click();
+    await page.waitForSelector('.labs-screen-container, [class*="labs"]', { timeout: 10000 });
+    await page.waitForTimeout(500);
+    const accountItem = page.locator('.labs-list-item').filter({ hasText: /アカウント|Account|Compte|Konto|账户/ });
+    await expect(accountItem).toBeVisible({ timeout: 5000 });
+    await accountItem.click();
+    await page.waitForTimeout(1000);
+    await expect(page.locator('.auth-screen')).toBeVisible({ timeout: 5000 });
+  });
+
   test('32: Bio-Tunerボタンが表示される', async ({ page }) => {
     // Labs画面に遷移
     const labsButton = page.locator('button.app-nav-button').filter({ hasText: /その他|🧪/ });

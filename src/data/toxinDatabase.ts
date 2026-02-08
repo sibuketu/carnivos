@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Plant Toxin Database
+ * CarnivOS - Plant Toxin Database
  *
  * 植物に含まれる毒素・抗栄養素のデータベース。
  * カーニボアの視点から、植物性食品の「なぜ避けるべきか」を説明するためのデータ。

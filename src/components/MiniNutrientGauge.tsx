@@ -1,11 +1,11 @@
 /**
- * Primal Logic - Mini Nutrient Gauge Component
+ * CarnivOS - Mini Nutrient Gauge Component
  *
  * ButcherSelectで使用されている栄養素ゲージコンポーネントを共通化
  * 4-Zone Gradientスタイルで、摂取基準との距離を視覚的に表示
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import {
   calculateNutrientImpactFactors,
@@ -27,9 +27,10 @@ interface MiniNutrientGaugeProps {
   showLowIsOk?: boolean; // Vitamin Cなど、低くてもOKな場合
   nutrientKey?: string; // 栄養素キー（例: 'protein', 'iron', 'magnesium'）
   hideTarget?: boolean; // カスタム食品画面用: targetを表示しない
+  onInfoClick?: () => void; // 💡アイコンクリック時のコールバック
 }
 
-export default function MiniNutrientGauge({
+function MiniNutrientGauge({
   label,
   currentDailyTotal = 0, // Layer 1: 今日すでに確定した摂取量
   previewAmount = 0, // Layer 2: 今選択している食材の増加分
@@ -41,6 +42,7 @@ export default function MiniNutrientGauge({
   showLowIsOk = false,
   nutrientKey,
   hideTarget = false, // カスタム食品画面用: targetを表示しない
+  onInfoClick,
 }: MiniNutrientGaugeProps) {
   const { userProfile } = useApp();
   const [showTooltip, setShowTooltip] = useState(false);
@@ -230,6 +232,10 @@ export default function MiniNutrientGauge({
     e.stopPropagation(); // 親要素のクリックイベントを防ぐ
     // 常にモーダルを表示（影響要因がある場合は影響要因モーダル、ない場合は「なぜこの数値なのか」説明モーダル）
     setShowModal(true);
+    // トロフィー進捗トラッキング用コールバック
+    if (onInfoClick) {
+      onInfoClick();
+    }
   };
 
   // ゲージ全体のクリックハンドラ（ロジック表示用）
@@ -263,7 +269,7 @@ export default function MiniNutrientGauge({
         flexDirection: 'column',
         gap: 0,
         position: 'relative',
-        cursor: logic ? 'pointer' : 'default',
+        cursor: 'pointer',
         userSelect: 'none',
         marginBottom: 0,
       }}
@@ -1853,3 +1859,5 @@ export default function MiniNutrientGauge({
     </div>
   );
 }
+
+export default React.memo(MiniNutrientGauge);

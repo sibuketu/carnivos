@@ -5,7 +5,7 @@
  * rechartsを使用して日次・週次・月次の推移を表示
  */
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -27,7 +27,7 @@ interface NutrientTrendChartProps {
   period: 'daily' | 'weekly' | 'monthly'; // 表示期間
 }
 
-export default function NutrientTrendChart({
+function NutrientTrendChart({
   logs,
   nutrientKey,
   nutrientLabel,
@@ -187,3 +187,5 @@ export default function NutrientTrendChart({
     </div>
   );
 }
+
+export default React.memo(NutrientTrendChart);

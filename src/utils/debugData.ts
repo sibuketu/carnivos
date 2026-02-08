@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Debug Data Generator
+ * CarnivOS - Debug Data Generator
  *
  * デバッグ用の仮データを生成
  */

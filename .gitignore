@@ -35,6 +35,12 @@ ios/
 # Local Netlify folder
 .netlify
 
+# Playwright
+playwright/.auth
+test-results
+playwright-report
+blob-report
+
 # Security
 *.key
 *.pem

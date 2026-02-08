@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Tips Screen
+ * CarnivOS - Tips Screen
  *
  * カーニボアダイエットに関する一般的な誤解（Myth）と科学的真実（Truth）を表示
  * カード型のリスト表示で、MythをタップするとTruthとSourceが表示される
@@ -12,9 +12,11 @@ import {
   getKnowledgeByCategory,
   type KnowledgeItem,
 } from '../data/knowledgeBase';
+import { useTrophyProgress } from '../hooks/useTrophyProgress';
 // import './KnowledgeScreen.css'; // Deleted
 
 export default function TipsScreen() {
+  const { updateProgress: updateTrophyProgress } = useTrophyProgress();
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<KnowledgeItem['category'] | 'All'>(
     'All'
@@ -35,27 +37,38 @@ export default function TipsScreen() {
         newSet.delete(id);
       } else {
         newSet.add(id);
+        // 知識人トロフィー進捗更新（Tips20個読む）
+        updateTrophyProgress('scholar');
       }
       return newSet;
     });
   };
 
   return (
-    <div className="knowledge-screen-container">
-      <div className="knowledge-screen-header">
-        <h1 className="knowledge-screen-title">💡 Tips</h1>
-        <p className="knowledge-screen-subtitle">
+    <div style={{ padding: '1rem', backgroundColor: 'var(--color-bg-primary)', minHeight: '100vh' }}>
+      <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>💡 Tips</h1>
+        <p style={{ color: '#78716c', fontSize: '0.875rem' }}>
           カーニボアに対する誤解と真実
         </p>
       </div>
 
       {/* カテゴリフィルター */}
-      <div className="knowledge-category-filter">
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem', justifyContent: 'center' }}>
         {categories.map((category) => (
           <button
             key={category}
-            className={`knowledge-category-button ${selectedCategory === category ? 'active' : ''}`}
             onClick={() => setSelectedCategory(category)}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              border: selectedCategory === category ? '2px solid #f43f5e' : '1px solid #e5e7eb',
+              backgroundColor: selectedCategory === category ? '#fce7f3' : 'var(--color-bg-secondary, #f9fafb)',
+              color: selectedCategory === category ? '#f43f5e' : '#1f2937',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: selectedCategory === category ? '600' : '400',
+            }}
           >
             {category === 'All'
               ? 'すべて'
@@ -73,45 +86,87 @@ export default function TipsScreen() {
       </div>
 
       {/* 知識カードリスト */}
-      <div className="knowledge-cards-container">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {filteredKnowledge.map((item) => {
           const isFlipped = flippedCards.has(item.id);
           return (
             <div
               key={item.id}
-              className={`knowledge-card ${isFlipped ? 'flipped' : ''}`}
               onClick={() => toggleCard(item.id)}
+              style={{
+                backgroundColor: isFlipped ? '#f0f9ff' : 'var(--color-bg-secondary, #f9fafb)',
+                border: '1px solid #e5e7eb',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                cursor: 'pointer',
+                transition: 'transform 0.3s, box-shadow 0.3s',
+                boxShadow: isFlipped ? '0 4px 12px rgba(0,0,0,0.1)' : '0 2px 4px rgba(0,0,0,0.05)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.02)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
             >
-              <div className="knowledge-card-inner">
-                {/* 表面（Myth） */}
-                <div className="knowledge-card-front">
-                  <div className="knowledge-card-category">{item.category}</div>
-                  <h3 className="knowledge-card-title">{item.title}</h3>
-                  <div className="knowledge-card-myth">
-                    <div className="knowledge-card-label">❌ Myth (誤解)</div>
-                    <p className="knowledge-card-text">{item.myth}</p>
+              <div>
+                {!isFlipped ? (
+                  /* 表面（Myth） */
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: '#f43f5e', fontWeight: '600', marginBottom: '0.5rem' }}>
+                      {item.category}
+                    </div>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>
+                      カーニボアの誤解
+                    </h3>
+                    <div style={{ marginBottom: '1rem' }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#ef4444', marginBottom: '0.5rem' }}>
+                        ❌ Myth (誤解)
+                      </div>
+                      <p style={{ fontSize: '0.875rem', lineHeight: '1.6', color: '#374151' }}>{item.myth}</p>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#78716c', textAlign: 'right' }}>
+                      タップして真実を見る →
+                    </div>
                   </div>
-                  <div className="knowledge-card-hint">タップして真実を見る →</div>
-                </div>
-
-                {/* 裏面（Truth + Source） */}
-                <div className="knowledge-card-back">
-                  <div className="knowledge-card-category">{item.category}</div>
-                  <h3 className="knowledge-card-title">{item.title}</h3>
-                  <div className="knowledge-card-truth">
-                    <div className="knowledge-card-label">✅ Truth (真実)</div>
-                    <p className="knowledge-card-text">{item.truth}</p>
+                ) : (
+                  /* 裏面（Truth + Source + Mechanism + Effect Size） */
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: '#f43f5e', fontWeight: '600', marginBottom: '0.5rem' }}>
+                      {item.category}
+                    </div>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>
+                      科学的真実
+                    </h3>
+                    <div style={{ marginBottom: '1rem' }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#10b981', marginBottom: '0.5rem' }}>
+                        ✅ Truth (真実)
+                      </div>
+                      <p style={{ fontSize: '0.875rem', lineHeight: '1.6', color: '#374151' }}>{item.truth}</p>
+                    </div>
+                    <div style={{ marginBottom: '1rem' }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#3b82f6', marginBottom: '0.5rem' }}>
+                        🔬 Mechanism (メカニズム)
+                      </div>
+                      <p style={{ fontSize: '0.875rem', lineHeight: '1.6', color: '#374151' }}>{item.mechanism}</p>
+                    </div>
+                    <div style={{ marginBottom: '1rem' }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#8b5cf6', marginBottom: '0.5rem' }}>
+                        📊 Effect Size (効果量)
+                      </div>
+                      <p style={{ fontSize: '0.875rem', lineHeight: '1.6', color: '#374151' }}>{item.effectSize}</p>
+                    </div>
+                    <div style={{ marginBottom: '1rem' }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#f59e0b', marginBottom: '0.5rem' }}>
+                        📚 Source (出典)
+                      </div>
+                      <p style={{ fontSize: '0.875rem', lineHeight: '1.6', color: '#374151' }}>{item.source}</p>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#78716c', textAlign: 'right' }}>
+                      タップして戻る ←
+                    </div>
                   </div>
-                  <div className="knowledge-card-details">
-                    <div className="knowledge-card-label">📖 Details</div>
-                    <p className="knowledge-card-text">{item.details}</p>
-                  </div>
-                  <div className="knowledge-card-source">
-                    <div className="knowledge-card-label">🔬 Source</div>
-                    <p className="knowledge-card-text">{item.source}</p>
-                  </div>
-                  <div className="knowledge-card-hint">タップして戻る ←</div>
-                </div>
+                )}
               </div>
             </div>
           );
@@ -119,7 +174,7 @@ export default function TipsScreen() {
       </div>
 
       {filteredKnowledge.length === 0 && (
-        <div className="knowledge-empty-state">
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#78716c' }}>
           <p>このカテゴリには知識がありません</p>
         </div>
       )}

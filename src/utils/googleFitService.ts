@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Google Fit Service
+ * CarnivOS - Google Fit Service
  *
  * Google Fit APIを使用して運動データを取得
  * 動的目標値計算に活用

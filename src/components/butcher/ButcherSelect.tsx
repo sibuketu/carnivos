@@ -1201,7 +1201,7 @@ export default function ButcherSelect({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setSaltGrinds(Math.max(1, saltGrinds - 1))}
-                      className="w-8 h-8 flex items-center justify-center bg-stone-200 hover:bg-stone-300 rounded-lg font-bold text-lg"
+                      className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center bg-stone-200 hover:bg-stone-300 rounded-lg font-bold text-lg"
                     >
                       −
                     </button>
@@ -1250,7 +1250,7 @@ export default function ButcherSelect({
                         updateConfig({ saltUnitWeight: 0.5 }); // デフォルト値に戻す
                         setAmount(saltGrinds * 0.5);
                       }}
-                      className="text-xs text-stone-400 hover:text-stone-600 ml-1"
+                      className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs text-stone-400 hover:text-stone-600 ml-1 rounded-lg"
                       title={t('butcher.resetToDefault')}
                     >
                       ↺
@@ -1590,7 +1590,7 @@ export default function ButcherSelect({
                           fontSize: '12px',
                           border: '1px solid #d1d5db',
                           borderRadius: '4px',
-                          backgroundColor: 'white',
+                          backgroundColor: 'var(--color-bg-primary)',
                           cursor: 'pointer',
                         }}
                       >
@@ -2163,6 +2163,12 @@ export default function ButcherSelect({
         onClose={() => setIsSearchModalOpen(false)}
         onSelect={handleSearchSelect}
         initialQuery={searchModalQuery}
+        onCreateCustom={(query) => {
+          // カスタム食品画面に遷移
+          window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'customFood' }));
+          // クエリをカスタム食品画面に渡す（LocalStorageまたはイベントで）
+          localStorage.setItem('@carnivos:custom_food_initial_name', query);
+        }}
       />
     </div>
   );

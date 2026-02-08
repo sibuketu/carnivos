@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Voice Input (Web Speech API)
+ * CarnivOS - Voice Input (Web Speech API)
  *
  * WindowsHキーでの音声入力対応
  * Web Speech APIを使用した音声認識機能

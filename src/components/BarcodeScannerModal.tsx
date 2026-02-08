@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Barcode Scanner Modal
+ * CarnivOS - Barcode Scanner Modal
  *
  * バーコード読み取りモーダル（スキャン中の表示、成功/失敗のフィードバック）
  */

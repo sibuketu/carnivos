@@ -224,7 +224,7 @@ export default function CommunityScreen({ onBack }: CommunityScreenProps) {
             <div
               style={{
                 padding: '1.5rem',
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 border: '1px solid #e5e7eb',
                 marginBottom: '1rem',
@@ -397,7 +397,7 @@ export default function CommunityScreen({ onBack }: CommunityScreenProps) {
             <div
               style={{
                 padding: '1.5rem',
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 border: '1px solid #e5e7eb',
                 marginBottom: '1rem',
@@ -504,7 +504,7 @@ export default function CommunityScreen({ onBack }: CommunityScreenProps) {
             <div
               style={{
                 padding: '1.5rem',
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 border: '1px solid #e5e7eb',
                 marginBottom: '1rem',
@@ -609,7 +609,7 @@ export default function CommunityScreen({ onBack }: CommunityScreenProps) {
             <div
               style={{
                 padding: '1.5rem',
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 border: '1px solid #e5e7eb',
                 marginBottom: '1rem',

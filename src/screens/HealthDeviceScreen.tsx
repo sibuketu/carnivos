@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Health Device Screen
+ * CarnivOS - Health Device Screen
  *
  * ウェアラブルデバイス連携画面
  *

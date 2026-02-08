@@ -10,6 +10,11 @@ import { useSettings } from '../hooks/useSettings';
 import { useAuth } from '../context/AuthContext';
 import { requestNotificationPermission } from '../utils/defrostReminder';
 import { getFastingDefaultHours, setFastingDefaultHours } from '../utils/fastingDefaults';
+import {
+  getNutrientDisplayMode,
+  saveNutrientDisplayMode,
+  type NutrientDisplayMode,
+} from '../utils/nutrientPriority';
 import HelpTooltip from '../components/common/HelpTooltip';
 
 import './SettingsScreen.css';
@@ -40,6 +45,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
   const [fontSizeLocal, setFontSizeLocal] = useState(fontSize || 'medium');
   const [fastingDefaultHours, setFastingDefaultHoursLocal] = useState(() => getFastingDefaultHours());
+  const [nutrientMode, setNutrientMode] = useState<NutrientDisplayMode>(() => getNutrientDisplayMode());
   const [notificationPermission, setNotificationPermission] =
     useState<NotificationPermission>('default');
   const [notificationEnabled, setNotificationEnabled] = useState(() => {
@@ -195,8 +201,37 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
           </div>
         </div>
 
-        {/* 栄養素表示設定 */}
-
+        {/* 栄養素表示モード（3モードUI） */}
+        <div className="settings-screen-section">
+          <h2 className="settings-screen-section-title">栄養素の表示モード</h2>
+          <p className="settings-screen-section-description" style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem' }}>
+            ホーム・履歴で表示する栄養素の量を選べます。シンプル→標準→詳細の順に多く表示されます。
+          </p>
+          <div className="settings-screen-button-row" style={{ flexDirection: 'column', gap: '0.5rem' }}>
+            {(
+              [
+                { value: 'simple' as const, label: 'シンプル', desc: '電解質（Na, K, Mg）と脂質のみ' },
+                { value: 'standard' as const, label: '標準', desc: '電解質・マクロ＋主要ミネラル・ビタミン' },
+                { value: 'detailed' as const, label: '詳細', desc: '全栄養素（60項目以上）' },
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  saveNutrientDisplayMode(option.value);
+                  setNutrientMode(option.value);
+                  window.dispatchEvent(new CustomEvent('nutrientDisplayModeChanged'));
+                }}
+                className={`settings-screen-option-button ${nutrientMode === option.value ? 'active' : ''}`}
+                style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem' }}
+              >
+                <div style={{ fontWeight: '600' }}>{option.label}</div>
+                <div style={{ fontSize: '0.8125rem', opacity: 0.9 }}>{option.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* 表示設定 */}
         <div className="settings-screen-section">
@@ -285,31 +320,63 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
         {/* 通知設定 */}
         <div className="settings-screen-section">
           <h2 className="settings-screen-section-title">通知設定</h2>
-          <div className="settings-screen-switch-row">
-            <div className="settings-screen-switch-label-group">
-              <label className="settings-screen-switch-label">
-                {t('settings.notificationEnable')}
-                <HelpTooltip text={t('settings.notificationTooltip')} />
-              </label>
-              <div className="settings-screen-switch-description">
-                {notificationPermission === 'granted'
-                  ? t('settings.notificationGranted')
-                  : notificationPermission === 'denied'
-                    ? t('settings.notificationDenied')
-                    : t('settings.notificationRequest')}
-              </div>
+
+          {notificationPermission === 'default' ? (
+            // 許可が未取得の場合: ボタンを表示
+            <div style={{ padding: '1rem 0' }}>
+              <p style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#666' }}>
+                解凍リマインダーなどの通知を受け取るには、ブラウザの通知許可が必要です。
+              </p>
+              <button
+                onClick={async () => {
+                  const permission = await requestNotificationPermission();
+                  if (permission) {
+                    setNotificationEnabled(true);
+                    setNotificationPermission(Notification.permission);
+                    localStorage.setItem('settings_notification_enabled', JSON.stringify(true));
+                  } else {
+                    alert(t('settings.notificationPermissionRequired'));
+                  }
+                }}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  minHeight: '44px',
+                  minWidth: '44px',
+                }}
+              >
+                🔔 通知を受け取る
+              </button>
             </div>
-            <label className="settings-screen-switch">
-              <input
-                type="checkbox"
-                checked={notificationEnabled && notificationPermission === 'granted'}
-                onChange={handleNotificationToggle}
-                disabled={notificationPermission === 'denied'}
-              />
-              <span className="settings-screen-switch-slider"></span>
-            </label>
-          </div>
-          {notificationPermission === 'denied' && (
+          ) : notificationPermission === 'granted' ? (
+            // 許可済みの場合: トグルを表示
+            <div className="settings-screen-switch-row">
+              <div className="settings-screen-switch-label-group">
+                <label className="settings-screen-switch-label">
+                  {t('settings.notificationEnable')}
+                  <HelpTooltip text={t('settings.notificationTooltip')} />
+                </label>
+                <div className="settings-screen-switch-description">
+                  {t('settings.notificationGranted')}
+                </div>
+              </div>
+              <label className="settings-screen-switch">
+                <input
+                  type="checkbox"
+                  checked={notificationEnabled}
+                  onChange={handleNotificationToggle}
+                />
+                <span className="settings-screen-switch-slider"></span>
+              </label>
+            </div>
+          ) : (
+            // 拒否された場合: 警告を表示
             <div
               style={{
                 marginTop: '0.5rem',
@@ -322,6 +389,9 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
               }}
             >
               ⚠️ {t('settings.notificationDenied')}
+              <p style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>
+                ブラウザの設定から通知を許可してください。
+              </p>
             </div>
           )}
         </div>

@@ -1,5 +1,5 @@
 /**
- * Primal Logic - HeyGen API Integration
+ * CarnivOS - HeyGen API Integration
  *
  * HeyGen APIを使用して動画を生成
  * API仕様: https://www.heygen.com/api (要確認)

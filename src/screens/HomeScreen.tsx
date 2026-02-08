@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Home Screen (Web版)
+ * CarnivOS - Home Screen (Web版)
  *
  * 栄養素ゲージの表示と基本的なナビゲーション
  */
@@ -24,7 +24,7 @@ import { getAllFoodHistory } from '../utils/foodHistory';
 import { getMyFoods, addMyFood, removeMyFood, type MyFoodItem } from '../utils/myFoodsStorage';
 import { searchFoods } from '../data/foodsDatabase';
 import { getDailyLogs } from '../utils/storage';
-import { getCarnivoreTargets } from '../data/carnivoreTargets';
+import { getDynamicNutrientTargets } from '../data/dynamicNutrientCalculator';
 import {
   calculateWaterFromFood,
   getWaterTargetMl,
@@ -42,12 +42,14 @@ import {
 import { calculateStreak, type StreakData } from '../utils/streakCalculator';
 // Removed TransitionBanner and TransitionGuideModal imports
 import BarcodeScannerModal from '../components/BarcodeScannerModal';
+import ElectrolyteBalance from '../components/ElectrolyteBalance';
 import type { AnimalType } from '../data/deepNutritionData';
 import type { FoodItem } from '../types';
 import { logError } from '../utils/errorHandler';
 import PhotoAnalysisModal from '../components/PhotoAnalysisModal';
 import { getRandomTip, type Tip } from '../data/tips';
 import FoodEditModal from '../components/dashboard/FoodEditModal';
+import WelcomeModal from '../components/WelcomeModal';
 import './HomeScreen.css';
 
 interface HomeScreenProps {
@@ -62,43 +64,10 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
   const { showNutrientPreview } = useSettings();
   const featureDisplaySettings = getFeatureDisplaySettings();
 
-  // 動的目標値を取得（ユーザープロファイルから）
+  // 動的目標値を取得（UserProfile + その日の DailyStatus で日次変動）
   const dynamicTargets = useMemo(() => {
-    return getCarnivoreTargets(
-      userProfile?.gender,
-      userProfile?.age,
-      userProfile?.activityLevel,
-      userProfile?.isPregnant,
-      userProfile?.isBreastfeeding,
-      userProfile?.isPostMenopause,
-      userProfile?.stressLevel,
-      userProfile?.sleepHours,
-      userProfile?.exerciseIntensity,
-      userProfile?.exerciseFrequency,
-      userProfile?.thyroidFunction,
-      userProfile?.sunExposureFrequency,
-      userProfile?.digestiveIssues,
-      userProfile?.inflammationLevel,
-      userProfile?.mentalHealthStatus,
-      userProfile?.supplementMagnesium,
-      userProfile?.supplementVitaminD,
-      userProfile?.supplementIodine,
-      userProfile?.alcoholFrequency,
-      userProfile?.caffeineIntake,
-      // Phase 1 related params removed (daysOnCarnivore, start, mode)
-      userProfile?.bodyComposition, // Phase 3: 体組成設定
-      userProfile?.weight, // Phase 3: 体重（LBM計算用）
-      userProfile?.metabolicStressIndicators, // Phase 4: 代謝ストレス指標
-      userProfile?.customNutrientTargets
-        ? Object.fromEntries(
-          Object.entries(userProfile.customNutrientTargets).map(([key, value]) => [
-            key,
-            typeof value === 'number' ? { mode: 'manual' as const, value } : value,
-          ])
-        )
-        : undefined // Phase 5: 栄養素目標値のカスタマイズ
-    );
-  }, [userProfile]);
+    return getDynamicNutrientTargets(userProfile ?? undefined, dailyLog?.status ?? undefined);
+  }, [userProfile, dailyLog?.status]);
   const [selectedArgumentCard, setSelectedArgumentCard] = useState<string | null>(null);
   const [showRecoveryProtocol, setShowRecoveryProtocol] = useState(false);
   const [recoveryProtocolForModal, setRecoveryProtocolForModal] = useState<RecoveryProtocol | null>(null);
@@ -130,6 +99,8 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
   const [feedbackBannerHidden, setFeedbackBannerHidden] = useState(false);
   // 栄養素表示モード切替時に useMemo を再計算させるため
   const [nutrientDisplayModeVersion, setNutrientDisplayModeVersion] = useState(0);
+
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   // AI写真解析確認モーダル用ステート
   const [showPhotoConfirmation, setShowPhotoConfirmation] = useState(false);
@@ -188,6 +159,16 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
     await addFood(food);
     handleStorageRefill(food);
   };
+
+  // 初回訪問検知
+  useEffect(() => {
+    const FIRST_VISIT_KEY = '@carnivos:first_visit_done';
+    const hasVisited = localStorage.getItem(FIRST_VISIT_KEY);
+    if (!hasVisited) {
+      setShowWelcomeModal(true);
+      localStorage.setItem(FIRST_VISIT_KEY, 'true');
+    }
+  }, []);
 
   // Storage Decay Logic
   useEffect(() => {
@@ -305,6 +286,13 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
     const handler = () => setSelectedAnimal('ruminant');
     window.addEventListener('openButcherSelect', handler);
     return () => window.removeEventListener('openButcherSelect', handler);
+  }, []);
+
+  // 設定画面で栄養素表示モードを変更したときに再描画
+  useEffect(() => {
+    const handler = () => setNutrientDisplayModeVersion((v) => v + 1);
+    window.addEventListener('nutrientDisplayModeChanged', handler);
+    return () => window.removeEventListener('nutrientDisplayModeChanged', handler);
   }, []);
 
   const loadMyFoods = async () => {
@@ -927,8 +915,8 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
                 </span>
               )}
             </span>
-            <div style={{ display: 'flex', gap: '0.25rem' }}>
-              {[200, 500].map((ml) => (
+            <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+              {[250, 500, 750, 1000].map((ml) => (
                 <button
                   key={ml}
                   onClick={() => updateWaterIntake(ml)}
@@ -948,6 +936,22 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           </div>
         );
       })()}
+
+      {/* 電解質バランス表示（Na / K / Mg） */}
+      {dailyLog?.calculatedMetrics && (
+        <ElectrolyteBalance
+          consumed={{
+            sodium: dailyLog.calculatedMetrics.sodiumTotal ?? 0,
+            potassium: dailyLog.calculatedMetrics.potassiumTotal ?? 0,
+            magnesium: dailyLog.calculatedMetrics.magnesiumTotal ?? 0,
+          }}
+          targets={{
+            sodium: dynamicTargets.sodium ?? 5000,
+            potassium: dynamicTargets.potassium ?? 4500,
+            magnesium: dynamicTargets.magnesium ?? 600,
+          }}
+        />
+      )}
 
       {/* コンテンツエリア */}
       <div className="home-screen-content" style={{ paddingTop: '100px' }}>
@@ -1574,6 +1578,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             </div>
             <ButcherSelect
               initialAnimal={mapAnimalType(selectedAnimal)!}
+              dynamicTargets={dynamicTargets}
               onSelect={(_animal, _part) => {
                 if (import.meta.env.DEV) {
                   // 開発時のみログ等に利用可能
@@ -1688,7 +1693,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           >
             <div
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 padding: '2rem',
                 borderRadius: '8px',
                 maxWidth: '90%',
@@ -1834,7 +1839,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           >
             <div
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 padding: '2rem',
                 maxWidth: '400px',
@@ -1937,7 +1942,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           >
             <div
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 padding: '2rem',
                 maxWidth: '400px',
@@ -2144,7 +2149,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           >
             <div
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 padding: '1.5rem',
                 maxWidth: '400px',
@@ -2289,6 +2294,11 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
           />
         )
       }
+
+      {/* ウェルカムモーダル */}
+      {showWelcomeModal && (
+        <WelcomeModal onClose={() => setShowWelcomeModal(false)} />
+      )}
     </div >
   );
 }

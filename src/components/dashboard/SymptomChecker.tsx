@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Symptom Checker (トラブルシューティング)
+ * CarnivOS - Symptom Checker (トラブルシューティング)
  *
  * カーニボア実践中の症状をチェックし、対処法を提案するコンポーネント
  */

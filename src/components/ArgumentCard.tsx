@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Argument Card Component (Web版)
+ * CarnivOS - Argument Card Component (Web版)
  *
  * 3-tier情報表示: Level 1 (Glance) → Level 2 (Explanation) → Level 3 (Source)
  * Phase 3: The Logic Shield

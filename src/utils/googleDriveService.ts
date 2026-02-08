@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Google Drive Service
+ * CarnivOS - Google Drive Service
  *
  * Google Drive APIを使用してデータバックアップ
  * 将来的に実装予定

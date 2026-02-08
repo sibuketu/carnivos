@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Vitamin D Calculator
+ * CarnivOS - Vitamin D Calculator
  *
  * Solar Charge (太陽光暴露) から Vitamin D 合成量を計算
  * 技術仕様書: @Primal_Logic_Technical_Spec.md 参照

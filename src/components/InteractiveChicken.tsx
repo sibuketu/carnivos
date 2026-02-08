@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Interactive Chicken Component
+ * CarnivOS - Interactive Chicken Component
  *
  * クリッカブルSVG解剖図: 鶏の部位を直接タップして選択
  * デザインのトーン＆マナーは牛（InteractiveCow）と同じ

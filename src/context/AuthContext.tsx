@@ -1,6 +1,7 @@
-
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import type { Session, User } from '@supabase/auth-js';
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { supabase, isSupabaseAvailable } from '../lib/supabaseClient';
 
 type AuthContextType = {
@@ -30,6 +31,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (isSupabaseAvailable() && supabase) {
+            // Native: OAuth リダイレクトでアプリが開いた場合にセッションを復元
+            const restoreSessionFromLaunchUrl = async (url: string) => {
+                const hash = url.includes('#') ? url.slice(url.indexOf('#')) : '';
+                if (!hash) return;
+                const params = new URLSearchParams(hash.slice(1));
+                const access_token = params.get('access_token');
+                const refresh_token = params.get('refresh_token');
+                if (access_token && refresh_token) {
+                    const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
+                    if (!error) {
+                        setSession(data.session);
+                        setUser(data.user ?? null);
+                        setIsGuest(false);
+                    }
+                }
+            };
+
+            let urlListener: { remove: () => Promise<void> } | null = null;
+            if (Capacitor.isNativePlatform()) {
+                App.getLaunchUrl().then(({ url }) => {
+                    if (url && url.includes('auth')) restoreSessionFromLaunchUrl(url);
+                }).catch(() => {});
+                App.addListener('appUrlOpen', (e) => {
+                    if (e.url && e.url.includes('auth')) restoreSessionFromLaunchUrl(e.url);
+                }).then((listener) => {
+                    urlListener = listener;
+                });
+            }
+
             // Get initial session
             supabase.auth.getSession().then(({ data: { session } }) => {
                 setSession(session);
@@ -52,7 +82,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 }
             });
 
-            return () => subscription.unsubscribe();
+            return () => {
+                subscription.unsubscribe();
+                urlListener?.remove().catch(() => {});
+            };
         } else {
             setLoading(false);
         }

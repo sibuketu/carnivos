@@ -28,7 +28,7 @@ export function getNutrientColor(nutrientKey: string): string {
 export const NUTRIENT_GROUPS = {
     electrolytes: {
         label: '⚡ Electrolytes',
-        bg: '#f0f9ff', // light blue
+        bg: 'rgba(255, 255, 255, 0.05)', // neutral glass
         nutrients: ['sodium', 'potassium', 'magnesium'] as const,
     },
     macros: {

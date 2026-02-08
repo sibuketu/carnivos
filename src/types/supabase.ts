@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Supabase Database Types
+ * CarnivOS - Supabase Database Types
  *
  * Supabaseデータベースのテーブル型定義
  */

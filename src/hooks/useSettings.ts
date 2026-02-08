@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Settings Hook
+ * CarnivOS - Settings Hook
  *
  * アプリ設定の管理（Local Storage）
  */

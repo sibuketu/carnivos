@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Recovery Algorithm
+ * CarnivOS - Recovery Algorithm
  *
  * 違反タイプ別の処方箋生成ロジック
  * 技術仕様書: @Primal_Logic_Technical_Spec.md 参照

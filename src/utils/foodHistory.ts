@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Food History Utility
+ * CarnivOS - Food History Utility
  *
  * ヒストリーレコメンド: 過去の入力履歴からデフォルト値を取得
  */

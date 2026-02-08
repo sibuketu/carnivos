@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Streak Calculator
+ * CarnivOS - Streak Calculator
  *
  * ストリーク（継続日数）とフェーズ（称号）を計算するユーティリティ
  */

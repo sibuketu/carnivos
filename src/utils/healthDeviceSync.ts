@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Health Device Sync Utility
+ * CarnivOS - Health Device Sync Utility
  *
  * ウェアラブルデバイス連携（Apple Health、Google Fit）
  *

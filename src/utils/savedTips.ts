@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Saved Tips (お気に入りTips)
+ * CarnivOS - Saved Tips (お気に入りTips)
  *
  * ユーザーが星で保存したTipsを管理
  */

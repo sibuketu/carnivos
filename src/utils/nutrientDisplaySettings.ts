@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Nutrient Display Settings
+ * CarnivOS - Nutrient Display Settings
  *
  * 栄養素の表示/非表示を管理するユーティリティ
  * デフォルトは全部表示

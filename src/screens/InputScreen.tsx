@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Input Screen (Web版)
+ * CarnivOS - Input Screen (Web版)
  *
  * Status & Fuel の入力画面
  * Phase 1: Status (The Machine) + Fuel (The Input)
@@ -20,7 +20,8 @@ import {
 } from '../utils/weatherService';
 import { useTranslation } from '../utils/i18n';
 import { VoiceInputManager, type VoiceInputResult } from '../utils/voiceInput';
-import type { FoodItem } from '../types';
+import { getFastingDefaultHours, FASTING_TEMPLATES } from '../utils/fastingDefaults';
+import type { FoodItem, CalculatedMetrics } from '../types';
 import './InputScreen.css';
 
 interface InputScreenProps {
@@ -61,6 +62,52 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
     bristolScale?: number;
     notes?: string;
   }>(dailyLog?.status?.bowelMovement || { status: 'normal' });
+
+  // Fasting timer state
+  const [fastingEndTime, setFastingEndTime] = useState<string | null>(() => {
+    return localStorage.getItem('primal_logic_fasting_timer_end');
+  });
+  const [fastingRemainingTime, setFastingRemainingTime] = useState<string>('');
+
+  // Update fasting remaining time every second
+  useEffect(() => {
+    if (!fastingEndTime) {
+      setFastingRemainingTime('');
+      return;
+    }
+
+    const updateTime = () => {
+      const now = Date.now();
+      const end = new Date(fastingEndTime).getTime();
+      const diff = end - now;
+
+      if (diff <= 0) {
+        setFastingRemainingTime('完了');
+        setFastingEndTime(null);
+        localStorage.removeItem('primal_logic_fasting_timer_end');
+      } else {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        setFastingRemainingTime(`${hours}時間${minutes}分`);
+      }
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, [fastingEndTime]);
+
+  const startFasting = (hours: number) => {
+    const endAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+    localStorage.setItem('primal_logic_fasting_timer_end', endAt);
+    setFastingEndTime(endAt);
+  };
+
+  const stopFasting = () => {
+    localStorage.removeItem('primal_logic_fasting_timer_end');
+    setFastingEndTime(null);
+    setFastingRemainingTime('');
+  };
 
   // dailyLogが変更されたら日記・体重・睡眠時間も更新
   useEffect(() => {
@@ -903,6 +950,93 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
           </div>
         </div>
 
+        {/* 断食タイマーセクション */}
+        <div className="input-screen-section">
+          <h2 className="input-screen-section-title">⚡ 断食タイマー</h2>
+          <div className="input-screen-input-group">
+            {fastingEndTime ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div
+                  style={{
+                    padding: '1rem',
+                    borderRadius: '8px',
+                    backgroundColor: '#fef3c7',
+                    border: '2px solid #f59e0b',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#92400e' }}>
+                    {fastingRemainingTime}
+                  </div>
+                  <div style={{ fontSize: '14px', color: '#78716c', marginTop: '0.25rem' }}>
+                    残り時間
+                  </div>
+                </div>
+                <button
+                  onClick={stopFasting}
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid #d6d3d1',
+                    backgroundColor: '#fafaf9',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  タイマー停止
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div style={{ marginBottom: '1rem', fontSize: '14px', color: '#78716c' }}>
+                  断食時間を選択してスタート
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  {Object.entries(FASTING_TEMPLATES).map(([key, { name, hours }]) => (
+                    <button
+                      key={key}
+                      onClick={() => startFasting(hours)}
+                      style={{
+                        padding: '0.75rem',
+                        borderRadius: '8px',
+                        border: '2px solid #f59e0b',
+                        backgroundColor: '#fffbeb',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                      }}
+                    >
+                      <div style={{ fontWeight: 'bold', color: '#92400e' }}>{name}</div>
+                      <div style={{ fontSize: '12px', color: '#78716c' }}>{hours}時間</div>
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    const customHours = getFastingDefaultHours();
+                    startFasting(customHours);
+                  }}
+                  style={{
+                    marginTop: '0.5rem',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid #d6d3d1',
+                    backgroundColor: '#fafaf9',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    width: '100%',
+                  }}
+                >
+                  カスタム ({getFastingDefaultHours()}時間)
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* 日記セクション */}
         <div className="input-screen-section">
           <h2 className="input-screen-section-title">日記</h2>
@@ -1039,7 +1173,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
           >
             <div
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 padding: '2rem',
                 borderRadius: '8px',
                 maxWidth: '90%',
@@ -1153,13 +1287,14 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 };
 
                 // 現在のメトリクス
-                const currentMetrics = dailyLog?.calculatedMetrics || {
-                  effectiveProtein: 0,
-                  fatTotal: 0,
-                  vitaminB12Total: 0,
-                  effectiveIron: 0,
-                  effectiveZinc: 0,
-                } as any; // Allow partial missing props if needed, or cast to CalculatedMetrics if imported
+                const currentMetrics: Partial<CalculatedMetrics> =
+                  dailyLog?.calculatedMetrics || {
+                    effectiveProtein: 0,
+                    fatTotal: 0,
+                    vitaminB12Total: 0,
+                    effectiveIron: 0,
+                    effectiveZinc: 0,
+                  };
 
                 // プレビュー用のメトリクス（この食品を追加した場合）
                 const currentFuel = dailyLog?.fuel || [];

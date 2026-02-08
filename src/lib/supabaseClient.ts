@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Supabase Client
+ * CarnivOS - Supabase Client
  *
  * Supabaseクライアントの初期化と設定
  */
@@ -18,7 +18,7 @@ export const supabase =
         auth: {
           persistSession: true,
           autoRefreshToken: true,
-          detectSessionInUrl: false,
+          detectSessionInUrl: true,
         },
       })
     : null;

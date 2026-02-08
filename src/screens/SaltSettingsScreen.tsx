@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Salt Settings Screen
+ * CarnivOS - Salt Settings Screen
  *
  * 塩ミル設定画面
  */

@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Makefilm API Integration
+ * CarnivOS - Makefilm API Integration
  *
  * Makefilm APIを使用して動画を生成
  * API仕様: https://makefilm.jp/ (要確認)

@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Deep Nutrition Data (Seed Data)
+ * CarnivOS - Deep Nutrition Data (Seed Data)
  *
  * カーニボアにとっての「Tier 1（最重要）」データ
  * APIを使用せず、ローカルのマスターデータとして保持

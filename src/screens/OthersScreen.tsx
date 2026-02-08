@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { useTranslation } from '../utils/i18n';
 import { getFeatureDisplaySettings } from '../utils/featureDisplaySettings';
+import { useTrophyProgress } from '../hooks/useTrophyProgress';
+import { TROPHIES } from '../data/trophies';
+import TrophyModal from '../components/TrophyModal';
 import TipsScreen from './TipsScreen';
 import './OthersScreen.css';
 
 export default function OthersScreen() {
   const { t } = useTranslation();
   const featureDisplaySettings = getFeatureDisplaySettings();
+  const { progress: trophyProgress, unlockedCount } = useTrophyProgress();
   const [showTipsList, setShowTipsList] = useState(false);
+  const [showTrophyModal, setShowTrophyModal] = useState(false);
 
   const navigateTo = (screen: string) => {
     window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: screen }));
@@ -26,7 +31,7 @@ export default function OthersScreen() {
   }
 
   return (
-    <div className="labs-screen-container" style={{ paddingBottom: '80px' }}>
+    <div className="labs-screen-container" data-testid="labs-screen" style={{ paddingBottom: '80px' }}>
       <header className="labs-screen-header">
         <h1 className="labs-screen-title">{t('nav.others')}</h1>
         <p className="labs-screen-description">{t('others.description')}</p>
@@ -39,7 +44,7 @@ export default function OthersScreen() {
 
 
           {/* 統計・グラフ（栄養素・体重・習慣をタブで表示） */}
-          <button className="labs-card" onClick={() => navigateTo('stats')}>
+          <button className="labs-card" data-testid="labs-stats" onClick={() => navigateTo('stats')}>
             <span className="labs-card-icon">📊</span>
             <div className="labs-card-content">
               <h3 className="labs-card-title">{t('analysis.stats')}</h3>
@@ -53,11 +58,20 @@ export default function OthersScreen() {
       <section className="labs-screen-section">
         <h2 className="labs-screen-section-title">{t('others.tips')}</h2>
         <div className="labs-grid">
-          <button className="labs-card" onClick={() => setShowTipsList(true)}>
+          <button className="labs-card" data-testid="labs-tips" onClick={() => setShowTipsList(true)}>
             <span className="labs-card-icon">💡</span>
             <div className="labs-card-content">
               <h3 className="labs-card-title">{t('tips.title')}</h3>
               <p className="labs-card-description">{t('tips.viewList')}</p>
+            </div>
+          </button>
+
+          {/* トロフィー */}
+          <button className="labs-card" data-testid="labs-trophies" onClick={() => setShowTrophyModal(true)}>
+            <span className="labs-card-icon">🏆</span>
+            <div className="labs-card-content">
+              <h3 className="labs-card-title">トロフィー</h3>
+              <p className="labs-card-description">{unlockedCount} / {TROPHIES.length} 達成</p>
             </div>
           </button>
         </div>
@@ -68,7 +82,7 @@ export default function OthersScreen() {
         <h2 className="labs-screen-section-title">{t('others.records')}</h2>
         <div className="labs-grid">
           {/* Bio-Tuner / Input */}
-          <button className="labs-card" onClick={() => navigateTo('input')}>
+          <button className="labs-card" data-testid="labs-biotuner" onClick={() => navigateTo('input')}>
             <span className="labs-card-icon">🎛️</span>
             <div className="labs-card-content">
               <h3 className="labs-card-title">{t('others.bioTuner')}</h3>
@@ -78,7 +92,7 @@ export default function OthersScreen() {
 
           {/* Diary */}
           {featureDisplaySettings.diary && (
-            <button className="labs-card" onClick={() => navigateTo('diary')}>
+            <button className="labs-card" data-testid="labs-diary" onClick={() => navigateTo('diary')}>
               <span className="labs-card-icon">📓</span>
               <div className="labs-card-content">
                 <h3 className="labs-card-title">{t('records.diary')}</h3>
@@ -95,7 +109,7 @@ export default function OthersScreen() {
         <div className="labs-grid">
           {/* Gift */}
           {featureDisplaySettings.gift && (
-            <button className="labs-card" onClick={() => navigateTo('gift')}>
+            <button className="labs-card" data-testid="labs-gift" onClick={() => navigateTo('gift')}>
               <span className="labs-card-icon">🎁</span>
               <div className="labs-card-content">
                 <h3 className="labs-card-title">{t('store.gift')}</h3>
@@ -106,7 +120,7 @@ export default function OthersScreen() {
 
           {/* Shop */}
           {featureDisplaySettings.shop && (
-            <button className="labs-card" onClick={() => navigateTo('shop')}>
+            <button className="labs-card" data-testid="labs-shop" onClick={() => navigateTo('shop')}>
               <span className="labs-card-icon">🛒</span>
               <div className="labs-card-content">
                 <h3 className="labs-card-title">{t('store.shop')}</h3>
@@ -121,14 +135,14 @@ export default function OthersScreen() {
       <section className="labs-screen-section">
         <h2 className="labs-screen-section-title">⚙️ {t('others.settings')}</h2>
         <div className="labs-list">
-          <button className="labs-list-item" onClick={() => navigateTo('userSettings')}>
+          <button className="labs-list-item" data-testid="labs-user-settings" onClick={() => navigateTo('userSettings')}>
             <span className="labs-list-item-icon">👤</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">{t('profile.userSettings')}</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
-          <button className="labs-list-item" onClick={() => navigateTo('settings')}>
+          <button className="labs-list-item" data-testid="labs-ui-settings" onClick={() => navigateTo('settings')}>
             <span className="labs-list-item-icon">🛠️</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">{t('profile.uiSettings')}</span>
@@ -138,7 +152,7 @@ export default function OthersScreen() {
 
           {/* Diet Settings */}
           {featureDisplaySettings.customFoodRegistration && (
-            <button className="labs-list-item" onClick={() => navigateTo('customFood')}>
+            <button className="labs-list-item" data-testid="labs-custom-food" onClick={() => navigateTo('customFood')}>
               <span className="labs-list-item-icon">🥩</span>
               <div className="labs-list-item-content">
                 <span className="labs-list-item-title">{t('profile.customFood')}</span>
@@ -146,14 +160,14 @@ export default function OthersScreen() {
               <span className="labs-list-item-arrow">→</span>
             </button>
           )}
-          <button className="labs-list-item" onClick={() => navigateTo('salt')}>
+          <button className="labs-list-item" data-testid="labs-salt" onClick={() => navigateTo('salt')}>
             <span className="labs-list-item-icon">🧂</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">{t('profile.saltSettings')}</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
-          <button className="labs-list-item" onClick={() => navigateTo('carbTarget')}>
+          <button className="labs-list-item" data-testid="labs-carb-target" onClick={() => navigateTo('carbTarget')}>
             <span className="labs-list-item-icon">🎯</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">{t('profile.carbTargetSettings')}</span>
@@ -161,21 +175,21 @@ export default function OthersScreen() {
             <span className="labs-list-item-arrow">→</span>
           </button>
 
-          <button className="labs-list-item" onClick={() => navigateTo('language')}>
+          <button className="labs-list-item" data-testid="labs-language" onClick={() => navigateTo('language')}>
             <span className="labs-list-item-icon">🌐</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">{t('profile.languageSettings')}</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
-          <button className="labs-list-item" onClick={() => navigateTo('auth')}>
+          <button className="labs-list-item" data-testid="labs-account" onClick={() => navigateTo('auth')}>
             <span className="labs-list-item-icon">🔐</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">{t('profile.account')}</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
-          <button className="labs-list-item" onClick={() => navigateTo('feedback')}>
+          <button className="labs-list-item" data-testid="labs-feedback" onClick={() => navigateTo('feedback')}>
             <span className="labs-list-item-icon">💬</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">Feedback</span>
@@ -184,21 +198,21 @@ export default function OthersScreen() {
           </button>
 
           {/* Legal */}
-          <button className="labs-list-item" onClick={() => navigateTo('privacy')}>
+          <button className="labs-list-item" data-testid="labs-privacy" onClick={() => navigateTo('privacy')}>
             <span className="labs-list-item-icon">📄</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">Privacy Policy</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
-          <button className="labs-list-item" onClick={() => navigateTo('terms')}>
+          <button className="labs-list-item" data-testid="labs-terms" onClick={() => navigateTo('terms')}>
             <span className="labs-list-item-icon">⚖️</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title">Terms of Service</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
-          <button className="labs-list-item" onClick={() => navigateTo('dataDelete')}>
+          <button className="labs-list-item" data-testid="labs-data-delete" onClick={() => navigateTo('dataDelete')}>
             <span className="labs-list-item-icon">🗑️</span>
             <div className="labs-list-item-content">
               <span className="labs-list-item-title" style={{ color: '#dc2626' }}>{t('profile.deleteData')}</span>
@@ -207,6 +221,14 @@ export default function OthersScreen() {
           </button>
         </div>
       </section>
+
+      {/* トロフィーモーダル */}
+      {showTrophyModal && (
+        <TrophyModal
+          progress={trophyProgress}
+          onClose={() => setShowTrophyModal(false)}
+        />
+      )}
     </div>
   );
 }

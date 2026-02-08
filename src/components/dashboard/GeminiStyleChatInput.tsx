@@ -105,7 +105,7 @@ export default function GeminiStyleChatInput({
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--color-bg-primary)',
           borderRadius: '20px',
           padding: '0.75rem 1rem',
           border: '1px solid #e5e7eb',

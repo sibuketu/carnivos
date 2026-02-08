@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Food Category Screen
+ * CarnivOS - Food Category Screen
  *
  * 巨大アイコン5つ（牛・豚・鶏・卵・魚）で食品を選択
  */

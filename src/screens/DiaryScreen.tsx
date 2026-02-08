@@ -4,6 +4,7 @@ import { getDailyLogByDate, saveDailyLog } from '../utils/storage';
 import { calculateAllMetrics } from '../utils/nutrientCalculator';
 import { useTranslation } from '../utils/i18n';
 import { logError } from '../utils/errorHandler';
+import { useTrophyProgress } from '../hooks/useTrophyProgress';
 import type { DailyLog, DailyStatus } from '../types';
 import './DiaryScreen.css';
 
@@ -39,6 +40,8 @@ const METRICS: MetricDefinition[] = [
   { id: 'muscleSoreness', label: 'Muscle soreness', type: 'slider', min: 1, max: 10, category: 'physical' },
   { id: 'jointPain', label: 'Joint pain', type: 'slider', min: 1, max: 10, category: 'physical' },
   { id: 'headache', label: 'Headache', type: 'slider', min: 1, max: 10, category: 'physical' },
+  { id: 'exerciseMinutes', label: 'Exercise time', type: 'number', unit: 'min', category: 'physical' },
+  { id: 'exerciseIntensity', label: 'Exercise intensity', type: 'select', options: ['none', 'light', 'moderate', 'intense'], category: 'physical' },
   { id: 'bowelMovement.status', label: 'Bowel movement', type: 'select', options: ['normal', 'constipated', 'loose', 'watery'], category: 'physical' },
   { id: 'skinCondition', label: 'Skin condition', type: 'select', options: ['good', 'dry', 'oily', 'acne', 'rash'], category: 'physical' },
   { id: 'libido', label: 'Libido', type: 'slider', min: 1, max: 10, category: 'physical' },
@@ -47,6 +50,7 @@ const METRICS: MetricDefinition[] = [
   { id: 'mood', label: 'Mood', type: 'select', options: ['great', 'good', 'neutral', 'bad', 'terrible'], category: 'mental' },
   { id: 'focus', label: 'Focus', type: 'slider', min: 1, max: 10, category: 'mental' },
   { id: 'anxiety', label: 'Anxiety', type: 'slider', min: 1, max: 10, category: 'mental' },
+  { id: 'depression', label: 'Depression', type: 'slider', min: 1, max: 10, category: 'mental' },
   { id: 'motivation', label: 'Motivation', type: 'slider', min: 1, max: 10, category: 'mental' },
   { id: 'brainFog', label: 'Brain fog', type: 'slider', min: 1, max: 10, category: 'mental' },
   { id: 'stressLevel', label: 'Stress level', type: 'select', options: ['low', 'medium', 'high'], category: 'mental', connectable: true },
@@ -85,6 +89,7 @@ const METRICS: MetricDefinition[] = [
 export default function DiaryScreen({ onBack }: DiaryScreenProps) {
   const { t } = useTranslation();
   const { userProfile, loadTodayLog } = useApp();
+  const { updateProgress: updateTrophyProgress } = useTrophyProgress();
   const today = new Date().toISOString().split('T')[0];
   const [diary, setDiary] = useState('');
   const [selectedDate, setSelectedDate] = useState(today);
@@ -178,6 +183,11 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
       };
 
       await saveDailyLog(logToSave);
+
+      // 内省家トロフィー進捗更新（Diaryに3回書き込み）
+      if (diary.trim().length > 0) {
+        updateTrophyProgress('reflector');
+      }
 
       if (selectedDate === today) {
         await loadTodayLog();

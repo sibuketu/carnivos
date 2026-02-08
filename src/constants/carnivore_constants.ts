@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Carnivore Diet Constants
+ * CarnivOS - Carnivore Diet Constants
  *
  * バイオアベイラビリティ係数と動的必要量の定義
  * 技術仕様書: @Primal_Logic_Technical_Spec.md 参照

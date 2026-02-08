@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Paywall Screen（初回フロー用フル画面）
+ * CarnivOS - Paywall Screen（初回フロー用フル画面）
  *
  * docs/フロー_ログインサブスク.md に基づく。
  * 初回: Consent → サブスク画面 → ログイン/新規登録 → オンボーディング。

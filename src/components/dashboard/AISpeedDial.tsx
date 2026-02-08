@@ -12,11 +12,12 @@ import { getRandomTip, getRandomTipExcluding, TIPS_DATA } from '../../data/tips'
 import type { Tip } from '../../data/tips';
 import { saveTip, unsaveTip, isTipSaved } from '../../utils/savedTips';
 import { useSettings } from '../../hooks/useSettings';
+import { useTrophyProgress } from '../../hooks/useTrophyProgress';
 import { logError, getUserFriendlyErrorMessage } from '../../utils/errorHandler';
 import FoodEditModal from './FoodEditModal';
 import BarcodeScannerModal from '../BarcodeScannerModal';
 import { searchFoods } from '../../data/foodsDatabase';
-import { getFastingDefaultHours, FASTING_TEMPLATES } from '../../utils/fastingDefaults';
+import { getFastingDefaultHours } from '../../utils/fastingDefaults';
 import '../../styles/ai-chat.css';
 
 /** 体調・症状からプロンプトを選ぶチップ（Prompt Chips） */
@@ -115,6 +116,7 @@ export default function AISpeedDial({
 }: AISpeedDialProps = {}) {
   const { addFood, userProfile } = useApp();
   const { aiMode } = useSettings();
+  const { updateProgress: updateTrophyProgress } = useTrophyProgress();
   const [chatUIMode, setChatUIMode] = useState<'modal' | 'bubble' | 'browse'>(() => {
     // localStorageからUIモードを読み込む（デフォルトはbubble）
     const saved = localStorage.getItem('ai_chat_ui_mode');
@@ -755,6 +757,9 @@ export default function AISpeedDial({
       setLoadingTip(null); // ローディング中の表示は消すが、displayedTipは保持
       setChatMessages(prev => [...prev, { role: 'assistant', content: aiResponse.answer }]);
 
+      // 相談者トロフィー進捗更新（AIチャットで5回質問）
+      updateTrophyProgress('learner');
+
       // Todoがあれば保存
       if (aiResponse.todos && aiResponse.todos.length > 0) {
         setCurrentTodos(prev => [...prev, {
@@ -1384,7 +1389,7 @@ export default function AISpeedDial({
                 left: '16px',
                 maxWidth: '600px',
                 marginLeft: 'auto',
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
                 border: '1px solid #e5e7eb',
@@ -1534,7 +1539,7 @@ export default function AISpeedDial({
                           top: '100%',
                           left: 0,
                           marginTop: '8px',
-                          backgroundColor: 'white',
+                          backgroundColor: 'var(--color-bg-primary)',
                           borderRadius: '8px',
                           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                           minWidth: '180px',
@@ -1945,7 +1950,7 @@ export default function AISpeedDial({
         >
           <div
             style={{
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-bg-primary)',
               borderRadius: '16px',
               padding: '2rem',
               maxWidth: '300px',
@@ -2001,7 +2006,7 @@ export default function AISpeedDial({
         >
           <div
             style={{
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-bg-primary)',
               borderRadius: '16px',
               padding: '1.5rem',
               maxWidth: '400px',
@@ -2081,7 +2086,7 @@ export default function AISpeedDial({
         >
           <div
             style={{
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-bg-primary)',
               borderRadius: '16px',
               padding: '1.5rem',
               maxWidth: '400px',
@@ -2267,7 +2272,7 @@ export default function AISpeedDial({
         >
           <div
             style={{
-              backgroundColor: 'white',
+              backgroundColor: 'var(--color-bg-primary)',
               borderRadius: '16px',
               padding: '1.5rem',
               maxWidth: '400px',
@@ -2629,57 +2634,6 @@ export default function AISpeedDial({
                   marginBottom: '8px',
                 }}
               >
-                {/* Fasting Button */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>Fasting</span>
-                  <button
-                    onClick={() => {
-                      const hours = getFastingDefaultHours();
-                      const endAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
-                      localStorage.setItem('primal_logic_fasting_timer_end', endAt);
-                      alert(`${hours}時間の断食タイマーを開始しました`);
-                      setShowSpeedDial(false);
-                    }}
-                    style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      backgroundColor: '#f59e0b',
-                      color: 'white',
-                      border: 'none',
-                      boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
-                      cursor: 'pointer',
-                      fontSize: '20px',
-                    }}
-                  >
-                    ⚡
-                  </button>
-                </div>
-
-                {/* Photo Button */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>Photo</span>
-                  <button
-                    onClick={() => {
-                      handlePhoto();
-                      setShowSpeedDial(false);
-                    }}
-                    style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      backgroundColor: '#f43f5e',
-                      color: 'white',
-                      border: 'none',
-                      boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
-                      cursor: 'pointer',
-                      fontSize: '20px',
-                    }}
-                  >
-                    📷
-                  </button>
-                </div>
-
                 {/* Chat Button */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>Chat</span>
@@ -2763,7 +2717,7 @@ export default function AISpeedDial({
                 top: `${fabButtonPosition.y - 180}px`, // FABの上に配置
                 left: `${Math.min(window.innerWidth - 300, Math.max(20, fabButtonPosition.x - 250))}px`, // 画面内に収まるように調整
                 width: '280px',
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 padding: '1.25rem',
                 boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',

@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Language Settings Screen
+ * CarnivOS - Language Settings Screen
  *
  * 言語設定画面
  */

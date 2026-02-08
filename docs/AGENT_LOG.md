@@ -587,3 +587,17 @@
   - その後 CURSOR_ADDITIONAL_TASKS.md（Task 4-10）を実装
   - 合計所要時間: 1時間（Task 1-3）+ 4.5-5.5時間（Task 4-10）= 5.5-6.5時間
 - 参考: 未実装アイデア一覧.md, IMPROVEMENT_IDEAS.md
+
+---
+
+## 2026-02-07 (Agent: Cursor)
+- 目的: 伝言_E2E作成.md に従い、RULES.md 2.1b「画面遷移・ボタン・フォーム・主要フローを全部E2Eでカバー」を実施
+- 変更点:
+  - tests/screens-and-flows.spec.ts を新規作成。その他(Labs)配下の全画面遷移（Stats, Bio-Tuner/Input, Diary, ユーザー設定, UI設定, 塩, 炭水化物目標, 言語, アカウント, フィードバック, プライバシー, 利用規約, データ削除, Tips, Gift, Shop, カスタム食品）、設定画面のフォーム・ボタン（言語・断食時間・文字サイズ）、下部ナビ「設定」タブ、同意→Paywall→ゲストの一連フロー、履歴の期間選択、食品追加モーダル開閉をE2Eで追加。
+  - tests/phase1-transition-check.spec.ts の beforeEach でハードコードされていた `http://localhost:5174` を baseURL 利用の `'/'` に変更。
+- 根拠・ストーリー（Why）: 伝言で「E2Eをあらゆる操作で作りまくる」「足りていない操作・画面・フローを洗い出しPlaywright specに追加」と指示。既存は test-items-1-28/29-120, auth, embody-user 等で主要シナリオはあるが、その他から開くサブ画面の遷移・戻る、設定の各ボタン、一連オンボーディングフローが不足していたため、screens-and-flows.spec.ts に集約して追加。
+- 触ったファイル:
+  - tests/screens-and-flows.spec.ts（新規）
+  - tests/phase1-transition-check.spec.ts
+  - docs/AGENT_LOG.md
+- 動作影響: デプロイ前・変更後に `npm test` で screens-and-flows が実行され、画面遷移・ボタンが自動検証される。

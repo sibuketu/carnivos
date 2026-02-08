@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Carbohydrate Target Settings Screen
+ * CarnivOS - Carbohydrate Target Settings Screen
  *
  * 炭水化物ターゲット設定画面
  */

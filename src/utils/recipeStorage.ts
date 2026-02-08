@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Recipe Storage Utility
+ * CarnivOS - Recipe Storage Utility
  *
  * レシピ登録・保存機能
  */

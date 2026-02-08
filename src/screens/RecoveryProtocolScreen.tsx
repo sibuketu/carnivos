@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Recovery Protocol Screen (Web版)
+ * CarnivOS - Recovery Protocol Screen (Web版)
  *
  * Phase 4: Recovery Protocol詳細画面、編集UI、SET PROTOCOLボタン
  */

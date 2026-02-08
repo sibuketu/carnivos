@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Consent Screen
+ * CarnivOS - Consent Screen
  *
  * 初回起動時のプライバシーポリシー・利用規約への同意画面
  */

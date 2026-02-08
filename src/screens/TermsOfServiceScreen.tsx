@@ -1,5 +1,5 @@
 /**
- * Primal Logic - 利用規約画面
+ * CarnivOS - 利用規約画面
  */
 
 import './TermsOfServiceScreen.css';

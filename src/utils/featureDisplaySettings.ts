@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Feature Display Settings
+ * CarnivOS - Feature Display Settings
  *
  * あらゆる機能の表示/非表示を管理するユーティリティ
  * デフォルトは全部表示（ON）

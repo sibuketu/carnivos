@@ -1,5 +1,5 @@
 /**
- * Primal Logic - My Foods Storage Utility
+ * CarnivOS - My Foods Storage Utility
  *
  * 「いつもの食品」をユーザーが明示的に登録したものだけを管理
  */

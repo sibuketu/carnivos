@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Coffee Caffeine Calculator
+ * CarnivOS - Coffee Caffeine Calculator
  *
  * コーヒー入力からカフェイン量を自動計算
  */

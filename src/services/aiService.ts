@@ -7,6 +7,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { REMEDY_LOGIC } from '../data/remedyLogic';
 import { logError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
+import { checkRateLimit, recordUsage } from '../utils/rateLimiter';
+import { retryWithBackoff } from '../utils/retryWithBackoff';
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -742,6 +744,11 @@ export async function chatWithAIStructured(
     );
   }
 
+  const rateLimit = checkRateLimit();
+  if (!rateLimit.allowed) {
+    throw new Error(rateLimit.reason || 'レート制限のためしばらくお待ちください。');
+  }
+
   try {
     // AI Modeに応じてモデルを選択
     let modelName: string;
@@ -1060,7 +1067,7 @@ ${diaryAndFoodData && diaryAndFoodData.logs.length > 0
   </todos>
 </instruction>`;
 
-    const result = await model.generateContent(prompt);
+    const result = await retryWithBackoff(() => model.generateContent(prompt));
     const response = await result.response;
     const text = response.text();
 
@@ -1079,6 +1086,7 @@ ${diaryAndFoodData && diaryAndFoodData.logs.length > 0
       .replace(/<todos>[\s\S]*?<\/todos>/gi, '')
       .trim();
 
+    recordUsage();
     return {
       answer: cleanAnswer,
       todos: parsedResponse.todos,
@@ -1181,6 +1189,11 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
       return cached;
     }
 
+    const rateLimit = checkRateLimit();
+    if (!rateLimit.allowed) {
+      throw new Error(rateLimit.reason || 'レート制限のためしばらくお待ちください。');
+    }
+
     const model = genAI!.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // #33: 画像リサイズで転送量削減・速度改善
@@ -1281,6 +1294,7 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
           followupQuestions: parsed.followupQuestions || [],
         };
         setCachedAnalysis(imageHash, result);
+        recordUsage();
         return result;
       }
     } catch (parseError) {
@@ -1302,6 +1316,7 @@ export async function analyzeFoodImage(imageFile: File | Blob): Promise<{
       followupQuestions: [],
     };
     setCachedAnalysis(imageHash, fallbackResult);
+    recordUsage();
     return fallbackResult;
   } catch (error) {
     logError(error, { component: 'aiService', action: 'analyzeFoodImage' });
@@ -1327,6 +1342,11 @@ export async function refineFoodAnalysis(
 }> {
   if (!isGeminiAvailable()) {
     throw new Error('Gemini APIキーが設定されていません。');
+  }
+
+  const rateLimit = checkRateLimit();
+  if (!rateLimit.allowed) {
+    throw new Error(rateLimit.reason || 'レート制限のためしばらくお待ちください。');
   }
 
   try {
@@ -1376,6 +1396,7 @@ ${Object.entries(userAnswers)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
+      recordUsage();
       return {
         foodName: parsed.foodName,
         estimatedWeight: parsed.estimatedWeight,
@@ -1524,6 +1545,11 @@ export async function analyzeFoodName(
     throw new Error('Gemini APIキーが設定されていません。');
   }
 
+  const rateLimit = checkRateLimit();
+  if (!rateLimit.allowed) {
+    throw new Error(rateLimit.reason || 'レート制限のためしばらくお待ちください。');
+  }
+
   try {
     const model = genAI!.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
@@ -1613,6 +1639,7 @@ ${Object.entries(followupAnswers)
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
+        recordUsage();
         return {
           foodName: parsed.foodName || foodName,
           type: parsed.type || 'animal',
@@ -1628,7 +1655,7 @@ ${Object.entries(followupAnswers)
       });
     }
 
-    // JSONパースに失敗した場合、デフォルト値を返す
+    recordUsage();
     return {
       foodName: foodName,
       type: 'animal',

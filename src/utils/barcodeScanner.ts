@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Barcode Scanner Utility
+ * CarnivOS - Barcode Scanner Utility
  *
  * バーコード読み取り機能
  * Web API: BarcodeDetector API（Chrome/Edge対応）

@@ -1,5 +1,5 @@
 /**
- * Primal Logic - OpenAI API Integration
+ * CarnivOS - OpenAI API Integration
  *
  * Recovery Protocol生成用のAI API統合
  * 技術仕様書: @Primal_Logic_Technical_Spec.md 参照

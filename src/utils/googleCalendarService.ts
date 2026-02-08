@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Google Calendar Service
+ * CarnivOS - Google Calendar Service
  *
  * Google Calendar APIを使用して食事時間や運動時間を記録
  * 将来的に実装予定

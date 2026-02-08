@@ -7,7 +7,7 @@
  * - 連続日数を線でつなぐ
  */
 
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { DailyLog } from '../types';
 import './StreakCalendar.css';
 
@@ -16,7 +16,7 @@ interface StreakCalendarProps {
   onDayClick?: (date: string) => void;
 }
 
-export default function StreakCalendar({ logs, onDayClick }: StreakCalendarProps) {
+function StreakCalendar({ logs, onDayClick }: StreakCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // 現在の月の開始日と終了日を取得
@@ -258,3 +258,5 @@ export default function StreakCalendar({ logs, onDayClick }: StreakCalendarProps
     </div>
   );
 }
+
+export default React.memo(StreakCalendar);

@@ -8,8 +8,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Phase 1: 移行期間サポート機能', () => {
   test.beforeEach(async ({ page }) => {
-    // アプリを開く
-    await page.goto('http://localhost:5174');
+    // アプリを開く（baseURL を使用）
+    await page.goto('/');
     
     // ページが読み込まれるまで待機（networkidleの代わりに、より具体的な要素を待つ）
     await page.waitForSelector('.app-navigation, [class*="home"], [class*="Home"]', { timeout: 10000 }).catch(() => {});

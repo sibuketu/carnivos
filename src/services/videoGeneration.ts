@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Video Generation Service
+ * CarnivOS - Video Generation Service
  *
  * 動画生成機能: Makefilm/HeyGen/Runway APIを使用してロング動画を自動生成
  */

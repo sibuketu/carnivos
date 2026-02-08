@@ -1,10 +1,11 @@
 /**
- * Primal Logic - Nutrient Gauge Component (Web版)
+ * CarnivOS - Nutrient Gauge Component (Web版)
  *
  * 栄養素ゲージの表示（Anxiety-Free Gauges）
  * Phase 2: シンプルなバー表示、タップでArgument Cardを表示
  */
 
+import React from 'react';
 import './NutrientGauge.css';
 
 interface NutrientGaugeProps {
@@ -17,7 +18,7 @@ interface NutrientGaugeProps {
   onPress?: () => void;
 }
 
-export default function NutrientGauge({
+function NutrientGauge({
   label,
   current,
   target,
@@ -93,3 +94,5 @@ export default function NutrientGauge({
     </div>
   );
 }
+
+export default React.memo(NutrientGauge);

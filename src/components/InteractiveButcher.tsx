@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Interactive Butcher Component
+ * CarnivOS - Interactive Butcher Component
  *
  * クリッカブルSVG解剖図: 牛・豚・鶏などの部位を直接タップして選択
  */

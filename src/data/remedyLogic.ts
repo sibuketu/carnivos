@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Remedy Logic (トラブルシューティング)
+ * CarnivOS - Remedy Logic (トラブルシューティング)
  *
  * カーニボア実践中に起こりうる問題とその対処法を定義します。
  *
@@ -234,7 +234,7 @@ export function getRemedyBySymptom(symptom: string): RemedyItem | undefined {
 }
 
 /**
- * Primal Logic - Adaptation Phases (代謝フェーズ)
+ * CarnivOS - Adaptation Phases (代謝フェーズ)
  *
  * カーニボア移行における代謝適応の段階を定義します。
  * ユーザーが現在どの段階にいるかを判定するために使用します。

@@ -27,8 +27,19 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
+/* スクロールバー完全非表示（スクロール機能は残す） */
+*::-webkit-scrollbar {
+  display: none;
+}
 * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -42,6 +53,7 @@ body {
   padding: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  max-width: 100vw;
   /* Ensure vertical scroll is allowed */
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -260,4 +272,34 @@ select:focus-visible {
   100% {
     transform: translateX(100%);
   }
+}
+
+@keyframes loading-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* タッチターゲット最小サイズ（WCAG 2.5.5 / iOS HIG 推奨） */
+:root {
+  --touch-target-min: 44px; /* 44px = 指先に最適。24pxはAA、44pxはAAA相当 */
+}
+
+/* 全ボタン・ボタン役の当たり判定を最適化 */
+button,
+[role="button"],
+a[href].nav-item,
+.app-nav-button {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  box-sizing: border-box;
+  touch-action: manipulation; /* 300ms遅延を抑止 */
+}
+
+/* クリック可能なdiv/spanなどに付与するユーティリティ */
+.touch-target-min {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  box-sizing: border-box;
+  touch-action: manipulation;
 }

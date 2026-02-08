@@ -1,5 +1,5 @@
 /**
- * Primal Logic - プライバシーポリシー画面
+ * CarnivOS - プライバシーポリシー画面
  */
 
 import './PrivacyPolicyScreen.css';

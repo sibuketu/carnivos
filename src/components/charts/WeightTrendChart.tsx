@@ -5,7 +5,7 @@
  * rechartsを使用して日次・週次・月次の推移を表示
  */
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -23,7 +23,7 @@ interface WeightTrendChartProps {
   period: 'daily' | 'weekly' | 'monthly'; // 表示期間
 }
 
-export default function WeightTrendChart({ logs, period = 'daily' }: WeightTrendChartProps) {
+function WeightTrendChart({ logs, period = 'daily' }: WeightTrendChartProps) {
   // データを期間ごとに集計
   const chartData = useMemo(() => {
     if (logs.length === 0) return [];
@@ -158,3 +158,5 @@ export default function WeightTrendChart({ logs, period = 'daily' }: WeightTrend
     </div>
   );
 }
+
+export default React.memo(WeightTrendChart);

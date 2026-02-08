@@ -1,5 +1,5 @@
 /**
- * Primal Logic - User Settings Screen
+ * CarnivOS - User Settings Screen
  *
  * ユーザー設定画面: 基本情報、目標、代謝状態など
  */
@@ -1897,7 +1897,7 @@ export default function UserSettingsScreen() {
                         key={index}
                         style={{
                           padding: '0.75rem',
-                          backgroundColor: '#fff',
+                          backgroundColor: 'var(--color-bg-primary)',
                           borderRadius: '6px',
                           border: '1px solid #e5e7eb',
                         }}
@@ -2341,7 +2341,7 @@ export default function UserSettingsScreen() {
           style={{
             position: 'sticky',
             bottom: 0,
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-bg-primary)',
             padding: '1rem',
             borderTop: '1px solid #e5e7eb',
             zIndex: 100,

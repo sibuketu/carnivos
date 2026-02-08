@@ -1,5 +1,5 @@
 /**
- * Primal Logic - i18n (Internationalization)
+ * CarnivOS - i18n (Internationalization)
  *
  * 多言語対応のための翻訳機能
  *
@@ -779,6 +779,9 @@ const translations: Record<Language, Record<string, string>> = {
     'auth.successReset': 'パスワードリセットメールを送信しました',
     'auth.privacy': 'プライバシーポリシー',
     'auth.terms': '利用規約',
+    'auth.loginWithGoogle': 'Googleでログイン',
+    'auth.redirectToGoogle': 'Googleの認証画面に移動します…',
+    'auth.errorGoogle': 'Googleログインに失敗しました。設定を確認してください。',
 
     // ナビゲーション
     'nav.home': 'ホーム',
@@ -1549,6 +1552,9 @@ const translations: Record<Language, Record<string, string>> = {
     'auth.successReset': 'Password reset email sent',
     'auth.privacy': 'Privacy Policy',
     'auth.terms': 'Terms of Service',
+    'auth.loginWithGoogle': 'Sign in with Google',
+    'auth.redirectToGoogle': 'Redirecting to Google…',
+    'auth.errorGoogle': 'Google sign-in failed. Check configuration.',
 
     // Navigation
     'nav.home': 'Home',

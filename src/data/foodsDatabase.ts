@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Foods Database
+ * CarnivOS - Foods Database
  *
  * 食品データベース: 栄養素データ、フラグ、バイオアベイラビリティ係数
  * 技術仕様書: @Primal_Logic_Technical_Spec.md 参照

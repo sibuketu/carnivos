@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Argument Cards Database
+ * CarnivOS - Argument Cards Database
  *
  * 論破カードのネタ帳: 3-tier情報表示用のコンテンツ
  * 技術仕様書: @Primal_Logic_Technical_Spec.md 参照

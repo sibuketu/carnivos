@@ -97,6 +97,14 @@ export default function CustomFoodScreen({ foodId, onClose, onSave }: CustomFood
         setType((existingFood.type === 'plant' ? 'animal' : existingFood.type) || 'animal');
         setNutrients(existingFood.nutrients || {});
       }
+    } else {
+      // 検索から遷移した場合、初期名を設定
+      const initialName = localStorage.getItem('@carnivos:custom_food_initial_name');
+      if (initialName) {
+        setFoodName(initialName);
+        setDisplayName(initialName);
+        localStorage.removeItem('@carnivos:custom_food_initial_name');
+      }
     }
   }, [foodId]);
 

@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Withings API Service（骨格）
+ * CarnivOS - Withings API Service（骨格）
  *
  * 体重計・体組成計のデータ取得用。本実装は docs/デバイス連携_本実装計画.md に従う。
  * OAuth 2.0 → アクセストークン → Measure API で体重・体脂肪を取得。

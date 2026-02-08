@@ -1,11 +1,11 @@
 /**
- * Primal Logic - Butcher Chart Component
+ * CarnivOS - Butcher Chart Component
  *
  * ビジュアル（解剖図）選択: 牛・豚・鶏の部位をクリックで選択
  * 数量入力: スマートプリセット + Pack & Portion スライダー
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   getFoodsByPart,
   type AnimalType,
@@ -66,7 +66,7 @@ const PART_AREAS: Record<
   ],
 };
 
-export default function ButcherChart({ animalType, onFoodSelect, onBack }: ButcherChartProps) {
+function ButcherChart({ animalType, onFoodSelect, onBack }: ButcherChartProps) {
   const [selectedPart, setSelectedPart] = useState<PartLocation | null>(null);
   const [selectedFood, setSelectedFood] = useState<DeepFoodItem | null>(null);
   const [amount, setAmount] = useState(300);
@@ -311,3 +311,5 @@ export default function ButcherChart({ animalType, onFoodSelect, onBack }: Butch
     </div>
   );
 }
+
+export default React.memo(ButcherChart);

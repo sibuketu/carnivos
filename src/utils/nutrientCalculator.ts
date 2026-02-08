@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Nutrient Calculator Engine
+ * CarnivOS - Nutrient Calculator Engine
  *
  * 栄養素計算エンジン: Vitamin C動的計算、Vitamin K変換、電解質ロジック
  * 技術仕様書: @Primal_Logic_Technical_Spec.md 参照

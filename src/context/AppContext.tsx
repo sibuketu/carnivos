@@ -1,5 +1,5 @@
 /**
- * Primal Logic - App Context (Web版)
+ * CarnivOS - App Context (Web版)
  *
  * グローバル状態管理（日次ログ、栄養素計算結果など）
  */

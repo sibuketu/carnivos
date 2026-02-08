@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Tomorrow Log Utility
+ * CarnivOS - Tomorrow Log Utility
  *
  * 「明日のログに追加」機能: Phase 4の仕様
  * SET PROTOCOLボタンで明日のログにRecovery Protocolと推奨食品を追加

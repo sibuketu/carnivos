@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Onboarding Screen
+ * CarnivOS - Onboarding Screen
  *
  * 初回起動時のオンボーディング（3ステップ）
  * Step 1: 言語選択

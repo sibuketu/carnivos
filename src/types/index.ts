@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Type Definitions
+ * CarnivOS - Type Definitions
  *
  * データ構造、Recovery Protocol、Food types の型定義
  */
@@ -292,6 +292,10 @@ export interface DailyStatus {
   depression?: number; // 1-10 (抑うつ)
   irritability?: number; // 1-10 (イライラ)
   focus?: number; // 1-10 (集中力)
+  // 運動（日次記録・栄養目標の動的計算用）
+  exerciseMinutes?: number; // 運動時間（分）
+  exerciseIntensity?: 'none' | 'light' | 'moderate' | 'intense'; // 運動強度
+  exerciseType?: string; // 運動種類（ウェイト、ランニング等）
   brainFog?: number; // 1-10 (ブレインフォグ)
   motivation?: number; // 1-10 (やる気)
   gratitude?: string; // 感謝日記（テキスト）

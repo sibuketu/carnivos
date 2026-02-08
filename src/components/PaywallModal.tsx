@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Paywall Modal
+ * CarnivOS - Paywall Modal
  *
  * トライアル期限切れ時に表示するペイウォール
  */

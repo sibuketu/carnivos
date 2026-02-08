@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Trial Manager
+ * CarnivOS - Trial Manager
  *
  * 7日間無料トライアルの管理
  */

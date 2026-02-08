@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Gift Screen
+ * CarnivOS - Gift Screen
  *
  * ギフト購入画面: お金投げる + メッセージ入力
  */
@@ -375,7 +375,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
             body: JSON.stringify({
               amount: purchaseAmount,
               message: message.trim() || null,
-              isPublic: isPublicMessage,
+              isPublic: isPublic,
               userId: (await supabase.auth.getUser()).data.user?.id || 'anonymous',
             }),
           });
@@ -861,16 +861,6 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                                     logError(error, { action: 'handleReply', messageId: msg.id });
                                     alert('返信の保存に失敗しました');
                                   }
-
-                                  return; // 処理完了
-                                  const updatedMessages = publicMessages.map((m) =>
-                                    m.id === msg.id
-                                      ? { ...m, replies: [...(m.replies || []), newReply] }
-                                      : m
-                                  );
-                                  setPublicMessages(updatedMessages);
-                                  setReplyingTo(null);
-                                  setReplyText('');
                                 }}
                                 disabled={!replyText.trim()}
                               >

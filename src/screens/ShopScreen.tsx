@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Shop Screen
+ * CarnivOS - Shop Screen
  *
  * ショップ画面: ドット絵UIやその他のカスタマイズアイテムを購入
  */

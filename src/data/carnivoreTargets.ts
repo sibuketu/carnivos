@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Carnivore-Specific Nutrition Targets
+ * CarnivOS - Carnivore-Specific Nutrition Targets
  *
  * カーニボア専用の栄養目標値を定義します。
  * 一般的なRDA（推奨食事摂取基準）ではなく、厳格なカーニボア実践者のための目標値です。
@@ -274,47 +274,85 @@ export function getCarnivoreTargets(
     targets.protein = Math.max(targets.protein, 110); // 高齢者はタンパク質増量（筋肉量維持のため）
   }
 
-  // 睡眠時間による調整
-  if (sleepHours && sleepHours < 7) {
-    targets.magnesium = Math.max(targets.magnesium, 650); // 睡眠不足はマグネシウム増量
+  // 睡眠→ストレス→炎症 → マグネシウム係数（積で適用）
+  let magnesiumSleepFactor = 1;
+  if (sleepHours != null) {
+    if (sleepHours < 6) magnesiumSleepFactor = 1.3;
+    else if (sleepHours < 7) magnesiumSleepFactor = 1.15;
+  }
+  let magnesiumStressFactor = 1;
+  if (stressLevel === 'high') magnesiumStressFactor = 1.5;
+  else if (stressLevel === 'moderate') magnesiumStressFactor = 1.2;
+  let magnesiumInflammationFactor = 1;
+  if (inflammationLevel === 'high') magnesiumInflammationFactor = 1.3;
+  let magnesiumAlcoholFactor = 1;
+  if (alcoholFrequency === 'daily') magnesiumAlcoholFactor = 1.4;
+  else if (alcoholFrequency === 'weekly' || alcoholFrequency === 'rare') magnesiumAlcoholFactor = 1.2;
+  let magnesiumCaffeineFactor = 1;
+  if (caffeineIntake === 'high') magnesiumCaffeineFactor = 1.3;
+  else if (caffeineIntake === 'moderate') magnesiumCaffeineFactor = 1.15;
+  targets.magnesium = Math.round(
+    targets.magnesium *
+      magnesiumSleepFactor *
+      magnesiumStressFactor *
+      magnesiumInflammationFactor *
+      magnesiumAlcoholFactor *
+      magnesiumCaffeineFactor
+  );
+  if (sleepHours != null && sleepHours < 7) {
+    targets.magnesium = Math.max(targets.magnesium, 650); // 既存の最低保証
   }
 
-  // 運動強度・頻度による調整
+  // 運動→代謝 → タンパク質・脂質・ナトリウム係数
+  let exerciseFactor = 1;
+  if (exerciseIntensity === 'intense' && (exerciseFrequency === '5+' || exerciseFrequency === '3-4')) {
+    exerciseFactor = exerciseFrequency === '5+' ? 1.4 : 1.3;
+  } else if (exerciseIntensity === 'moderate' && (exerciseFrequency === '3-4' || exerciseFrequency === '1-2')) {
+    exerciseFactor = exerciseFrequency === '3-4' ? 1.25 : 1.15;
+  }
+  targets.protein = Math.round(targets.protein * exerciseFactor);
+  targets.fat = Math.round(targets.fat * exerciseFactor);
+  targets.sodium = Math.round(targets.sodium * (exerciseFactor > 1.2 ? 1.3 : 1.1));
+
+  // 既存の運動による下限も維持
   if (exerciseIntensity === 'intense' || exerciseFrequency === '5+') {
-    targets.protein = Math.max(targets.protein, 130); // 激しい運動はタンパク質増量
-    targets.fat = Math.max(targets.fat, 190); // 脂質も増量
-    targets.magnesium = Math.max(targets.magnesium, 750); // マグネシウム増量
+    targets.protein = Math.max(targets.protein, 130);
+    targets.fat = Math.max(targets.fat, 190);
+    targets.magnesium = Math.max(targets.magnesium, 750);
   } else if (exerciseIntensity === 'moderate' || exerciseFrequency === '3-4') {
     targets.protein = Math.max(targets.protein, 115);
     targets.fat = Math.max(targets.fat, 170);
     targets.magnesium = Math.max(targets.magnesium, 650);
   }
 
-  // 甲状腺機能による調整
-  if (thyroidFunction === 'hypothyroid' || thyroidFunction === 'hyperthyroid') {
-    if (!supplementIodine) {
-      targets.iodine = Math.max(targets.iodine || 150, 200); // ヨウ素増量（サプリメントなしの場合）
-    }
+  // 甲状腺→ヨウ素係数
+  let iodineFactor = 1;
+  if (thyroidFunction === 'hypothyroid') iodineFactor = 2.0;
+  else if (thyroidFunction === 'hyperthyroid') iodineFactor = 0.5;
+  if (supplementIodine) iodineFactor *= 0.7;
+  const baseIodine = targets.iodine ?? 150;
+  targets.iodine = Math.round(baseIodine * iodineFactor);
+  if (thyroidFunction === 'hypothyroid' && !supplementIodine) {
+    targets.iodine = Math.max(targets.iodine, 300);
   }
 
-  // 日光暴露頻度による調整
+  // 日光浴→ビタミンD係数
+  let vitaminDFactor = 1;
+  if (sunExposureFrequency === 'daily') vitaminDFactor = 0.5;
+  else if (sunExposureFrequency === 'occasional') vitaminDFactor = 0.8;
+  else if (sunExposureFrequency === 'rare') vitaminDFactor = 1.2;
+  else if (sunExposureFrequency === 'none') vitaminDFactor = 1.5;
+  if (supplementVitaminD) vitaminDFactor *= 0.6;
+  targets.vitamin_d = Math.round(targets.vitamin_d * vitaminDFactor);
   if (sunExposureFrequency === 'none' || sunExposureFrequency === 'rare') {
-    if (!supplementVitaminD) {
-      targets.vitamin_d = Math.max(targets.vitamin_d, 4000); // ビタミンD増量（サプリメントなしの場合）
-    }
-  } else if (sunExposureFrequency === 'daily') {
-    targets.vitamin_d = Math.max(targets.vitamin_d, 1500); // 毎日の日光暴露ではやや減量
+    if (!supplementVitaminD) targets.vitamin_d = Math.max(targets.vitamin_d, 4000);
   }
 
-  // 消化器系の問題による調整
+  // 消化問題→亜鉛・鉄 吸収率補正
   if (digestiveIssues) {
-    targets.protein = Math.max(targets.protein, 110); // 消化器系の問題はタンパク質増量（吸収率低下を考慮）
-  }
-
-  // 炎症レベルによる調整
-  if (inflammationLevel === 'high') {
-    // オメガ3/6比率の調整は別途実装が必要
-    targets.magnesium = Math.max(targets.magnesium, 650); // 炎症時はマグネシウム増量
+    targets.zinc = Math.round(targets.zinc * 1.3);
+    targets.iron = Math.round(targets.iron * 1.3);
+    targets.protein = Math.max(targets.protein, 110);
   }
 
   // メンタルヘルス状態による調整
@@ -325,18 +363,12 @@ export function getCarnivoreTargets(
     }
   }
 
-  // アルコール摂取頻度による調整
+  // アルコール・カフェインのマグネシウムは上記係数で適用済み。B12のみ追加
   if (alcoholFrequency === 'daily' || alcoholFrequency === 'weekly') {
-    targets.magnesium = Math.max(targets.magnesium, 700); // アルコール摂取時はマグネシウム増量
-    targets.vitamin_b12 = Math.max(targets.vitamin_b12, 3.0); // ビタミンB12も増量
+    targets.vitamin_b12 = Math.max(targets.vitamin_b12, 3.0);
   }
-
-  // カフェイン摂取量による調整
-  if (caffeineIntake === 'high') {
-    targets.magnesium = Math.max(targets.magnesium, 700); // 高カフェイン摂取時はマグネシウム増量
-    if (stressLevel === 'high') {
-      targets.magnesium = Math.max(targets.magnesium, 750); // 高ストレス+高カフェインはさらに増量
-    }
+  if (caffeineIntake === 'high' && stressLevel === 'high') {
+    targets.magnesium = Math.max(targets.magnesium, 750); // 高ストレス+高カフェインの下限
   }
 
   // Gemini提案：脂質ターゲットの自動設定（タンパク質量の1.2倍）

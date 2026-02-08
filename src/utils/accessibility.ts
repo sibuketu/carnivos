@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Accessibility Utilities
+ * CarnivOS - Accessibility Utilities
  *
  * アクセシビリティ関連のユーティリティ関数
  */

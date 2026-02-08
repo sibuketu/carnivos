@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { List } from 'react-window';
 import { getDailyLogs, deleteDailyLog, saveDailyLog } from '../utils/storage';
 import { getArgumentCardByNutrient } from '../data/argumentCards';
 import ArgumentCard from '../components/ArgumentCard';
@@ -454,7 +455,7 @@ export default function HistoryScreen() {
             return (
               <div
                 style={{
-                  backgroundColor: 'white',
+                  backgroundColor: 'var(--color-bg-primary)',
                   padding: '1rem',
                   borderRadius: '12px',
                   marginBottom: '1.5rem',
@@ -574,6 +575,64 @@ export default function HistoryScreen() {
                 >
                   💡 Tap "+ Add Food" on the Home screen to start logging.
                 </div>
+              </div>
+            ) : filteredLogs.length >= 100 ? (
+              <div className="history-screen-logs" style={{ height: '70vh' }}>
+                <List
+                  rowCount={filteredLogs.length}
+                  rowHeight={100}
+                  rowComponent={({ index, style, ...rowProps }) => {
+                    const item = filteredLogs[index];
+                    const { toggleExpand: toggle, handleDelete: del, formatDate: fmt, t: tr } = rowProps as {
+                      toggleExpand: (date: string) => void;
+                      handleDelete: (date: string) => void;
+                      formatDate: (date: string) => string;
+                      t: (key: string) => string;
+                    };
+                    return (
+                      <div style={style} className="history-screen-log-wrapper">
+                        <div
+                          className="history-screen-log-item"
+                          onClick={() => toggle(item.date)}
+                        >
+                          <div className="history-screen-log-header">
+                            <div className="history-screen-log-date">{fmt(item.date)}</div>
+                            <div className="history-screen-log-actions">
+                              <button
+                                className="history-screen-delete-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  del(item.date);
+                                }}
+                                title={tr('common.delete')}
+                              >
+                                🗑️
+                              </button>
+                              <span className="history-screen-expand-icon">▶</span>
+                            </div>
+                          </div>
+                          <div className="history-screen-log-summary">
+                            <span className="history-screen-log-summary-text">
+                              {item.fuel.length}
+                              {tr('history.items')}: {item.fuel.map((f) => f.item).join(', ')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }}
+                  rowProps={{
+                    toggleExpand,
+                    handleDelete,
+                    formatDate,
+                    t,
+                  }}
+                  style={{
+                    height: typeof window !== 'undefined' ? window.innerHeight * 0.7 : 500,
+                    width: '100%',
+                    overflowX: 'hidden',
+                  }}
+                />
               </div>
             ) : (
               <div className="history-screen-logs">
@@ -1002,7 +1061,7 @@ export default function HistoryScreen() {
           >
             <div
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderRadius: '16px',
                 padding: '2rem',
                 maxWidth: '400px',

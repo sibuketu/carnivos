@@ -8,6 +8,7 @@ interface FoodSearchModalProps {
     onClose: () => void;
     onSelect: (item: FoodMasterItem) => void;
     initialQuery?: string;
+    onCreateCustom?: (query: string) => void; // 未検出時のカスタム作成コールバック
 }
 
 export default function FoodSearchModal({
@@ -15,6 +16,7 @@ export default function FoodSearchModal({
     onClose,
     onSelect,
     initialQuery = '',
+    onCreateCustom,
 }: FoodSearchModalProps) {
     const { t, language } = useTranslation();
     const [query, setQuery] = useState(initialQuery);
@@ -86,8 +88,21 @@ export default function FoodSearchModal({
             {/* Results List */}
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
                 {results.length === 0 && query.trim() !== '' && (
-                    <div className="text-center py-10 text-stone-500">
-                        No results found for "{query}"
+                    <div className="text-center py-10">
+                        <p className="text-stone-500 mb-4">
+                            「{query}」が見つかりませんでした
+                        </p>
+                        {onCreateCustom && (
+                            <button
+                                onClick={() => {
+                                    onCreateCustom(query);
+                                    onClose();
+                                }}
+                                className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-500 transition-colors"
+                            >
+                                ⊕ カスタム食品として追加
+                            </button>
+                        )}
                     </div>
                 )}
 

@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Help Tooltip Component
+ * CarnivOS - Help Tooltip Component
  *
  * スマホ対応のツールチップコンポーネント
  */

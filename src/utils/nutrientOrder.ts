@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Nutrient Order Management
+ * CarnivOS - Nutrient Order Management
  *
  * 栄養素の表示順序と並び替え機能
  */

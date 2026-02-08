@@ -102,7 +102,7 @@ export default function StreakTrackerScreen({ onBack }: StreakTrackerScreenProps
             textAlign: 'center',
             marginBottom: '2rem',
             padding: '1.5rem',
-            backgroundColor: 'white',
+            backgroundColor: 'var(--color-bg-primary)',
             borderRadius: '16px',
             border: '1px solid #e5e7eb',
           }}

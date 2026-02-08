@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Storage Utility (Web版)
+ * CarnivOS - Storage Utility (Web版)
  *
  * SupabaseとlocalStorageの両方に対応したデータ永続化
  * Supabaseが利用可能な場合はSupabaseを優先、フォールバックとしてlocalStorageを使用

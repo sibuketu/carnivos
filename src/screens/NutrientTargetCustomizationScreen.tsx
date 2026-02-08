@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Nutrient Target Customization Screen
+ * CarnivOS - Nutrient Target Customization Screen
  *
  * 栄養素目標値のカスタマイズ画面
  */

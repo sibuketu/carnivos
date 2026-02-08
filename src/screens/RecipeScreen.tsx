@@ -1,5 +1,5 @@
 /**
- * Primal Logic - Recipe Screen
+ * CarnivOS - Recipe Screen
  *
  * レシピ登録・保存画面（CustomFoodScreenをベースに実装）
  * 2段階UI: 材料登録 → レシピ登録
@@ -1970,7 +1970,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                               alignItems: 'center',
                               padding: '0.5rem',
                               marginBottom: '0.25rem',
-                              backgroundColor: 'white',
+                              backgroundColor: 'var(--color-bg-primary)',
                               borderRadius: '4px',
                             }}
                           >
@@ -2120,7 +2120,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                             alignItems: 'center',
                             padding: '0.5rem',
                             marginBottom: '0.25rem',
-                            backgroundColor: 'white',
+                            backgroundColor: 'var(--color-bg-primary)',
                             borderRadius: '4px',
                           }}
                         >
