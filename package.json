@@ -33,7 +33,8 @@
     "self-check": "tsx scripts/self_check.ts",
     "audit": "tsx scripts/audit_app.ts",
     "auto-fix": "tsx scripts/auto-test-fix-loop.ts",
-    "check-colors": "tsx scripts/check-color-contrast.ts"
+    "check-colors": "tsx scripts/check-color-contrast.ts",
+    "video-generate": "tsx scripts/generate-video.ts"
   },
   "dependencies": {
     "@capacitor/app": "^8.0.0",
