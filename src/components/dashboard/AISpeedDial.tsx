@@ -376,7 +376,7 @@ export default function AISpeedDial({
 
       // onAddFoodが存在しない場合はエラー
       if (!onAddFood) {
-        alert('エラー: 食品追加機能が利用できません。ページを再読み込みしてください。');
+        (window as unknown as { showToast?: (msg: string) => void }).showToast?.('エラー: 食品追加機能が利用できません。ページを再読み込みしてください。');
         return;
       }
 
@@ -426,7 +426,7 @@ export default function AISpeedDial({
       logError(error, { component: 'AISpeedDial', action: 'handlePhoto' });
       const errorMessage = getUserFriendlyErrorMessage(error) || '写真の取得に失敗しました。';
       setImageAnalysisError(errorMessage);
-      alert(errorMessage);
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(errorMessage);
     }
   };
 
@@ -469,7 +469,7 @@ export default function AISpeedDial({
         logError(error, { component: 'AISpeedDial', action: 'voiceInput' });
         setIsVoiceInputActive(false);
         const errorMessage = getUserFriendlyErrorMessage(error) || `音声入力エラー: ${error}`;
-        alert(errorMessage);
+        (window as unknown as { showToast?: (msg: string) => void }).showToast?.(errorMessage);
       });
 
       voiceInputManagerRef.current.onEnd(() => {
@@ -486,7 +486,7 @@ export default function AISpeedDial({
 
   const handleVoiceInput = () => {
     if (!voiceInputManagerRef.current) {
-      alert('お使いのブラウザでは音声入力がサポートされていません。');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('お使いのブラウザでは音声入力がサポートされていません。');
       return;
     }
 
@@ -500,7 +500,7 @@ export default function AISpeedDial({
       } catch (error) {
         logError(error, { component: 'AISpeedDial', action: 'startVoiceInput' });
         const errorMessage = getUserFriendlyErrorMessage(error) || '音声入力の開始に失敗しました。';
-        alert(errorMessage);
+        (window as unknown as { showToast?: (msg: string) => void }).showToast?.(errorMessage);
       }
     }
   };
@@ -537,10 +537,10 @@ export default function AISpeedDial({
   const handleCopyShareTip = async (tip: Tip) => {
     try {
       await navigator.clipboard.writeText(getShareText(tip));
-      alert('クリップボードにコピーしました！');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('クリップボードにコピーしました');
     } catch (err) {
       logError(err, { component: 'AISpeedDial', action: 'copyToClipboard' });
-      alert('クリップボードへのコピーに失敗しました。');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('クリップボードへのコピーに失敗しました');
     }
   };
 

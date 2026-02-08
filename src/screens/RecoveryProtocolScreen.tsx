@@ -58,13 +58,13 @@ export default function RecoveryProtocolScreen({
         await scheduleDefrostReminder(meatItem);
       }
 
-      alert(
-        `✅ プロトコル設定完了\nリカバリープロトコルが明日のログに追加されました。\n断食: ${fastingHours}時間${hasMeatInPlan(updatedProtocol) ? '\n解凍リマインダーを今夜8時に設定しました。' : ''}`
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(
+        `✅ プロトコル設定完了 — 断食: ${fastingHours}時間${hasMeatInPlan(updatedProtocol) ? ' / 解凍リマインダー設定済み' : ''}`
       );
       onClose();
     } catch (error) {
       logError(error, { component: 'RecoveryProtocolScreen', action: 'handleSetProtocol' });
-      alert(
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(
         getUserFriendlyErrorMessage(error) ||
         'エラー: プロトコルの設定に失敗しました。再度お試しください。'
       );

@@ -351,7 +351,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
 
     const purchaseAmount = calculatePurchaseAmount();
     if (purchaseAmount <= 0) {
-      alert('金額を入力してください');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('金額を入力してください');
       return;
     }
 
@@ -397,9 +397,9 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
 
       // Stripe決済が利用できない場合、または失敗した場合はモック処理
       if (import.meta.env.DEV) {
-        alert(t('gift.purchaseSuccess'));
+        (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('gift.purchaseSuccess'));
       } else {
-        alert('決済機能は現在準備中です。しばらくお待ちください。');
+        (window as unknown as { showToast?: (msg: string) => void }).showToast?.('決済機能は現在準備中です。しばらくお待ちください。');
         return;
       }
 
@@ -463,7 +463,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
     } catch (error) {
       logError(error, { action: 'handlePurchase', amount: purchaseAmount });
       const errorMessage = getUserFriendlyErrorMessage(error);
-      alert(`${t('common.error')}: ${errorMessage}`);
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(`${t('common.error')}: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -765,7 +765,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                             onClick={async () => {
                               // いいね機能を実装
                               if (!isSupabaseAvailable()) {
-                                alert('いいね機能はログインが必要です');
+                                (window as unknown as { showToast?: (msg: string) => void }).showToast?.('いいね機能はログインが必要です');
                                 return;
                               }
 
@@ -773,7 +773,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                                 data: { user },
                               } = await supabase.auth.getUser();
                               if (!user) {
-                                alert('ログインが必要です');
+                                (window as unknown as { showToast?: (msg: string) => void }).showToast?.('ログインが必要です');
                                 return;
                               }
 
@@ -797,7 +797,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                                 loadMessages();
                               } catch (error) {
                                 logError(error, { action: 'handleLike', messageId: msg.id });
-                                alert('いいねの処理に失敗しました');
+                                (window as unknown as { showToast?: (msg: string) => void }).showToast?.('いいねの処理に失敗しました');
                               }
                             }}
                           >
@@ -842,7 +842,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                                     data: { user },
                                   } = await supabase.auth.getUser();
                                   if (!user) {
-                                    alert('ログインが必要です');
+                                    (window as unknown as { showToast?: (msg: string) => void }).showToast?.('ログインが必要です');
                                     return;
                                   }
 
@@ -859,7 +859,7 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
                                     setReplyText('');
                                   } catch (error) {
                                     logError(error, { action: 'handleReply', messageId: msg.id });
-                                    alert('返信の保存に失敗しました');
+                                    (window as unknown as { showToast?: (msg: string) => void }).showToast?.('返信の保存に失敗しました');
                                   }
                                 }}
                                 disabled={!replyText.trim()}

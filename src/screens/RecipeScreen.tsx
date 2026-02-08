@@ -313,19 +313,21 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
     recipe.foods.forEach((food) => {
       addFood(food);
     });
-    (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('recipe.added', { name: recipe.name }));
+    (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('recipe.added').replace('{name}', recipe.name));
     onBack();
   };
 
   // 栄養素の値を更新
   const updateNutrient = (key: string, value: number | undefined) => {
-    setCurrentIngredient((prev) => ({
-      ...prev,
-      nutrients: {
-        ...prev.nutrients,
-        [key]: value === undefined || value === 0 ? undefined : value,
-      },
-    }));
+    setCurrentIngredient((prev) => {
+      const nutrients = { ...prev.nutrients };
+      if (value === undefined || value === 0) {
+        delete nutrients[key];
+      } else {
+        nutrients[key] = value;
+      }
+      return { ...prev, nutrients };
+    });
   };
 
   // レシピの栄養素を計算
@@ -357,9 +359,6 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
       userProfile?.supplementIodine,
       userProfile?.alcoholFrequency,
       userProfile?.caffeineIntake,
-      userProfile?.daysOnCarnivore,
-      userProfile?.carnivoreStartDate,
-      userProfile?.forceAdaptationMode,
       userProfile?.bodyComposition,
       userProfile?.weight,
       userProfile?.metabolicStressIndicators,

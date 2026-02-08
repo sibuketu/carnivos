@@ -80,7 +80,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
         setShopItems((items) =>
           items.map((i) => (i.id === item.id ? { ...i, isPurchased: true } : i))
         );
-        alert(t('shop.purchaseSuccess', { name: item.name }));
+        (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('shop.purchaseSuccess').replace('{name}', item.name));
       }
       return;
     }
@@ -105,7 +105,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
 
         if (response.ok) {
           const { sessionId } = await response.json();
-          const stripe = (window as Window & { Stripe: (key: string) => { redirectToCheckout: (opts: { sessionId: string }) => Promise<unknown> } }).Stripe(stripeKey);
+          const stripe = (window as unknown as { Stripe: (key: string) => { redirectToCheckout: (opts: { sessionId: string }) => Promise<unknown> } }).Stripe(stripeKey);
           await stripe.redirectToCheckout({ sessionId });
           return; // リダイレクトされるため、ここで終了
         }
@@ -128,9 +128,9 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
       setShopItems((items) =>
         items.map((i) => (i.id === item.id ? { ...i, isPurchased: true } : i))
       );
-      alert(t('shop.purchaseSuccessDebug').replace('{name}', item.name));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('shop.purchaseSuccessDebug').replace('{name}', item.name));
     } else {
-      alert(t('shop.paymentPending'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('shop.paymentPending'));
     }
   };
 
@@ -140,7 +140,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
       localStorage.setItem('primal_logic_dot_ui_enabled', 'true');
       setIsDotUIEnabled(true);
       window.dispatchEvent(new CustomEvent('dotUIChanged'));
-      alert(t('shop.enablePixelArtUISuccess'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('shop.enablePixelArtUISuccess'));
       window.location.reload();
     }
   };
@@ -151,7 +151,7 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
       localStorage.removeItem('primal_logic_dot_ui_enabled');
       setIsDotUIEnabled(false);
       window.dispatchEvent(new CustomEvent('dotUIChanged'));
-      alert(t('shop.disablePixelArtUISuccess'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('shop.disablePixelArtUISuccess'));
       window.location.reload();
     }
   };
