@@ -71,19 +71,19 @@ ${description}
 
   return (
     <>
-      {/* フローティングバグ報告ボタン */}
+      {/* フローティングバグ報告ボタン（四角・左下配置） */}
       <button
         onClick={() => setShowModal(true)}
         style={{
           position: 'fixed',
           bottom: '80px',
-          right: '20px',
-          width: '48px',
-          height: '48px',
-          borderRadius: '50%',
-          backgroundColor: '#ef4444',
+          left: '20px',
+          width: '56px',
+          height: '56px',
+          borderRadius: '12px',
+          backgroundColor: '#dc2626',
           color: 'white',
-          border: 'none',
+          border: '2px solid #b91c1c',
           fontSize: '24px',
           cursor: 'pointer',
           boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',

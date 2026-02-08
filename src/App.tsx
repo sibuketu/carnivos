@@ -616,8 +616,8 @@ function AppContent() {
           />
         )}
 
-      {/* エラー報告ボタン（開発モードまたは全ユーザー向け） */}
-      {!['consent', 'paywall', 'auth', 'onboarding'].includes(currentScreen) && (
+      {/* エラー報告ボタン（Home専用） */}
+      {currentScreen === 'home' && (
         <ErrorReportButton screenName={currentScreen} />
       )}
 

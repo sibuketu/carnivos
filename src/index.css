@@ -9,6 +9,7 @@
   /* Color Palette - "Toxic Neon" */
   --primal-bg: #050505;
   --primal-text: #e0e0e0;
+  --primal-text-secondary: #a8a29e; /* WCAG AA準拠 (6.5:1) */
   --neon-green: #00ff9d;
   --neon-red: #ff0055;
   --neon-blue: #00d9ff;
