@@ -375,7 +375,7 @@ function AppContent() {
             <ConsentScreen
               onAccept={() => setCurrentScreen('paywall')}
               onDecline={() => {
-                alert(t('consent.declineAlert'));
+                (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('consent.declineAlert'));
               }}
             />
           )}
@@ -632,7 +632,7 @@ function AppContent() {
             try {
               const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
               if (!supabaseUrl) {
-                alert('Supabase URLが設定されていません');
+                (window as unknown as { showToast?: (msg: string) => void }).showToast?.('Supabase URLが設定されていません');
                 return;
               }
 
@@ -657,7 +657,7 @@ function AppContent() {
               }
             } catch (err) {
               console.error('Subscription error:', err);
-              alert('決済画面への遷移に失敗しました。設定画面から再度お試しください。');
+              (window as unknown as { showToast?: (msg: string) => void }).showToast?.('決済画面への遷移に失敗しました。設定画面から再度お試しください。');
             }
           }}
         />

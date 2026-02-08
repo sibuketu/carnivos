@@ -710,7 +710,7 @@ export default function CommunityScreen({ onBack }: CommunityScreenProps) {
                     URL.revokeObjectURL(url);
                   } catch (error) {
                     logError(error, { component: 'CommunityScreen', action: 'handleExport' });
-                    alert(getUserFriendlyErrorMessage(error) || t('community.exportFailed'));
+                    (window as unknown as { showToast?: (msg: string) => void }).showToast?.(getUserFriendlyErrorMessage(error) || t('community.exportFailed'));
                   }
                 }}
                 style={{

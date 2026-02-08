@@ -1203,7 +1203,7 @@ export default function AISpeedDial({
                                                   unit: unit || 'g',
                                                   type: 'animal',
                                                 });
-                                                alert(`${item} ${amount}${unit || 'g'}を追加しました`);
+                                                (window as unknown as { showToast?: (msg: string) => void }).showToast?.(`${item} ${amount}${unit || 'g'}を追加しました`);
                                               }
                                             } else if (todo.action?.type === 'timer' && todo.action.params) {
                                               const { hours } = todo.action.params;
@@ -1766,7 +1766,7 @@ export default function AISpeedDial({
                                                 unit: unit || 'g',
                                                 type: 'animal',
                                               });
-                                              alert(`${item} ${amount}${unit || 'g'}を追加しました`);
+                                              (window as unknown as { showToast?: (msg: string) => void }).showToast?.(`${item} ${amount}${unit || 'g'}を追加しました`);
                                             }
                                           } else if (todo.action?.type === 'timer' && todo.action.params) {
                                             const { hours } = todo.action.params;

@@ -46,7 +46,7 @@ export default function DataExportScreen() {
       setExported(true);
     } catch (error) {
       logError(error, { component: 'DataExportScreen', action: 'handleExport' });
-      alert('データのエクスポートに失敗しました');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('データのエクスポートに失敗しました');
     } finally {
       setExporting(false);
     }

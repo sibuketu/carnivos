@@ -195,7 +195,7 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
       }
     } catch (error) {
       logError(error, { component: 'DiaryScreen', action: 'handleSave' });
-      alert(t('diary.saveFailed'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('diary.saveFailed'));
     } finally {
       setIsSaving(false);
     }

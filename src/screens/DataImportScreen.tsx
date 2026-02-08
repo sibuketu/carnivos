@@ -24,7 +24,7 @@ export default function DataImportScreen({ onBack }: DataImportScreenProps) {
   const handleImport = async () => {
     const file = fileInputRef.current?.files?.[0];
     if (!file) {
-      alert('ファイルを選択してください');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('ファイルを選択してください');
       return;
     }
 
@@ -69,7 +69,7 @@ export default function DataImportScreen({ onBack }: DataImportScreenProps) {
       }
 
       setImported(true);
-      alert(t('dataImport.importComplete'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('dataImport.importComplete'));
       // 画面をリロードしてデータを反映
       setTimeout(() => {
         window.location.reload();

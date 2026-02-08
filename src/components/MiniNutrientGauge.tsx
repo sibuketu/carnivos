@@ -258,7 +258,7 @@ function MiniNutrientGauge({
     }
     if (logic) {
       // ロジックをモーダルまたはアラートで表示（将来はArgument Cardに統合）
-      alert(`${label}の目標値の根拠:\n\n${logic}`);
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(`${label}の目標値の根拠: ${logic}`);
     }
   };
 

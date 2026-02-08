@@ -801,7 +801,7 @@ export default function HistoryScreen() {
                                                 date: item.date,
                                                 index,
                                               });
-                                              alert(t('history.deleteFailed'));
+                                              (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('history.deleteFailed'));
                                             }
                                           }
                                         }}

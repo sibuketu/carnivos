@@ -89,7 +89,7 @@ export default function PhotoAnalysisModal({
 
   if (showChargeAnim) {
     return (
-      <div className="fixed inset-0 z-[10000] bg-black flex flex-col items-center justify-center">
+      <div className="fixed inset-0 z-10000 bg-black flex flex-col items-center justify-center">
         <div className="text-6xl mb-6 animate-bounce">⚡</div>
         <div className="text-3xl font-bold text-rose-500 font-mono tracking-widest animate-pulse">
           NUTRIENT CHARGED
@@ -224,7 +224,7 @@ export default function PhotoAnalysisModal({
                       type: result.type,
                     }));
                   } catch {
-                    alert('検索に失敗しました');
+                    (window as unknown as { showToast?: (msg: string) => void }).showToast?.('検索に失敗しました');
                   } finally {
                     setIsAIProcessing(false);
                   }
@@ -535,7 +535,7 @@ export default function PhotoAnalysisModal({
                     );
                     setCurrentResult({ ...refined, followupQuestions: [] });
                   } catch {
-                    alert('再計算に失敗しました');
+                    (window as unknown as { showToast?: (msg: string) => void }).showToast?.('再計算に失敗しました');
                   } finally {
                     setIsAIProcessing(false);
                   }

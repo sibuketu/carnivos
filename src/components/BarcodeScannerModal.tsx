@@ -181,7 +181,7 @@ export default function BarcodeScannerModal({
 
     const amount = Number(amountStr);
     if (isNaN(amount) || amount <= 0) {
-      alert('有効な量を入力してください');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('有効な量を入力してください');
       return;
     }
 

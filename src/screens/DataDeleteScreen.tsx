@@ -16,7 +16,7 @@ export default function DataDeleteScreen() {
 
   const handleDelete = async () => {
     if (confirmText !== '削除') {
-      alert('「削除」と入力してください');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('「削除」と入力してください');
       return;
     }
 
@@ -61,7 +61,7 @@ export default function DataDeleteScreen() {
       }, 3000);
     } catch (error) {
       logError(error, { component: 'DataDeleteScreen', action: 'handleDelete' });
-      alert(getUserFriendlyErrorMessage(error) || 'データの削除に失敗しました');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(getUserFriendlyErrorMessage(error) || 'データの削除に失敗しました');
     } finally {
       setDeleting(false);
     }

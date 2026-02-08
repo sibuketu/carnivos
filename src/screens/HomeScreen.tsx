@@ -2231,7 +2231,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
 
                         logError(error, { component: 'HomeScreen', action: 'handlePhotoUpload' });
                         const { getUserFriendlyErrorMessage } = await import('../utils/errorHandler');
-                        alert(
+                        (window as unknown as { showToast?: (msg: string) => void }).showToast?.(
                           getUserFriendlyErrorMessage(error) ||
                           '写真の解析に失敗しました。もう一度お試しください。'
                         );

@@ -25,7 +25,7 @@ export default function FeedbackScreen() {
     e.preventDefault();
 
     if (!message.trim()) {
-      alert(t('feedback.pleaseEnterMessage'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('feedback.pleaseEnterMessage'));
       return;
     }
 
@@ -84,7 +84,7 @@ export default function FeedbackScreen() {
       }, 3000);
     } catch (error) {
       logError(error, { component: 'FeedbackScreen', action: 'handleSubmit', type });
-      alert(t('feedback.sendFailed'));
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('feedback.sendFailed'));
     } finally {
       setSubmitting(false);
     }
