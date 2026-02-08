@@ -151,6 +151,6 @@ export async function clearDebugData(days: number = 30): Promise<void> {
 
 /** デバッグコマンド: ブラウザコンソールで使用可能 */
 if (typeof window !== 'undefined') {
-  (window as any).generateDebugData = generateDebugData;
-  (window as any).clearDebugData = clearDebugData;
+  (window as Window & { generateDebugData: typeof generateDebugData; clearDebugData: typeof clearDebugData }).generateDebugData = generateDebugData;
+  (window as Window & { generateDebugData: typeof generateDebugData; clearDebugData: typeof clearDebugData }).clearDebugData = clearDebugData;
 }

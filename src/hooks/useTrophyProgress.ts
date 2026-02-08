@@ -2,7 +2,7 @@
  * トロフィー進捗管理hook
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { TrophyProgress } from '../types/trophy';
 import { TROPHIES } from '../data/trophies';
 

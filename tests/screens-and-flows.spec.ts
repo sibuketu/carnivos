@@ -93,7 +93,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
   const skipLazyScreens = true;
 
   // ========== その他(Labs)配下の全画面遷移 ==========
-  test('その他 → 統計(Stats) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → 統計(Stats) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -107,7 +107,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await expect(page.getByTestId('labs-screen').or(page.getByRole('heading', { name: /Other|その他|Others/ })).first()).toBeVisible({ timeout: 5000 });
   });
 
-  test('その他 → Bio-Tuner(Input) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → Bio-Tuner(Input) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -118,7 +118,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await page.waitForTimeout(800);
   });
 
-  test('その他 → 日記(Diary) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → 日記(Diary) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -131,7 +131,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await page.waitForTimeout(800);
   });
 
-  test('その他 → ユーザー設定(Profile) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → ユーザー設定(Profile) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -145,7 +145,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await expect(page.getByTestId('labs-screen').or(page.getByRole('heading', { name: /その他|Others/ })).first()).toBeVisible({ timeout: 5000 });
   });
 
-  test('その他 → UI設定(Settings) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → UI設定(Settings) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -159,7 +159,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await expect(page.getByTestId('labs-screen').or(page.getByRole('heading', { name: /Other|その他|Others/ })).first()).toBeVisible({ timeout: 5000 });
   });
 
-  test('その他 → 塩設定(Salt) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → 塩設定(Salt) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -172,7 +172,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await page.waitForTimeout(800);
   });
 
-  test('その他 → 炭水化物目標(CarbTarget) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → 炭水化物目標(CarbTarget) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -185,7 +185,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await page.waitForTimeout(800);
   });
 
-  test('その他 → 言語設定(Language) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → 言語設定(Language) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -205,7 +205,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await expect(page.locator('.auth-screen').first()).toBeVisible({ timeout: 15000 });
   });
 
-  test('その他 → フィードバック(Feedback) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → フィードバック(Feedback) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -218,7 +218,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await page.waitForTimeout(800);
   });
 
-  test('その他 → プライバシーポリシー(Privacy) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → プライバシーポリシー(Privacy) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -231,7 +231,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await page.waitForTimeout(800);
   });
 
-  test('その他 → 利用規約(Terms) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → 利用規約(Terms) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -244,7 +244,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     await page.waitForTimeout(800);
   });
 
-  test('その他 → データ削除(DataDelete) に遷移し戻る', async ({ page }, testInfo) => {
+  test('その他 → データ削除(DataDelete) に遷移し戻る', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -281,7 +281,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     }
   });
 
-  test('その他 → カスタム食品(CustomFood) に遷移し戻る（表示時のみ）', async ({ page }, testInfo) => {
+  test('その他 → カスタム食品(CustomFood) に遷移し戻る（表示時のみ）', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'customFood or preceding steps exceed timeout in this env');
     test.setTimeout(28000);
     await ensureHomeWithNav(page);
@@ -310,7 +310,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
   });
 
   // ========== 設定画面のフォーム・ボタン ==========
-  test('設定画面: 言語ボタンがクリックできる', async ({ page }, testInfo) => {
+  test('設定画面: 言語ボタンがクリックできる', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -329,7 +329,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     }
   });
 
-  test('設定画面: 断食タイマー時間ボタンがクリックできる', async ({ page }, testInfo) => {
+  test('設定画面: 断食タイマー時間ボタンがクリックできる', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -342,7 +342,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
     }
   });
 
-  test('設定画面: 文字サイズボタンがクリックできる', async ({ page }, testInfo) => {
+  test('設定画面: 文字サイズボタンがクリックできる', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);
@@ -356,7 +356,7 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
   });
 
   // ========== その他 → UI設定 で設定画面を開く（下部ナビに設定タブはないため、その他経由で確認） ==========
-  test('その他 → UI設定 で設定画面が開く', async ({ page }, testInfo) => {
+  test('その他 → UI設定 で設定画面が開く', async ({ page }, _testInfo) => {
     test.skip(skipLazyScreens, 'Lazy screen does not render in time in this env');
     await ensureHomeWithNav(page);
     await openLabs(page);

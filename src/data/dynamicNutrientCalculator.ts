@@ -62,7 +62,7 @@ export function getDynamicNutrientTargets(
   let ironFactor = 1;
   let vitaminDFactor = 1;
   let vitaminAFactor = 1;
-  let digestiveIssuesFlag = false;
+  const _digestiveIssuesFlag = false; // Future use
   let proteinMinFromLbm: number | null = null;
 
   // 1. 睡眠の質 → マグネシウム・ビタミンD

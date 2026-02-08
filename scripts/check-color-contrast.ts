@@ -76,9 +76,9 @@ function getContrastLevel(ratio: number): 'AAA' | 'AA' | 'FAIL' {
 }
 
 /**
- * CSSファイルから色ペアを抽出
+ * CSSファイルから色ペアを抽出（将来の拡張用）
  */
-async function extractColorPairs(filePath: string): Promise<ColorPair[]> {
+async function _extractColorPairs(filePath: string): Promise<ColorPair[]> {
   const content = await fs.readFile(filePath, 'utf-8');
   const lines = content.split('\n');
   const pairs: ColorPair[] = [];

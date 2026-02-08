@@ -8,8 +8,6 @@
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import * as fs from 'fs/promises';
-import * as path from 'path';
 
 const execAsync = promisify(exec);
 
@@ -20,19 +18,18 @@ interface TestResult {
 }
 
 const MAX_FIX_ATTEMPTS = 5;
-const PROJECT_ROOT = path.join(__dirname, '..');
 
 async function runCommand(command: string): Promise<{ stdout: string; stderr: string }> {
   try {
-    const { stdout, stderr } = await execAsync(command, {
-      cwd: PROJECT_ROOT,
+    const result = await execAsync(command, {
       maxBuffer: 1024 * 1024 * 10, // 10MB
     });
-    return { stdout, stderr };
-  } catch (error: any) {
+    return { stdout: result.stdout, stderr: result.stderr };
+  } catch (error: unknown) {
+    const err = error as { stdout?: string; stderr?: string; message?: string };
     return {
-      stdout: error.stdout || '',
-      stderr: error.stderr || error.message || String(error),
+      stdout: err.stdout || '',
+      stderr: err.stderr || err.message || String(error),
     };
   }
 }
@@ -63,7 +60,7 @@ async function runTypeCheck(): Promise<TestResult> {
 
 async function runBuild(): Promise<TestResult> {
   console.log('🏗️  Building...');
-  const { stdout, stderr } = await runCommand('npm run build');
+  const { stderr } = await runCommand('npm run build');
   const hasErrors = stderr.includes('ERROR') || stderr.includes('Failed');
 
   return {
