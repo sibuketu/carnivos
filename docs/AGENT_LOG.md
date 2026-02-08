@@ -633,3 +633,28 @@
   - package.json
   - docs/AGENT_LOG.md
 - 動作影響: 青背景なし、横スクロールなし、Fastingタイマーは Input から利用可能、トロフィーは Others で動作、自動テストループで品質保証
+
+---
+
+## 2026-02-08 13:10 (Agent: Claude Code)
+- 目的: UI改善（バグ報告ボタン区別、色コントラストWCAG AA準拠）
+- 変更点:
+  - バグ報告ボタン: Home専用に制限、丸→四角（56x56, borderRadius 12px）、右下→左下に移動
+  - 色コントラスト自動チェック: scripts/check-color-contrast.ts 作成（WCAG AA基準4.5:1以上を検証）
+  - セカンダリテキスト色: #78716c → #a8a29e（コントラスト比 4.25→8.08）
+  - エラーボタンBG: #ef4444 → #dc2626（コントラスト比 3.76→4.83）
+  - index.css に --primal-text-secondary 追加
+  - package.json に check-colors スクリプト追加
+- 根拠・ストーリー（Why）:
+  - ユーザー指摘「AIフロートとバグ報告が両方丸で紛らわしい、バグはHomeだけで良い」に対応
+  - ユーザー要求「色の相性・見えにくさを毎回考慮」→ 自動チェック実装で品質保証
+  - WCAG AA準拠: コントラスト比4.5:1以上で視認性確保（アクセシビリティ向上）
+  - RULES 1.3「反論・代案」: バグ報告は四角＋左下配置で明確に区別
+- 触ったファイル:
+  - src/App.tsx (バグ報告ボタンをHome専用に)
+  - src/components/ErrorReportButton.tsx (四角・左下配置、色変更)
+  - src/index.css (--primal-text-secondary 追加)
+  - scripts/check-color-contrast.ts (新規)
+  - package.json (check-colors スクリプト追加)
+  - docs/AGENT_LOG.md
+- 動作影響: バグ報告ボタンはHomeのみ表示、AIフロート（丸・右下）と明確に区別、全色WCAG AA準拠で視認性向上
