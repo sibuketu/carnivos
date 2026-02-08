@@ -31,7 +31,8 @@
     "screenshot:all": "tsx scripts/capture-screenshots-simple.ts",
     "verify-ui": "tsx scripts/verify-ui-flow.ts",
     "self-check": "tsx scripts/self_check.ts",
-    "audit": "tsx scripts/audit_app.ts"
+    "audit": "tsx scripts/audit_app.ts",
+    "auto-fix": "tsx scripts/auto-test-fix-loop.ts"
   },
   "dependencies": {
     "@capacitor/app": "^8.0.0",
