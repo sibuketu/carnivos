@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useTranslation } from '../utils/i18n';
+import { useTranslation, setLanguage } from '../utils/i18n';
 import { useSettings } from '../hooks/useSettings';
 import { useAuth } from '../context/AuthContext';
 import { requestNotificationPermission } from '../utils/defrostReminder';
@@ -119,8 +119,8 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
         <div className="settings-screen-button-row">
           <button
-            className={`settings-screen-option-button ${i18n.language === 'en' ? 'active' : ''}`}
-            onClick={() => changeLanguage('en')}
+            className={`settings-screen-option-button ${language === 'en' ? 'active' : ''}`}
+            onClick={() => setLanguage('en')}
           >
             English
           </button>
@@ -131,8 +131,8 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
             日本語
           </button>
           <button
-            className={`settings-screen-option-button ${i18n.language === 'fr' ? 'active' : ''}`}
-            onClick={() => changeLanguage('fr')}
+            className={`settings-screen-option-button ${language === 'fr' ? 'active' : ''}`}
+            onClick={() => setLanguage('fr')}
           >
             Français
           </button>
@@ -444,8 +444,8 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                   backgroundColor: '#fafafa',
                 }}
               >
-                <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{item.title}</div>
-                <div style={{ fontSize: '0.8125rem', color: '#6b7280', marginBottom: '0.5rem' }}>{item.desc}</div>
+                <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{t(item.titleKey)}</div>
+                <div style={{ fontSize: '0.8125rem', color: '#6b7280', marginBottom: '0.5rem' }}>{t(item.descKey)}</div>
                 <button
                   type="button"
                   className="settings-screen-option-button"

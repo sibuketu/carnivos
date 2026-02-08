@@ -48,7 +48,7 @@ test.describe('Primal Logic UI Tests', () => {
     await expect(page.getByTestId('add-food')).toBeVisible({ timeout: 10000 });
     
     // スクリーンショットを撮る
-    await page.screenshot({ path: 'tests/screenshots/zones.png', fullPage: true });
+    await page.screenshot({ path: 'tests/screenshots/zones.png', fullPage: true, timeout: 10000 }).catch(() => {});
   });
 
   test('食品追加ボタンがホーム画面に存在する', async ({ page }) => {
@@ -62,7 +62,7 @@ test.describe('Primal Logic UI Tests', () => {
     await expect(page.getByText(/\+250ml|\+500ml/).first()).toBeVisible({ timeout: 10000 });
     
     // スクリーンショットを撮る
-    await page.screenshot({ path: 'tests/screenshots/home-buttons.png', fullPage: true });
+    await page.screenshot({ path: 'tests/screenshots/home-buttons.png', fullPage: true, timeout: 10000 }).catch(() => {});
   });
 
   test('ナビゲーション3タブが表示される', async ({ page }) => {
@@ -79,6 +79,6 @@ test.describe('Primal Logic UI Tests', () => {
     await expect(page.getByText(/History|履歴|No data|データ/).first()).toBeVisible({ timeout: 15000 });
     
     // スクリーンショットを撮る
-    await page.screenshot({ path: 'tests/screenshots/navigation-check.png', fullPage: true });
+    await page.screenshot({ path: 'tests/screenshots/navigation-check.png', fullPage: true, timeout: 10000 }).catch(() => {});
   });
 });

@@ -20,6 +20,7 @@ import AISpeedDial from './components/dashboard/AISpeedDial';
 import Toast from './components/common/Toast';
 import PaywallModal from './components/PaywallModal';
 import ErrorReportButton from './components/ErrorReportButton';
+import { ScreenErrorBoundary } from './components/ScreenErrorBoundary';
 import { getFeatureDisplaySettings } from './utils/featureDisplaySettings';
 import { startFastingTimerWatcher } from './utils/notificationService';
 import './App.css';
@@ -68,6 +69,8 @@ function AppContent() {
   const [openFatTabCallback, setOpenFatTabCallback] = useState<(() => void) | null>(null);
   const [addFoodCallback, setAddFoodCallback] = useState<((foodItem: FoodItem) => void) | null>(null);
 
+
+  const [_statsInitialTab, setStatsInitialTab] = useState<string | undefined>(undefined);
 
   const [isPixelArtEnabled, setIsPixelArtEnabled] = useState(() => {
     return localStorage.getItem('primal_logic_dot_ui_enabled') === 'true';
