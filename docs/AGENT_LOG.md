@@ -754,3 +754,26 @@
   - src/App.tsx
   - src/screens/SettingsScreen.tsx
 - 動作影響: 全ブラウザ（Chromium/Firefox/WebKit）で87 passed, 0 skipped, 0 failed。全E2Eテスト完全パス。
+
+## 2026-02-09 07:15 (Agent: Windsurf Cascade)
+- 目的: 継続品質改善 — ハリボテ実装の修正、デッドコード削除、ルール更新
+- 変更点:
+  1. RULES.md: Ship It Protocol (0.5) → Continuous Quality Protocol に書き換え。リリース済みのため品質改善を妨げるルールを廃止
+  2. aiService.ts: _original_chatWithAI デッドコード約14KB（430行）を削除。型チェック0エラー維持
+  3. StorageNutrientGauge: ダミー計算値（decayRate=1.5固定、90日固定）→ 栄養素別の生理学的ストレージ日数に修正（VitA:90日、VitD:60日、B12:365日、Iron:120日）
+  4. CommunityScreen: alert() → setSelectedThread によるインライン展開に修正（ブラウザのalertダイアログを除去）
+  5. UserSettingsScreen: useRef/HelpTooltip import欠落修正 + MetabolicStatus型に'transitioning'を復元
+  6. screens-and-flows.spec.ts: 全画面ランタイムエラー回帰テスト追加（21画面を自動巡回、エラー0件を検証）
+- 根拠・ストーリー（Why）:
+  - ユーザーから「リリースできる状態にする」ルールの廃止提案があり、品質改善を継続的に行う方針に変更
+  - Playwright E2Eテストでブラウザ操作によるユーザー視点の動作確認を自動化し、ユーザーの手動確認負担を削減
+  - ハリボテ実装（ダミー値、alert()、デッドコード）を優先的に修正し、アプリの実装品質を向上
+- 触ったファイル:
+  - RULES.md
+  - src/services/aiService.ts
+  - src/components/StorageNutrientGauge.tsx
+  - src/screens/CommunityScreen.tsx
+  - src/screens/UserSettingsScreen.tsx
+  - src/types/index.ts
+  - tests/screens-and-flows.spec.ts
+- 動作影響: 型チェック0エラー、ビルド成功、コアE2Eテスト33/33パス。Netlifyへ自動デプロイ済み。
