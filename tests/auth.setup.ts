@@ -18,13 +18,12 @@ setup('prepare guest auth state', async ({ page }) => {
     localStorage.setItem('primal_logic_guest_mode', 'true');
   });
   await page.reload();
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   const guestBtn = page.getByRole('button', { name: /ゲスト|Guest|続ける|Continue/ });
-  if (await guestBtn.isVisible().catch(() => false)) {
+  if (await guestBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await guestBtn.click();
     await page.waitForTimeout(1500);
   }
-  await page.waitForLoadState('networkidle');
   await expect(
     page.getByTestId('nav-home').or(page.getByRole('button', { name: /Home|ホーム/i })).first()
   ).toBeVisible({ timeout: 20000 });

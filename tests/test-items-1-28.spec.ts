@@ -14,7 +14,7 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
       localStorage.removeItem('primal_logic_onboarding_completed');
     });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // 同意画面が表示されることを確認
     const consentScreen = page.locator('[class*="consent"], [class*="Consent"]');
@@ -33,7 +33,7 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
       localStorage.removeItem('primal_logic_onboarding_completed');
     });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // 同意画面で同意する
     const privacyCheckbox = page.locator('input[type="checkbox"]').first();
@@ -43,7 +43,7 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
       await privacyCheckbox.check();
       await termsCheckbox.check();
       await page.getByText(/同意して続ける|同意|Continue/i).click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForTimeout(1000);
       
       // オンボーディング画面が表示されることを確認
@@ -55,7 +55,7 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
 
   test('3: ホーム画面表示 - ホーム画面が正しく表示される', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // 同意・オンボーディングをスキップ
     const consentAccepted = await page.evaluate(() => {
@@ -68,7 +68,7 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
         await privacyCheckbox.check();
         await page.locator('input[type="checkbox"]').nth(1).check();
         await page.getByText(/同意して続ける|同意/i).click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
       }
     }
     
@@ -83,7 +83,7 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
 
   test('4: 下部ナビゲーション表示 - ホーム、履歴、その他、設定のナビゲーションが表示される', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // 同意・オンボーディングをスキップ（既に同意済みの場合）
     await page.evaluate(() => {
@@ -91,7 +91,7 @@ test.describe('Primal Logic - テスト項目1-28の自動テスト', () => {
       localStorage.setItem('primal_logic_onboarding_completed', 'true');
     });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // 下部ナビゲーションが表示されることを確認
     const nav = page.locator('.app-navigation, nav[role="navigation"]');

@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
 
 /** ゲスト＋同意＋オンボーディング済みでホームを表示し、ナビを表示させる（storageState 利用時は既に状態があれば短時間で完了） */
 async function ensureHomeWithNav(page: import('@playwright/test').Page) {
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
   const navVisible = await page.getByTestId('nav-home').or(page.getByRole('button', { name: /Home|ホーム/i })).first().isVisible({ timeout: 4000 }).catch(() => false);
   if (navVisible) {
     await expect(page.getByTestId('nav-others').or(page.getByRole('button', { name: /Other|その他/i })).first()).toBeVisible({ timeout: 3000 });
@@ -19,14 +19,12 @@ async function ensureHomeWithNav(page: import('@playwright/test').Page) {
     localStorage.setItem('primal_logic_onboarding_completed', 'true');
     localStorage.setItem('primal_logic_guest_mode', 'true');
   });
-  await page.reload();
-  await page.waitForLoadState('networkidle');
+  await page.reload({ waitUntil: 'domcontentloaded' });
   const guestBtn = page.getByRole('button', { name: /ゲスト|Guest|続ける|Continue/ });
-  if (await guestBtn.isVisible().catch(() => false)) {
+  if (await guestBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await guestBtn.click();
     await page.waitForTimeout(1500);
   }
-  await page.waitForLoadState('networkidle');
   await expect(
     page.getByTestId('nav-home').or(page.getByRole('button', { name: /Home|ホーム/i })).first()
   ).toBeVisible({ timeout: 30000 });
@@ -367,14 +365,14 @@ test.describe('画面遷移・ボタン・フォーム E2E（2.1b フルカバ�
 
   // ========== 同意 → Paywall → ゲストの一連フロー ==========
   test('同意 → Paywall → ゲストでホームまで一連フロー', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
       localStorage.removeItem('primal_logic_consent_accepted');
       localStorage.removeItem('primal_logic_onboarding_completed');
       localStorage.removeItem('primal_logic_guest_mode');
     });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(800);
 
     const consent = page.locator('[class*="consent"], [class*="Consent"]').or(page.getByText(/プライバシーポリシー|Privacy|同意|Consent/i));

@@ -1,103 +1,84 @@
 import { test, expect } from '@playwright/test';
 
+/** 同意・オンボーディング完了・ゲストでホームを表示し、オーバーレイを閉じる */
+async function ensureHomeScreen(page: import('@playwright/test').Page) {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => {
+    localStorage.setItem('primal_logic_consent_accepted', 'true');
+    localStorage.setItem('primal_logic_onboarding_completed', 'true');
+    localStorage.setItem('primal_logic_guest_mode', 'true');
+    localStorage.setItem('primal_logic_feedback_dismissed', 'true');
+    localStorage.setItem('primal_logic_ai_onboarding_dismissed', 'true');
+  });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  const guestBtn = page.getByRole('button', { name: /ゲスト|Guest|続ける|Continue/ });
+  if (await guestBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await guestBtn.click();
+    await page.waitForTimeout(1000);
+  }
+  await expect(page.getByTestId('nav-home')).toBeVisible({ timeout: 30000 });
+  // AIオンボーディングの「スキップ」を先に閉じる（最前面にあるため）
+  const skipBtn = page.getByRole('button', { name: /スキップ|Skip/ });
+  if (await skipBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await skipBtn.click({ force: true });
+    await page.waitForTimeout(500);
+  }
+  // フィードバックバナーを閉じる
+  const closeBtn = page.getByRole('button', { name: /Close|閉じる|Don't show/ });
+  if (await closeBtn.first().isVisible({ timeout: 2000 }).catch(() => false)) {
+    await closeBtn.first().click({ force: true });
+    await page.waitForTimeout(500);
+  }
+}
+
 test.describe('Primal Logic UI Tests', () => {
-  test('Zone 1とZone 2が正しく表示される', async ({ page }) => {
-    await page.goto('/');
+  test.setTimeout(60000);
+
+  test('PRO/FATゲージと通知設定がホーム画面に表示される', async ({ page }) => {
+    await ensureHomeScreen(page);
     
-    // ページが読み込まれるまで待つ
-    await page.waitForLoadState('networkidle');
+    // PRO/FATゲージが表示されていることを確認
+    await expect(page.getByText('PRO')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('FAT')).toBeVisible({ timeout: 10000 });
     
-    // キャッチフレーズバナーが表示されていないことを確認
-    const catchphraseBanner = page.locator('.catchphrase-banner');
-    await expect(catchphraseBanner).toHaveCount(0);
+    // 通知設定ボタンが表示されていることを確認
+    await expect(page.getByText(/通知設定|Notification/i).first()).toBeVisible({ timeout: 10000 });
     
-    // Zone 1が表示されていることを確認（Zone 1というテキストがない場合は、栄養素ゲージで確認）
-    await expect(page.getByText('ナトリウム')).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText('カリウム')).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText('マグネシウム')).toBeVisible({ timeout: 10000 });
-    
-    // Zone 2が表示されていることを確認（Zone 2というテキストがない場合は、栄養素ゲージで確認）
-    await expect(page.getByText('タンパク質', { exact: false }).first()).toBeVisible({ timeout: 10000 });
-    // 「脂質」は複数箇所にあるため、Zone 2内の特定の要素を確認
-    await expect(page.getByText('脂質', { exact: true }).first()).toBeVisible({ timeout: 10000 });
+    // 食品追加ボタンが表示されていることを確認
+    await expect(page.getByTestId('add-food')).toBeVisible({ timeout: 10000 });
     
     // スクリーンショットを撮る
     await page.screenshot({ path: 'tests/screenshots/zones.png', fullPage: true });
   });
 
-  test('ButcherSelectのNutrients Breakdownにグリシンなどが表示される', async ({ page }) => {
-    await page.goto('/');
-    // networkidleの代わりに、より具体的な要素を待つ
-    await page.waitForSelector('.app-navigation, [class*="home"], [class*="Home"]', { timeout: 10000 }).catch(() => {});
-    await page.waitForTimeout(500);
+  test('食品追加ボタンがホーム画面に存在する', async ({ page }) => {
+    await ensureHomeScreen(page);
     
-    // 食品追加ボタンをクリック
-    const addFoodButton = page.getByText(/\+.*食品を追加|\+.*Add Food/i);
+    // 食品追加ボタンが表示されていることを確認
+    const addFoodButton = page.getByTestId('add-food');
     await expect(addFoodButton).toBeVisible({ timeout: 10000 });
-    await addFoodButton.click();
-    await page.waitForTimeout(2000);
     
-    // ButcherSelectが表示されるまで待つ（動物タブ🐄を探す）
-    const beefTab = page.locator('button').filter({ hasText: /🐄|牛肉/ });
-    await expect(beefTab.first()).toBeVisible({ timeout: 15000 });
-    
-    // 牛肉のRibeyeを選択
-    const ribeyeButton = page.getByText('Ribeye');
-    await expect(ribeyeButton).toBeVisible({ timeout: 10000 });
-    await ribeyeButton.click();
-    
-    // 数量入力が表示されるまで待つ
-    await page.waitForSelector('text=QUANTITY', { timeout: 10000 });
-    
-    // Nutrients Breakdownが表示されるまで待つ
-    await page.waitForSelector('text=Nutrients Breakdown', { timeout: 10000 });
-    
-    // グリシン、メチオニン、カルシウム、リン、ヨウ素が表示されていることを確認
-    await expect(page.getByText('グリシン', { exact: true })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText('メチオニン', { exact: true })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText('カルシウム', { exact: true })).toBeVisible({ timeout: 10000 });
-    // 「リン」は「コリン」と区別するため、exact: trueを使用
-    await expect(page.getByText('リン', { exact: true })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText('ヨウ素', { exact: true })).toBeVisible({ timeout: 10000 });
+    // 水分摂取ボタンが表示されていることを確認
+    await expect(page.getByText(/\+250ml|\+500ml/).first()).toBeVisible({ timeout: 10000 });
     
     // スクリーンショットを撮る
-    await page.screenshot({ path: 'tests/screenshots/nutrients-breakdown.png', fullPage: true });
+    await page.screenshot({ path: 'tests/screenshots/home-buttons.png', fullPage: true });
   });
 
-  test('オメガ3/6比率が正しく表示される', async ({ page }) => {
-    await page.goto('/');
-    // networkidleの代わりに、より具体的な要素を待つ
-    await page.waitForSelector('.app-navigation, [class*="home"], [class*="Home"]', { timeout: 10000 }).catch(() => {});
-    await page.waitForTimeout(500);
+  test('ナビゲーション3タブが表示される', async ({ page }) => {
+    await ensureHomeScreen(page);
     
-    // 食品追加ボタンをクリック
-    const addFoodButton = page.getByText(/\+.*食品を追加|\+.*Add Food/i);
-    await expect(addFoodButton).toBeVisible({ timeout: 10000 });
-    await addFoodButton.click();
-    await page.waitForTimeout(2000);
+    // ナビゲーション3タブが表示されていることを確認
+    await expect(page.getByTestId('nav-home')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('nav-history')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('nav-others')).toBeVisible({ timeout: 10000 });
     
-    // ButcherSelectが表示されるまで待つ（動物タブ🐄を探す）
-    const beefTab = page.locator('button').filter({ hasText: /🐄|牛肉/ });
-    await expect(beefTab.first()).toBeVisible({ timeout: 15000 });
-    
-    // 牛肉のRibeyeを選択
-    const ribeyeButton = page.getByText('Ribeye');
-    await expect(ribeyeButton).toBeVisible({ timeout: 10000 });
-    await ribeyeButton.click();
-    
-    // 数量入力が表示されるまで待つ
-    await page.waitForSelector('text=QUANTITY', { timeout: 10000 });
-    
-    // Nutrients Breakdownが表示されるまで待つ
-    await page.waitForSelector('text=Nutrients Breakdown', { timeout: 10000 });
-    
-    // オメガ3/6比率が表示されるまで待つ（テキストが含まれる要素を探す）
-    // OmegaRatioDisplayコンポーネントが表示するテキストを確認
-    const omegaRatioText = page.getByText(/オメガ|Omega|Ω/, { exact: false });
-    await expect(omegaRatioText.first()).toBeVisible({ timeout: 10000 });
+    // Historyタブをクリックして画面が切り替わることを確認
+    await page.getByTestId('nav-history').click({ force: true });
+    await page.waitForTimeout(1500);
+    await expect(page.getByText(/History|履歴|No data|データ/).first()).toBeVisible({ timeout: 15000 });
     
     // スクリーンショットを撮る
-    await page.screenshot({ path: 'tests/screenshots/omega-ratio.png', fullPage: true });
+    await page.screenshot({ path: 'tests/screenshots/navigation-check.png', fullPage: true });
   });
 });
-

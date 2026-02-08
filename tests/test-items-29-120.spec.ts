@@ -4,7 +4,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
   
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // 同意画面とオンボーディングをスキップ（既に同意済みの場合）
     const consentAccepted = await page.evaluate(() => {
@@ -20,7 +20,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
         await privacyCheckbox.check();
         await termsCheckbox.check();
         await page.getByText('同意して続ける').click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
       }
     }
   });
@@ -115,7 +115,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
       localStorage.setItem('primal_logic_guest_mode', 'true');
     });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(1500);
     const labsButton = page.locator('button.app-nav-button').filter({ hasText: /その他|🧪/ });
     await expect(labsButton).toBeVisible({ timeout: 10000 });
@@ -405,7 +405,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
     
     // ページをリロード
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // データが残っていることを確認（実際の実装に合わせて調整が必要）
     // 例: 追加した食品が表示されることを確認
@@ -418,7 +418,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
     // 新しいページで開く（アプリを閉じて再度開くシミュレーション）
     const newPage = await context.newPage();
     await newPage.goto('/');
-    await newPage.waitForLoadState('networkidle');
+    await newPage.waitForLoadState('domcontentloaded');
     
     // データが読み込まれることを確認（実際の実装に合わせて調整が必要）
     await newPage.close();
@@ -451,7 +451,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
     // iPhone 15の画面サイズに設定
     await page.setViewportSize({ width: 393, height: 852 });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // ホーム画面が適切に表示されることを確認
     await expect(page.locator('.home-screen-container, [class*="home"]')).toBeVisible();
@@ -503,7 +503,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
       localStorage.clear();
     });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // 空データ表示が適切に表示されることを確認（実際の実装に合わせて調整が必要）
     // 例: 「データがありません」などのメッセージが表示されることを確認
@@ -516,7 +516,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
   test('86: 初回読み込み速度 - 3秒以内', async ({ page }) => {
     const startTime = Date.now();
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     const loadTime = Date.now() - startTime;
     
     // 初回読み込みが3秒以内であることを確認
@@ -525,7 +525,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
 
   test('87: 画面遷移速度 - 1秒以内', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     const startTime = Date.now();
     const historyButton = page.locator('button.app-nav-button').filter({ hasText: /履歴|History|📊/ });
@@ -541,7 +541,7 @@ test.describe('Primal Logic - テスト項目29以降の自動テスト', () => 
 
   test('88: 食品検索速度 - 2秒以内に完了', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     // 入力画面に遷移
     const inputButton = page.getByText(/\+.*食品を追加|\+.*Add Food/i);
