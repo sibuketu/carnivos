@@ -18,22 +18,30 @@ const StorageNutrientGauge: React.FC<StorageNutrientGaugeProps> = ({
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'simple' | 'detailed' | 'general'>('simple');
 
-  // Dynamic color logic to match MiniNutrientGauge (Red -> Orange -> Green -> Purple)
+  // Dynamic color logic: Red → Orange → Rose (matches app theme)
   const getDynamicColor = (percent: number): string => {
-    if (percent < 30) return '#ef4444'; // Red (Refill needed)
-    if (percent < 70) return '#f97316'; // Orange (OK but dropping)
-    if (percent < 100) return '#f43f5e'; // Green (Good)
-    return '#f43f5e'; // Purple (Supercharged)
+    if (percent < 30) return '#ef4444'; // Red — refill needed
+    if (percent < 70) return '#f97316'; // Orange — adequate but dropping
+    return '#f43f5e'; // Rose — healthy level
   };
 
   const dynamicColor = getDynamicColor(currentStorage);
 
-  // Placeholder logic for missing variables to prevent crash
-  // In a real implementation, these should be calculated or passed as props
-  const maxStorage = dailyTarget * 90; // Approx 3 months buffer as default max?
+  // Nutrient-specific storage capacity (days the body can store at full)
+  const getStorageDays = (key: string): number => {
+    switch (key) {
+      case 'vitamin_a': return 90;   // liver stores ~90 days
+      case 'vitamin_d': return 60;   // body fat stores ~60 days
+      case 'vitamin_b12': return 365; // liver stores 1-5 years; use 1 year
+      case 'iron': return 120;       // ~3-6 months depending on gender
+      default: return 90;
+    }
+  };
+  const storageDays = getStorageDays(nutrientKey);
+  const maxStorage = dailyTarget * storageDays;
   const currentAmount = (currentStorage / 100) * maxStorage;
-  const daysUntilEmpty = Math.max(0, Math.floor((currentStorage / 100) * 90));
-  const decayRate = 1.5; // Dummy decay rate
+  const daysUntilEmpty = Math.max(0, Math.floor((currentStorage / 100) * storageDays));
+  const decayRate = Math.round((7 / storageDays) * 100 * 10) / 10; // weekly decay as % of max
 
   // Refill guide content mapping
   const getGuideContent = (key: string) => {

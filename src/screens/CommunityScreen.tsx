@@ -31,6 +31,7 @@ export default function CommunityScreen({ onBack }: CommunityScreenProps) {
   const [_patterns, setPatterns] = useState<PatternAnalysis | null>(null);
   const [_isLoading, setIsLoading] = useState(false);
   const [showConcept, setShowConcept] = useState(false);
+  const [selectedThread, setSelectedThread] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeCategory === 'patterns') {
@@ -300,8 +301,7 @@ export default function CommunityScreen({ onBack }: CommunityScreenProps) {
                       cursor: 'pointer',
                     }}
                     onClick={() => {
-                      // 将来的にはスレッド詳細画面に遷移
-                      alert(t('community.threadDetail'));
+                      setSelectedThread(selectedThread === conversation.id ? null : conversation.id);
                     }}
                   >
                     <div
