@@ -777,3 +777,35 @@
   - src/types/index.ts
   - tests/screens-and-flows.spec.ts
 - 動作影響: 型チェック0エラー、ビルド成功、コアE2Eテスト33/33パス。Netlifyへ自動デプロイ済み。
+
+## 2026-02-09 08:45 (Agent: Windsurf Cascade)
+- 目的: alert()完全排除 + 既存型エラー修正 + lint警告修正
+- 変更点:
+  - アプリ全体のalert()をshowToastに完全置換（合計30箇所以上、20ファイル以上）
+    - 前回セッション: Settings, Recipe, Language, History, Home, HealthDevice（6画面）
+    - 今回セッション: Shop, Gift, RecoveryProtocol, AISpeedDial, PhotoAnalysisModal, DataDelete, DataImport, DataExport, Feedback, BarcodeScannerModal, MiniNutrientGauge, CommunityScreen, DiaryScreen, App.tsx（14ファイル）
+  - RecipeScreen型エラー3件修正: updateNutrientのundefined処理、t()のテンプレート置換、getCarnivoreTargetsの削除済みPhase1引数除去
+  - ShopScreen: Stripe型キャスト修正（Window → unknown → 具体型）
+  - StorageNutrientGauge: z-[9999] → z-9999 lint修正
+  - PhotoAnalysisModal: z-[10000] → z-10000 lint修正
+- 根拠・ストーリー（Why）: ブラウザのalert()はUXを著しく損なう（操作がブロックされる、見た目が粗い）。showToastは非侵入的で、世界一のアプリにふさわしいフィードバック手段。getCarnivoreTargetsの引数不整合はPhase1パラメータ削除時の呼び出し側更新漏れ。
+- 触ったファイル:
+  - src/App.tsx
+  - src/components/BarcodeScannerModal.tsx
+  - src/components/MiniNutrientGauge.tsx
+  - src/components/PhotoAnalysisModal.tsx
+  - src/components/StorageNutrientGauge.tsx
+  - src/components/dashboard/AISpeedDial.tsx
+  - src/screens/CommunityScreen.tsx
+  - src/screens/DataDeleteScreen.tsx
+  - src/screens/DataExportScreen.tsx
+  - src/screens/DataImportScreen.tsx
+  - src/screens/DiaryScreen.tsx
+  - src/screens/FeedbackScreen.tsx
+  - src/screens/GiftScreen.tsx
+  - src/screens/HistoryScreen.tsx
+  - src/screens/HomeScreen.tsx
+  - src/screens/RecipeScreen.tsx
+  - src/screens/RecoveryProtocolScreen.tsx
+  - src/screens/ShopScreen.tsx
+- 動作影響: 型チェック0エラー、ビルド成功。alert()がsrc内で0件に。Netlifyへ自動デプロイ済み。
