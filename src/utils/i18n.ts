@@ -26,6 +26,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.confirm': '確認',
     'common.loading': '読み込み中...',
     'common.error': 'エラーが発生しました',
+    'common.paymentSuccess': 'ようこそ！CarnivOSへ（決済完了）',
     'common.backAriaLabel': '戻る',
     'common.languageChangeFailed': '言語の変更に失敗しました',
     'common.days': '日',
@@ -477,6 +478,11 @@ const translations: Record<Language, Record<string, string>> = {
     'profile.navigateToTermsOfService': '利用規約画面に遷移',
 
     // ユーザー設定画面
+    'us.fieldGender': '性別',
+    'us.fieldHeight': '身長',
+    'us.fieldWeight': '体重',
+    'us.priorityRequired': '必須',
+    'us.dairyToleranceDesc': '乳製品を摂取できますか？',
     'us.title': 'ユーザー設定',
     'us.optimized': 'このアプリで最大限最適化されています',
     'us.basicInfo': '基本情報',
@@ -1347,6 +1353,7 @@ const translations: Record<Language, Record<string, string>> = {
     'common.confirm': 'Confirm',
     'common.loading': 'Loading...',
     'common.error': 'An error occurred',
+    'common.paymentSuccess': 'Welcome to CarnivOS! (Payment complete)',
     'common.backAriaLabel': 'Back',
     'common.languageChangeFailed': 'Failed to change language',
     'common.days': 'days',
@@ -1791,6 +1798,11 @@ const translations: Record<Language, Record<string, string>> = {
     'profile.navigateToTermsOfService': 'Navigate to terms of service screen',
 
     // User Settings screen
+    'us.fieldGender': 'Gender',
+    'us.fieldHeight': 'Height',
+    'us.fieldWeight': 'Weight',
+    'us.priorityRequired': 'Required',
+    'us.dairyToleranceDesc': 'Can you consume dairy products?',
     'us.title': 'User Settings',
     'us.optimized': 'Fully optimized with this app',
     'us.basicInfo': 'Basic Info',

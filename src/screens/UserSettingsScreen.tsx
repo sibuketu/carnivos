@@ -46,53 +46,42 @@ interface ProfileField {
 const PROFILE_FIELDS: Record<string, ProfileField> = {
   gender: {
     key: 'gender',
-    label: '性別',
+    label: 'us.fieldGender',
     priority: 'required',
   },
   height: {
     key: 'height',
-    label: '身長',
+    label: 'us.fieldHeight',
     priority: 'recommended',
     description: 'cm',
   },
   weight: {
     key: 'weight',
-    label: '体重',
+    label: 'us.fieldWeight',
     priority: 'recommended',
     description: 'kg',
   },
   goal: {
     key: 'goal',
-    label: '目標',
+    label: 'us.goal',
     priority: 'required',
   },
   metabolicStatus: {
     key: 'metabolicStatus',
-    label: '代謝状態',
+    label: 'us.metabolicStatus',
     priority: 'required',
   },
   mode: {
     key: 'mode',
-    label: 'ダイエットモード',
+    label: 'us.dietMode',
     priority: 'recommended',
   },
   dairyTolerance: {
     key: 'dairyTolerance',
-    label: '乳糖耐性',
+    label: 'us.dairyTolerance',
     priority: 'optional',
-    description: '乳製品を摂取できますか？',
+    description: 'us.dairyToleranceDesc',
   },
-};
-
-const getPriorityLabel = (priority: FieldPriority): string => {
-  switch (priority) {
-    case 'required':
-      return '必須';
-    case 'recommended':
-      return '推奨';
-    case 'optional':
-      return '任意';
-  }
 };
 
 const getPriorityClass = (priority: FieldPriority): string => {
@@ -467,9 +456,20 @@ export default function UserSettingsScreen() {
     window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'profile' }));
   };
 
+  const getPriorityLabel = (priority: FieldPriority): string => {
+    switch (priority) {
+      case 'required':
+        return t('us.priorityRequired');
+      case 'recommended':
+        return t('us.recommended');
+      case 'optional':
+        return t('us.optional');
+    }
+  };
+
   const renderFieldLabel = (field: ProfileField) => (
     <div className="profile-screen-field-header">
-      <span className="profile-screen-field-label">{field.label}</span>
+      <span className="profile-screen-field-label">{t(field.label)}</span>
       <span className={`profile-screen-priority-badge ${getPriorityClass(field.priority)}`}>
         {getPriorityLabel(field.priority)}
       </span>

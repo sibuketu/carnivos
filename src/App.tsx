@@ -186,7 +186,7 @@ function AppContent() {
 
       // 少し遅延させてトースト表示（DOMのマウントを待つ）
       setTimeout(() => {
-        (window as unknown as { showToast: (msg: string) => void }).showToast?.('ようこそ！CarnivOSへ（決済完了）');
+        (window as unknown as { showToast: (msg: string) => void }).showToast?.(t('common.paymentSuccess'));
       }, 1000);
     }
   }, []);

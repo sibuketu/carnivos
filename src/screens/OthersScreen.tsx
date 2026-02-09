@@ -192,7 +192,7 @@ export default function OthersScreen() {
           <button className="labs-list-item" data-testid="labs-feedback" onClick={() => navigateTo('feedback')}>
             <span className="labs-list-item-icon">💬</span>
             <div className="labs-list-item-content">
-              <span className="labs-list-item-title">Feedback</span>
+              <span className="labs-list-item-title">{t('settings.bugReport')}</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
@@ -201,14 +201,14 @@ export default function OthersScreen() {
           <button className="labs-list-item" data-testid="labs-privacy" onClick={() => navigateTo('privacy')}>
             <span className="labs-list-item-icon">📄</span>
             <div className="labs-list-item-content">
-              <span className="labs-list-item-title">Privacy Policy</span>
+              <span className="labs-list-item-title">{t('settings.privacyPolicy')}</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
           <button className="labs-list-item" data-testid="labs-terms" onClick={() => navigateTo('terms')}>
             <span className="labs-list-item-icon">⚖️</span>
             <div className="labs-list-item-content">
-              <span className="labs-list-item-title">Terms of Service</span>
+              <span className="labs-list-item-title">{t('settings.termsOfService')}</span>
             </div>
             <span className="labs-list-item-arrow">→</span>
           </button>
