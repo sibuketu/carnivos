@@ -153,7 +153,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
         {/* 断食タイマーのデフォルト時間 */}
         <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">断食タイマー（デフォルト時間）</h2>
+          <h2 className="settings-screen-section-title">{t('settings.fastingTimer')}</h2>
           <div className="settings-screen-button-row">
             {[12, 16, 18, 24].map((h) => (
               <button
@@ -172,7 +172,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
         {/* 文字サイズ設定 */}
         <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">文字サイズ</h2>
+          <h2 className="settings-screen-section-title">{t('settings.fontSize')}</h2>
           <div className="settings-screen-button-row">
             <button
               className={`settings-screen-option-button ${fontSizeLocal === 'small' ? 'active' : ''}`}
@@ -203,16 +203,16 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
         {/* 栄養素表示モード（3モードUI） */}
         <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">栄養素の表示モード</h2>
+          <h2 className="settings-screen-section-title">{t('settings.nutrientDisplayMode')}</h2>
           <p className="settings-screen-section-description" style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem' }}>
-            ホーム・履歴で表示する栄養素の量を選べます。シンプル→標準→詳細の順に多く表示されます。
+            {t('settings.nutrientDisplayModeDesc')}
           </p>
           <div className="settings-screen-button-row" style={{ flexDirection: 'column', gap: '0.5rem' }}>
             {(
               [
-                { value: 'simple' as const, label: 'シンプル', desc: '電解質（Na, K, Mg）と脂質のみ' },
-                { value: 'standard' as const, label: '標準', desc: '電解質・マクロ＋主要ミネラル・ビタミン' },
-                { value: 'detailed' as const, label: '詳細', desc: '全栄養素（60項目以上）' },
+                { value: 'simple' as const, label: t('settings.nutrientSimple'), desc: t('settings.nutrientSimpleDesc') },
+                { value: 'standard' as const, label: t('settings.nutrientStandard'), desc: t('settings.nutrientStandardDesc') },
+                { value: 'detailed' as const, label: t('settings.nutrientDetailed'), desc: t('settings.nutrientDetailedDesc') },
               ] as const
             ).map((option) => (
               <button
@@ -235,7 +235,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
         {/* 表示設定 */}
         <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">その他の表示設定</h2>
+          <h2 className="settings-screen-section-title">{t('settings.otherDisplay')}</h2>
           <div className="settings-screen-switch-row">
             <div className="settings-screen-switch-label-group">
               <label className="settings-screen-switch-label">
@@ -254,11 +254,11 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
           <div className="settings-screen-switch-row">
             <div className="settings-screen-switch-label-group">
               <label className="settings-screen-switch-label">
-                栄養素プレビューを表示
-                <HelpTooltip text="食品を追加する際に、その食品を追加した場合の栄養素の変動を事前にプレビュー表示します。目標値との比較が一目で分かります。" />
+                {t('settings.showNutrientPreview')}
+                <HelpTooltip text={t('settings.nutrientPreviewTooltip')} />
               </label>
               <div className="settings-screen-switch-description">
-                食品追加時に栄養素の変動をプレビュー表示します
+                {t('settings.nutrientPreviewDesc')}
               </div>
             </div>
             <label className="settings-screen-switch">
@@ -288,11 +288,11 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
           <div className="settings-screen-switch-row">
             <div className="settings-screen-switch-label-group">
               <label className="settings-screen-switch-label">
-                Tips（豆知識）を表示
-                <HelpTooltip text="AI応答のローディング中やアプリ起動時に、カーニボアダイエットに関する役立つTipsをランダムに表示します。知識を深めるのに役立ちます。" />
+                {t('settings.showTips')}
+                <HelpTooltip text={t('settings.tipsTooltip')} />
               </label>
               <div className="settings-screen-switch-description">
-                AI応答のローディング中やアプリ起動時に、カーニボアに関するTipsをランダム表示
+                {t('settings.tipsDesc')}
               </div>
             </div>
             <label className="settings-screen-switch">
@@ -319,13 +319,13 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
 
         {/* 通知設定 */}
         <div className="settings-screen-section">
-          <h2 className="settings-screen-section-title">通知設定</h2>
+          <h2 className="settings-screen-section-title">{t('settings.notification')}</h2>
 
           {notificationPermission === 'default' ? (
             // 許可が未取得の場合: ボタンを表示
             <div style={{ padding: '1rem 0' }}>
               <p style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#666' }}>
-                解凍リマインダーなどの通知を受け取るには、ブラウザの通知許可が必要です。
+                {t('settings.notificationDesc')}
               </p>
               <button
                 onClick={async () => {
@@ -351,7 +351,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                   minWidth: '44px',
                 }}
               >
-                🔔 通知を受け取る
+                {t('settings.notificationButton')}
               </button>
             </div>
           ) : notificationPermission === 'granted' ? (
@@ -390,7 +390,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
             >
               ⚠️ {t('settings.notificationDenied')}
               <p style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>
-                ブラウザの設定から通知を許可してください。
+                {t('settings.notificationDeniedDesc')}
               </p>
             </div>
           )}
@@ -454,7 +454,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                     window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: item.screen }));
                   }}
                 >
-                  実際の画面を見る →
+                  {t('settings.viewScreen')}
                 </button>
               </div>
             ))}
@@ -472,7 +472,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                 window.dispatchEvent(event);
               }}
             >
-              バグ報告・フィードバック
+              {t('settings.bugReport')}
             </button>
           </div>
         </div>
@@ -490,7 +490,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                 }
               }}
             >
-              オンボーディングを再表示
+              {t('settings.showOnboarding')}
             </button>
             <button
               className="settings-screen-option-button"
@@ -499,7 +499,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                 window.dispatchEvent(event);
               }}
             >
-              プライバシーポリシー
+              {t('settings.privacyPolicy')}
             </button>
             <button
               className="settings-screen-option-button"
@@ -508,7 +508,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
                 window.dispatchEvent(event);
               }}
             >
-              利用規約
+              {t('settings.termsOfService')}
             </button>
           </div>
         </div>
@@ -520,7 +520,7 @@ export default function SettingsScreen({ onShowOnboarding, onBack }: SettingsScr
             <button
               className="settings-screen-option-button"
               onClick={async () => {
-                if (window.confirm('ログアウトしますか？')) {
+                if (window.confirm(t('settings.logoutConfirm'))) {
                   await signOut();
                 }
               }}

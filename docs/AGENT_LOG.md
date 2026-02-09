@@ -903,3 +903,22 @@
   - src/components/MiniNutrientGauge.tsx
   - src/screens/OthersScreen.tsx
 - 動作影響: 英語設定時、WelcomeModal・TrophyModal・MiniNutrientGaugeの計算式表示が英語で表示される。日本語設定時は従来通り。
+
+---
+
+## 2026-02-09 (Agent: Windsurf/Cascade) - i18nバッチ2
+- 目的: i18nクリーンアップ継続 - InputScreen/UserSettingsScreen/HomeScreen/HistoryScreenのハードコード日本語をi18nキーに置換
+- 変更点:
+  - **InputScreen**: 全52件のハードコード日本語をi18nキーに置換（天気・排泄・断食・日記・食品リスト等）
+  - **UserSettingsScreen**: 全130+件のハードコード日本語をi18nキーに置換（基本情報・目標・代謝状態・ダイエットモード・乳糖耐性・女性特有条件・ストレス・推奨項目・任意項目・代謝ストレス指標・栄養素カスタマイズ等）
+  - **HomeScreen**: 全栄養素レポートモーダル・表示モード切替・写真解析中テキスト・追加方法選択モーダルのi18n対応
+  - **HistoryScreen**: 睡眠スコア・太陽光暴露・活動レベル・ストレスレベル・日記ラベルのi18n対応
+  - **i18n.ts**: `us.*`（UserSettings用130+キー）、`home.*`（30+キー）、`history.*`（5キー）を日英両方に追加
+- 根拠・ストーリー（Why）: 英語ユーザー向けに全画面のUIテキストを言語切替対応にする。主要4画面を一気に対応し、i18nカバレッジを大幅に向上。
+- 触ったファイル:
+  - src/utils/i18n.ts
+  - src/screens/InputScreen.tsx
+  - src/screens/UserSettingsScreen.tsx
+  - src/screens/HomeScreen.tsx
+  - src/screens/HistoryScreen.tsx
+- 動作影響: 英語設定時、上記4画面の全UIテキストが英語で表示される。日本語設定時は従来通り。

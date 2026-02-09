@@ -203,6 +203,21 @@ const translations: Record<Language, Record<string, string>> = {
     'home.analyzing': '解析中...',
     'home.photoAnalysisFailed': '写真の解析に失敗しました。もう一度お試しください。',
 
+    // 設定画面（追加）
+    'settings.nutrientDisplayMode': '栄養素の表示モード',
+    'settings.nutrientDisplayModeDesc': 'ホーム・履歴で表示する栄養素の量を選べます。シンプル→標準→詳細の順に多く表示されます。',
+    'settings.nutrientSimple': 'シンプル',
+    'settings.nutrientSimpleDesc': '電解質（Na, K, Mg）と脂質のみ',
+    'settings.nutrientStandard': '標準',
+    'settings.nutrientStandardDesc': '電解質・マクロ＋主要ミネラル・ビタミン',
+    'settings.nutrientDetailed': '詳細',
+    'settings.nutrientDetailedDesc': '全栄養素（60項目以上）',
+    'settings.notification': '通知設定',
+    'settings.notificationDesc': '解凍リマインダーなどの通知を受け取るには、ブラウザの通知許可が必要です。',
+    'settings.notificationButton': '🔔 通知を受け取る',
+    'settings.notificationDeniedDesc': 'ブラウザの設定から通知を許可してください。',
+    'settings.bugReport': 'バグ報告・フィードバック',
+
     // 履歴画面
     'history.sleepScore': '睡眠スコア:',
     'history.sunExposure': '太陽光暴露:',
@@ -1286,6 +1301,21 @@ const translations: Record<Language, Record<string, string>> = {
     'home.analyzingPhoto': 'Analyzing photo...',
     'home.analyzing': 'Analyzing...',
     'home.photoAnalysisFailed': 'Photo analysis failed. Please try again.',
+
+    // Settings screen (additional)
+    'settings.nutrientDisplayMode': 'Nutrient Display Mode',
+    'settings.nutrientDisplayModeDesc': 'Choose how many nutrients to show on Home and History. Simple → Standard → Detailed shows more.',
+    'settings.nutrientSimple': 'Simple',
+    'settings.nutrientSimpleDesc': 'Electrolytes (Na, K, Mg) and fat only',
+    'settings.nutrientStandard': 'Standard',
+    'settings.nutrientStandardDesc': 'Electrolytes, macros + key minerals & vitamins',
+    'settings.nutrientDetailed': 'Detailed',
+    'settings.nutrientDetailedDesc': 'All nutrients (60+ items)',
+    'settings.notification': 'Notifications',
+    'settings.notificationDesc': 'Browser notification permission is required to receive reminders such as defrost reminders.',
+    'settings.notificationButton': '🔔 Enable Notifications',
+    'settings.notificationDeniedDesc': 'Please allow notifications in your browser settings.',
+    'settings.bugReport': 'Bug Report / Feedback',
 
     // History screen
     'history.sleepScore': 'Sleep score:',
