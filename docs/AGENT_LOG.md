@@ -884,3 +884,22 @@
 - 触ったファイル:
   - docs/VERCEL_MIGRATION_GUIDE.md（新規）
 - 動作影響: なし（ガイドmdのみ）。
+
+---
+
+## 2026-02-09 (Agent: Windsurf/Cascade)
+- 目的: i18nクリーンアップ（A案）- ハードコード日本語を言語切替対応に
+- 変更点:
+  - **WelcomeModal**: 全テキストをi18nキーに置換。トロフィー場所説明を「OTHERタブ→🏆トロフィー」に修正。
+  - **TrophyModal**: 全テキストをi18nキーに置換。日付表示をlocale対応。`as any`lint対策として`tt()`ヘルパー導入。
+  - **OthersScreen**: トロフィーボタンのタイトル・達成テキストをi18nキーに置換。
+  - **MiniNutrientGauge**: `getDefaultExplanation()`に英語版栄養素説明を追加し`getLanguage()`で切替。全栄養素（protein/fat/magnesium/iron/vitamin_d/sodium/potassium/zinc/vitamin_c/vitamin_a/vitamin_k2/vitamin_b12/choline/phosphorus）の計算式表示テキストを`getLanguage()`ベースで日英切替対応。調整名（妊娠中/授乳中/激しい運動/中程度の運動/活動的/50歳以上/消化器系の問題/高ストレス/睡眠不足/高炎症/移行期間中/メンタルヘルス不良/アルコール摂取/高カフェイン等）を全てlang-aware化。
+  - **i18n.ts**: WelcomeModal・Trophy用のi18nキーを日英両方に追加。
+- 根拠・ストーリー（Why）: 英語ユーザーがアプリを使う際、栄養素の計算式表示やモーダルテキストが日本語のままでは使えない。i18nクリーンアップを優先し、全UIテキストを言語切替対応にすることで国際展開の基盤を整備。
+- 触ったファイル:
+  - src/utils/i18n.ts
+  - src/components/WelcomeModal.tsx
+  - src/components/TrophyModal.tsx
+  - src/components/MiniNutrientGauge.tsx
+  - src/screens/OthersScreen.tsx
+- 動作影響: 英語設定時、WelcomeModal・TrophyModal・MiniNutrientGaugeの計算式表示が英語で表示される。日本語設定時は従来通り。

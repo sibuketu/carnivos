@@ -225,7 +225,7 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
               <button
                 type="button"
                 className="connect-button"
-                title="デバイス連携"
+                title="Device link"
                 onClick={() => window.dispatchEvent(new CustomEvent('navigateToScreen', { detail: 'healthDevice' }))}
               >
                 🔗
@@ -323,13 +323,13 @@ export default function DiaryScreen({ onBack }: DiaryScreenProps) {
       </div>
 
       <div className="diary-tabs">
-        <button className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`} onClick={() => setActiveTab('favorites')}>★ お気に入り</button>
-        <button className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>すべて</button>
-        <button className={`tab-btn ${activeTab === 'physical' ? 'active' : ''}`} onClick={() => setActiveTab('physical')}>身体</button>
-        <button className={`tab-btn ${activeTab === 'mental' ? 'active' : ''}`} onClick={() => setActiveTab('mental')}>メンタル</button>
-        <button className={`tab-btn ${activeTab === 'sleep' ? 'active' : ''}`} onClick={() => setActiveTab('sleep')}>睡眠</button>
-        <button className={`tab-btn ${activeTab === 'social' ? 'active' : ''}`} onClick={() => setActiveTab('social')}>社交</button>
-        <button className={`tab-btn ${activeTab === 'environment' ? 'active' : ''}`} onClick={() => setActiveTab('environment')}>環境</button>
+        <button className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`} onClick={() => setActiveTab('favorites')}>★ {t('diary.favorites')}</button>
+        <button className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>{t('diary.all')}</button>
+        <button className={`tab-btn ${activeTab === 'physical' ? 'active' : ''}`} onClick={() => setActiveTab('physical')}>{t('diary.categoryPhysical')}</button>
+        <button className={`tab-btn ${activeTab === 'mental' ? 'active' : ''}`} onClick={() => setActiveTab('mental')}>{t('diary.categoryMental')}</button>
+        <button className={`tab-btn ${activeTab === 'sleep' ? 'active' : ''}`} onClick={() => setActiveTab('sleep')}>{t('diary.categorySleep')}</button>
+        <button className={`tab-btn ${activeTab === 'social' ? 'active' : ''}`} onClick={() => setActiveTab('social')}>{t('diary.categorySocial')}</button>
+        <button className={`tab-btn ${activeTab === 'environment' ? 'active' : ''}`} onClick={() => setActiveTab('environment')}>{t('diary.categoryEnvironment')}</button>
       </div>
 
       <div className="diary-content-scroll">
