@@ -847,3 +847,16 @@
   - supabase/functions/create-checkout-session/index.ts
   - docs/second-brain/10_Planning_Requirements/決定事項ログ.md
 - 動作影響: 型チェック0エラー、ビルド成功。全画面がCSS変数ベースでダークモード対応。
+
+---
+
+## 2026-02-09 10:50 (Agent: Windsurf/Cascade)
+- 目的: Netlify origin URL修正、別Agent向け作業委託md作成
+- 変更点:
+  - **Supabase Edge Function origin修正**: デフォルトoriginを`carnivos.netlify.app`→`carnivoslol.netlify.app`に修正（実際のNetlifyサイト名に合わせた）。
+  - **作業委託md作成**: `docs/WINDSURF_TASK_STRIPE_PAYMENT.md`を作成。Stripe決済本番化・Netlify自動デプロイ接続・GiftScreen型エラー修正の3タスクを別Agentに委託。
+- 根拠・ストーリー（Why）: ユーザーからStripe等は別Agentで作業する指示。Netlify URLは`carnivoslol`が正しい本番サイト名であり、`primal-logic`は存在しないサイト。
+- 触ったファイル:
+  - supabase/functions/create-checkout-session/index.ts
+  - docs/WINDSURF_TASK_STRIPE_PAYMENT.md（新規）
+- 動作影響: Edge Functionのフォールバックoriginが正しいURLに。
