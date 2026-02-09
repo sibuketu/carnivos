@@ -1799,7 +1799,7 @@ export default function AISpeedDial({
                       <div className="ai-chat-message ai-chat-message-assistant">
                         <div className="ai-chat-loading">
                           <div className="ai-chat-loading-spinner"></div>
-                          <span>考え中...</span>
+                          <span>{t('ai.thinking')}</span>
                         </div>
                         {loadingTip && (
                           <TipCard
