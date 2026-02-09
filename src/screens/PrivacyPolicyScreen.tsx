@@ -2,9 +2,11 @@
  * CarnivOS - プライバシーポリシー画面
  */
 
+import { useTranslation } from '../utils/i18n';
 import './PrivacyPolicyScreen.css';
 
 export default function PrivacyPolicyScreen() {
+  const { t } = useTranslation();
   return (
     <div className="privacy-policy-screen">
       <div className="privacy-policy-container">
@@ -14,9 +16,9 @@ export default function PrivacyPolicyScreen() {
           }}
           className="privacy-policy-back-button"
         >
-          ← 設定に戻る
+          {t('privacy.backToSettings')}
         </button>
-        <h1 className="privacy-policy-title">プライバシーポリシー</h1>
+        <h1 className="privacy-policy-title">{t('privacy.title')}</h1>
         <div className="privacy-policy-content">
           <p className="privacy-policy-updated">最終更新日: 2025年1月1日</p>
 

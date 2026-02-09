@@ -2,9 +2,11 @@
  * CarnivOS - 利用規約画面
  */
 
+import { useTranslation } from '../utils/i18n';
 import './TermsOfServiceScreen.css';
 
 export default function TermsOfServiceScreen() {
+  const { t } = useTranslation();
   return (
     <div className="terms-of-service-screen">
       <div className="terms-of-service-container">
@@ -14,9 +16,9 @@ export default function TermsOfServiceScreen() {
           }}
           className="terms-of-service-back-button"
         >
-          ← 設定に戻る
+          {t('terms.backToSettings')}
         </button>
-        <h1 className="terms-of-service-title">利用規約</h1>
+        <h1 className="terms-of-service-title">{t('terms.title')}</h1>
         <div className="terms-of-service-content">
           <p className="terms-of-service-updated">最終更新日: 2025年1月1日</p>
 

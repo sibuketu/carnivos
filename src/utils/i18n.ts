@@ -333,6 +333,14 @@ const translations: Record<Language, Record<string, string>> = {
     // Tips画面
     'tips.noKnowledge': 'このカテゴリには知識がありません',
 
+    // プライバシーポリシー画面
+    'privacy.backToSettings': '← 設定に戻る',
+    'privacy.title': 'プライバシーポリシー',
+
+    // 利用規約画面
+    'terms.backToSettings': '← 設定に戻る',
+    'terms.title': '利用規約',
+
     // InputScreen追加
     'input.currentValues': '現在の値',
     'input.afterAddValues': '追加後の値',
@@ -1567,6 +1575,14 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Tips screen
     'tips.noKnowledge': 'No knowledge in this category',
+
+    // Privacy Policy screen
+    'privacy.backToSettings': '← Back to Settings',
+    'privacy.title': 'Privacy Policy',
+
+    // Terms of Service screen
+    'terms.backToSettings': '← Back to Settings',
+    'terms.title': 'Terms of Service',
 
     // InputScreen additional
     'input.currentValues': 'Current values',
