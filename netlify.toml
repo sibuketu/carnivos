@@ -22,6 +22,12 @@
   to = "/terms.html"
   status = 200
 
+# 特定商取引法に基づく表記（Stripe提出用）
+[[redirects]]
+  from = "/tokushoho"
+  to = "/tokushoho.html"
+  status = 200
+
 # SPA用フォールバック
 [[redirects]]
   from = "/*"
