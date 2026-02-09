@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import type { ArgumentCard as ArgumentCardType } from '../data/argumentCards';
+import { useTranslation } from '../utils/i18n';
 import './ArgumentCard.css';
 
 interface ArgumentCardProps {
@@ -15,6 +16,7 @@ interface ArgumentCardProps {
 }
 
 export default function ArgumentCard({ card, onClose }: ArgumentCardProps) {
+  const { t } = useTranslation();
   const [level, setLevel] = useState<1 | 2 | 3>(1);
   const [showCitations, setShowCitations] = useState(false);
 
@@ -87,7 +89,7 @@ export default function ArgumentCard({ card, onClose }: ArgumentCardProps) {
           {/* Level 1: Glance */}
           {level >= 1 && (
             <div className="argument-card-level">
-              <div className="argument-card-level-label">レベル1: 概要</div>
+              <div className="argument-card-level-label">{t('argumentCard.level1')}</div>
               <div
                 className="argument-card-level-card"
                 style={{ borderLeftColor: getVerdictColor() }}
@@ -100,7 +102,7 @@ export default function ArgumentCard({ card, onClose }: ArgumentCardProps) {
           {/* Level 2: Explanation */}
           {level >= 2 && (
             <div className="argument-card-level">
-              <div className="argument-card-level-label">レベル2: 詳細説明</div>
+              <div className="argument-card-level-label">{t('argumentCard.level2')}</div>
               <div
                 className="argument-card-level-card"
                 style={{ borderLeftColor: getVerdictColor() }}

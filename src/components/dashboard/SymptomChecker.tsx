@@ -6,9 +6,11 @@
 
 import { useState } from 'react';
 import { REMEDY_LOGIC, type RemedyItem } from '../../data/remedyLogic';
+import { useTranslation } from '../../utils/i18n';
 import './SymptomChecker.css';
 
 export default function SymptomChecker() {
+  const { t } = useTranslation();
   const [selectedSymptom, setSelectedSymptom] = useState<RemedyItem | null>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -26,7 +28,7 @@ export default function SymptomChecker() {
     <>
       <div className="symptom-checker-section">
         <h3 className="symptom-checker-title">💊 体調はどう？</h3>
-        <p className="symptom-checker-subtitle">症状を選んで対処法を確認</p>
+        <p className="symptom-checker-subtitle">{t('symptomChecker.subtitle')}</p>
         <div className="symptom-buttons">
           {REMEDY_LOGIC.map((remedy) => (
             <button

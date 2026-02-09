@@ -236,7 +236,7 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
                 <div className="food-edit-footer">
                     <button className="cancel-button" onClick={onClose}>{t('foodEdit.cancel')}</button>
                     <button className="confirm-button" onClick={() => onSave(editedFood)}>
-                        確定して記録
+                        {t('foodEdit.confirmRecord')}
                     </button>
                 </div>
             </div>

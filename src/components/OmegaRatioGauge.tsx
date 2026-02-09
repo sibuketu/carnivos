@@ -5,6 +5,7 @@
  * カーニボア重要：炎症管理のための最重要指標
  */
 
+import { useTranslation } from '../utils/i18n';
 import './NutrientGauge.css';
 
 interface OmegaRatioGaugeProps {
@@ -22,6 +23,7 @@ export default function OmegaRatioGauge({
   previewOmega6 = 0,
   onPress,
 }: OmegaRatioGaugeProps) {
+  const { t } = useTranslation();
   const totalOmega3 = omega3 + previewOmega3;
   const totalOmega6 = omega6 + previewOmega6;
 
@@ -55,7 +57,7 @@ export default function OmegaRatioGauge({
       style={{ cursor: onPress ? 'pointer' : 'default' }}
     >
       <div className="nutrient-gauge-header">
-        <span className="nutrient-gauge-label">オメガ3/6比率</span>
+        <span className="nutrient-gauge-label">{t('gauge.omegaRatio')}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <span className="nutrient-gauge-value">
             {totalOmega3 > 0 && totalOmega6 > 0 ? (

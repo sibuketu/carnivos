@@ -386,6 +386,32 @@ const translations: Record<Language, Record<string, string>> = {
     'errorReport.dateTime': '日時',
     'errorReport.browserInfo': 'ブラウザ情報',
 
+    // StreakCalendar コンポーネント
+    'streakCalendar.onStreak': '連続記録中',
+    'streakCalendar.noRecord': '記録なし',
+    'streakCalendar.violation': '違反あり',
+
+    // ArgumentCard コンポーネント
+    'argumentCard.level1': 'レベル1: 概要',
+    'argumentCard.level2': 'レベル2: 詳細説明',
+
+    // AppIconGenerator コンポーネント
+    'appIcon.title': 'アプリアイコン生成',
+
+    // ゲージ コンポーネント
+    'gauge.calciumPhosphorus': 'カルシウム:リン比率',
+    'gauge.glycineMethionine': 'グリシン:メチオニン比',
+    'gauge.omegaRatio': 'オメガ3/6比率',
+
+    // InteractiveChicken コンポーネント
+    'chicken.tapPart': '部位をタップしてください',
+
+    // PhotoAnalysisModal コンポーネント
+    'photoAnalysis.eatAmount': '食べる量',
+
+    // SymptomChecker コンポーネント
+    'symptomChecker.subtitle': '症状を選んで対処法を確認',
+
     // InputScreen追加
     'input.currentValues': '現在の値',
     'input.afterAddValues': '追加後の値',
@@ -1673,6 +1699,32 @@ const translations: Record<Language, Record<string, string>> = {
     'errorReport.unknown': 'Unknown',
     'errorReport.dateTime': 'Date/Time',
     'errorReport.browserInfo': 'Browser info',
+
+    // StreakCalendar component
+    'streakCalendar.onStreak': 'On streak',
+    'streakCalendar.noRecord': 'No record',
+    'streakCalendar.violation': 'Violation',
+
+    // ArgumentCard component
+    'argumentCard.level1': 'Level 1: Overview',
+    'argumentCard.level2': 'Level 2: Detailed Explanation',
+
+    // AppIconGenerator component
+    'appIcon.title': 'App Icon Generator',
+
+    // Gauge components
+    'gauge.calciumPhosphorus': 'Calcium:Phosphorus Ratio',
+    'gauge.glycineMethionine': 'Glycine:Methionine Ratio',
+    'gauge.omegaRatio': 'Omega 3/6 Ratio',
+
+    // InteractiveChicken component
+    'chicken.tapPart': 'Tap a part to select',
+
+    // PhotoAnalysisModal component
+    'photoAnalysis.eatAmount': 'Amount to eat',
+
+    // SymptomChecker component
+    'symptomChecker.subtitle': 'Select symptoms to check remedies',
 
     // InputScreen additional
     'input.currentValues': 'Current values',

@@ -9,6 +9,7 @@
 
 import React, { useState, useMemo } from 'react';
 import type { DailyLog } from '../types';
+import { useTranslation } from '../utils/i18n';
 import './StreakCalendar.css';
 
 interface StreakCalendarProps {
@@ -17,6 +18,7 @@ interface StreakCalendarProps {
 }
 
 function StreakCalendar({ logs, onDayClick }: StreakCalendarProps) {
+  const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // 現在の月の開始日と終了日を取得
@@ -241,18 +243,18 @@ function StreakCalendar({ logs, onDayClick }: StreakCalendarProps) {
       <div className="streak-calendar-legend">
         <div className="streak-calendar-legend-item">
           <div className="streak-calendar-legend-color" style={{ backgroundColor: '#f43f5e' }} />
-          <span>連続記録中</span>
+          <span>{t('streakCalendar.onStreak')}</span>
         </div>
         <div className="streak-calendar-legend-item">
           <div
             className="streak-calendar-legend-color"
             style={{ backgroundColor: '#f9fafb', borderColor: '#e5e7eb' }}
           />
-          <span>記録なし</span>
+          <span>{t('streakCalendar.noRecord')}</span>
         </div>
         <div className="streak-calendar-legend-item">
           <div className="streak-calendar-legend-color" style={{ backgroundColor: '#dc2626' }} />
-          <span>違反あり</span>
+          <span>{t('streakCalendar.violation')}</span>
         </div>
       </div>
     </div>

@@ -12,8 +12,10 @@ import {
 } from '../services/imageGenerationServiceAuto';
 // 手動生成版（プロンプトのみ）も残しておく
 import { generateAppIcon, generateMultipleAppIcons } from '../services/imageGenerationService';
+import { useTranslation } from '../utils/i18n';
 
 export function AppIconGenerator() {
+  const { t } = useTranslation();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<
     Array<{ style: number; variation: number; url: string }>
@@ -79,7 +81,7 @@ export function AppIconGenerator() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">アプリアイコン生成</h1>
+      <h1 className="text-2xl font-bold mb-4">{t('appIcon.title')}</h1>
 
       <div className="mb-4 space-x-2">
         <button

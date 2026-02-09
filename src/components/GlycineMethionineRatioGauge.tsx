@@ -5,6 +5,7 @@
  * カーニボア重要：長寿の視点（Nose to Tail理論）
  */
 
+import { useTranslation } from '../utils/i18n';
 import './NutrientGauge.css';
 
 interface GlycineMethionineRatioGaugeProps {
@@ -22,6 +23,7 @@ export default function GlycineMethionineRatioGauge({
   previewMethionine = 0,
   onPress,
 }: GlycineMethionineRatioGaugeProps) {
+  const { t } = useTranslation();
   const totalGlycine = glycine + previewGlycine;
   const totalMethionine = methionine + previewMethionine;
 
@@ -67,7 +69,7 @@ export default function GlycineMethionineRatioGauge({
       style={{ cursor: onPress ? 'pointer' : 'default' }}
     >
       <div className="nutrient-gauge-header">
-        <span className="nutrient-gauge-label">グリシン:メチオニン比</span>
+        <span className="nutrient-gauge-label">{t('gauge.glycineMethionine')}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <span className="nutrient-gauge-value">
             {totalGlycine > 0 && totalMethionine > 0 ? (

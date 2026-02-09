@@ -5,6 +5,7 @@
  * デザインのトーン＆マナーは牛（InteractiveCow）と同じ
  */
 
+import { useTranslation } from '../utils/i18n';
 import './InteractiveButcher.css';
 
 interface InteractiveChickenProps {
@@ -16,9 +17,10 @@ export default function InteractiveChicken({
   selectedPart,
   onSelectPart,
 }: InteractiveChickenProps) {
+  const { t } = useTranslation();
   return (
     <div className="w-full max-w-md mx-auto">
-      <h2 className="text-xl font-bold text-center mb-4">部位をタップしてください</h2>
+      <h2 className="text-xl font-bold text-center mb-4">{t('chicken.tapPart')}</h2>
 
       <svg
         viewBox="0 0 500 300"

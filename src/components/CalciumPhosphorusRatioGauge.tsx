@@ -5,6 +5,7 @@
  * カーニボア重要：骨代謝に影響
  */
 
+import { useTranslation } from '../utils/i18n';
 import './NutrientGauge.css';
 
 interface CalciumPhosphorusRatioGaugeProps {
@@ -22,6 +23,7 @@ export default function CalciumPhosphorusRatioGauge({
   previewPhosphorus = 0,
   onPress,
 }: CalciumPhosphorusRatioGaugeProps) {
+  const { t } = useTranslation();
   const totalCalcium = calcium + previewCalcium;
   const totalPhosphorus = phosphorus + previewPhosphorus;
 
@@ -55,7 +57,7 @@ export default function CalciumPhosphorusRatioGauge({
     >
       <div className="nutrient-gauge-header">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <span className="nutrient-gauge-label">カルシウム:リン比率</span>
+          <span className="nutrient-gauge-label">{t('gauge.calciumPhosphorus')}</span>
           <span style={{ fontSize: '10px', color: '#78716c' }}>
             骨代謝に重要（推奨: 1:1以上）。リン過多は骨密度低下のリスクがあります。
           </span>

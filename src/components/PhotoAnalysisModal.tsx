@@ -5,6 +5,7 @@ import MiniNutrientGauge from './MiniNutrientGauge';
 import type { CarnivoreTarget } from '../data/carnivoreTargets';
 import { getSequentialTip, type Tip, saveTip, unsaveTip, isTipSaved } from '../data/tips';
 import { useNutrition } from '../hooks/useNutrition';
+import { useTranslation } from '../utils/i18n';
 
 interface PhotoAnalysisModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export default function PhotoAnalysisModal({
   onConfirm,
   dynamicTargets,
 }: PhotoAnalysisModalProps) {
+  const { t } = useTranslation();
   // ローカルステートで編集内容を管理
   const [currentResult, setCurrentResult] = useState(analysisResult);
   const [followupAnswers, setFollowupAnswers] = useState<Record<string, string>>({});
@@ -262,7 +264,7 @@ export default function PhotoAnalysisModal({
                 marginBottom: '1rem',
               }}
             >
-              <label style={{ fontWeight: '600', color: '#e5e7eb' }}>食べる量</label>
+              <label style={{ fontWeight: '600', color: '#e5e7eb' }}>{t('photoAnalysis.eatAmount')}</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <input
                   type="number"
