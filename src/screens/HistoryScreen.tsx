@@ -957,21 +957,21 @@ export default function HistoryScreen() {
                               </div>
 
                               <div className="history-screen-detail-section">
-                                <div className="history-screen-detail-label">睡眠スコア:</div>
+                                <div className="history-screen-detail-label">{t('history.sleepScore')}</div>
                                 <div className="history-screen-detail-value">
                                   {item.status.sleepScore}
                                 </div>
                               </div>
 
                               <div className="history-screen-detail-section">
-                                <div className="history-screen-detail-label">太陽光暴露:</div>
+                                <div className="history-screen-detail-label">{t('history.sunExposure')}</div>
                                 <div className="history-screen-detail-value">
                                   {item.status.sunMinutes} min
                                 </div>
                               </div>
 
                               <div className="history-screen-detail-section">
-                                <div className="history-screen-detail-label">活動レベル:</div>
+                                <div className="history-screen-detail-label">{t('history.activityLevel')}</div>
                                 <div className="history-screen-detail-value">
                                   {item.status.activityLevel}
                                 </div>
@@ -979,7 +979,7 @@ export default function HistoryScreen() {
 
                               {item.status.stressLevel && (
                                 <div className="history-screen-detail-section">
-                                  <div className="history-screen-detail-label">ストレスレベル:</div>
+                                  <div className="history-screen-detail-label">{t('history.stressLevel')}</div>
                                   <div className="history-screen-detail-value">
                                     {item.status.stressLevel}
                                   </div>
@@ -988,7 +988,7 @@ export default function HistoryScreen() {
 
                               {item.diary && (
                                 <div className="history-screen-detail-section">
-                                  <div className="history-screen-detail-label">日記:</div>
+                                  <div className="history-screen-detail-label">{t('history.diary')}</div>
                                   <div
                                     className="history-screen-detail-value"
                                     style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}

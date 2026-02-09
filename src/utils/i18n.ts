@@ -203,6 +203,13 @@ const translations: Record<Language, Record<string, string>> = {
     'home.analyzing': '解析中...',
     'home.photoAnalysisFailed': '写真の解析に失敗しました。もう一度お試しください。',
 
+    // 履歴画面
+    'history.sleepScore': '睡眠スコア:',
+    'history.sunExposure': '太陽光暴露:',
+    'history.activityLevel': '活動レベル:',
+    'history.stressLevel': 'ストレスレベル:',
+    'history.diary': '日記:',
+
     // プロフィール画面
     'profile.title': 'プロフィール',
     'profile.userSettings': 'ユーザー設定',
@@ -1279,6 +1286,13 @@ const translations: Record<Language, Record<string, string>> = {
     'home.analyzingPhoto': 'Analyzing photo...',
     'home.analyzing': 'Analyzing...',
     'home.photoAnalysisFailed': 'Photo analysis failed. Please try again.',
+
+    // History screen
+    'history.sleepScore': 'Sleep score:',
+    'history.sunExposure': 'Sun exposure:',
+    'history.activityLevel': 'Activity level:',
+    'history.stressLevel': 'Stress level:',
+    'history.diary': 'Diary:',
 
     // Profile screen
     'profile.title': 'Profile',
