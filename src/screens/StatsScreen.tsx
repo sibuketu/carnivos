@@ -86,7 +86,7 @@ export default function StatsScreen({ initialTab }: StatsScreenProps) {
     <div className="stats-screen-container">
       <div className="stats-screen-content">
         <div className="stats-screen-header">
-          <h1 className="stats-screen-title">統計・グラフ</h1>
+          <h1 className="stats-screen-title">{t('stats.title')}</h1>
         </div>
 
         {/* タブ切り替え */}
@@ -95,19 +95,19 @@ export default function StatsScreen({ initialTab }: StatsScreenProps) {
             className={`stats-screen-tab ${activeTab === 'nutrients' ? 'active' : ''}`}
             onClick={() => setActiveTab('nutrients')}
           >
-            栄養素
+            {t('stats.nutrients')}
           </button>
           <button
             className={`stats-screen-tab ${activeTab === 'weight' ? 'active' : ''}`}
             onClick={() => setActiveTab('weight')}
           >
-            体重
+            {t('stats.weight')}
           </button>
           <button
             className={`stats-screen-tab ${activeTab === 'streak' ? 'active' : ''}`}
             onClick={() => setActiveTab('streak')}
           >
-            習慣
+            {t('stats.habits')}
           </button>
         </div>
 
@@ -122,9 +122,9 @@ export default function StatsScreen({ initialTab }: StatsScreenProps) {
         >
           {(
             [
-              { key: 'daily', label: '日次' },
-              { key: 'weekly', label: '週次' },
-              { key: 'monthly', label: '月次' },
+              { key: 'daily', label: t('stats.daily') },
+              { key: 'weekly', label: t('stats.weekly') },
+              { key: 'monthly', label: t('stats.monthly') },
             ] as const
           ).map(({ key, label }) => (
             <button
@@ -164,7 +164,7 @@ export default function StatsScreen({ initialTab }: StatsScreenProps) {
                   color: '#e4e4e7',
                 }}
               >
-                栄養素を選択
+                {t('stats.selectNutrient')}
               </label>
               <select
                 value={selectedNutrient}
@@ -199,7 +199,7 @@ export default function StatsScreen({ initialTab }: StatsScreenProps) {
                     textShadow: '0 0 5px rgba(244, 63, 94, 0.4)',
                   }}
                 >
-                  {selectedNutrientOption.label}の推移
+                  {selectedNutrientOption.label}{t('stats.trend')}
                 </h2>
                 <NutrientTrendChart
                   logs={logs}
@@ -226,7 +226,7 @@ export default function StatsScreen({ initialTab }: StatsScreenProps) {
                 textShadow: '0 0 5px rgba(244, 63, 94, 0.4)',
               }}
             >
-              体重の推移
+              {t('stats.weightTrend')}
             </h2>
             <WeightTrendChart logs={logs} period={selectedPeriod} />
           </div>
@@ -236,7 +236,7 @@ export default function StatsScreen({ initialTab }: StatsScreenProps) {
         {activeTab === 'streak' && (
           <div className="stats-screen-streak-section" style={{ marginTop: '1rem' }}>
             {streakData === null ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#a1a1aa' }}>読み込み中...</div>
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#a1a1aa' }}>{t('stats.loading')}</div>
             ) : (
               <>
                 <div
@@ -252,10 +252,10 @@ export default function StatsScreen({ initialTab }: StatsScreenProps) {
                   <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#f43f5e', marginBottom: '0.25rem' }}>
                     {streakData.currentStreak}
                   </div>
-                  <div style={{ fontSize: '14px', color: '#a1a1aa' }}>日連続</div>
+                  <div style={{ fontSize: '14px', color: '#a1a1aa' }}>{t('stats.consecutiveDays')}</div>
                   {streakData.longestStreak > 0 && (
                     <div style={{ marginTop: '0.75rem', fontSize: '13px', color: '#71717a' }}>
-                      最長記録 {streakData.longestStreak}日
+                      {t('stats.longestRecord')} {streakData.longestStreak}{t('stats.days')}
                     </div>
                   )}
                 </div>

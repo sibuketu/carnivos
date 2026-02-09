@@ -560,9 +560,22 @@ const translations: Record<Language, Record<string, string>> = {
 
     // 統計画面
     'stats.title': '統計・グラフ',
+    'stats.nutrients': '栄養素',
+    'stats.weight': '体重',
+    'stats.habits': '習慣',
+    'stats.daily': '日次',
+    'stats.weekly': '週次',
+    'stats.monthly': '月次',
+    'stats.selectNutrient': '栄養素を選択',
+    'stats.trend': 'の推移',
+    'stats.weightTrend': '体重の推移',
     'stats.nutrientTrends': '栄養素の推移',
     'stats.weightTrends': '体重の推移',
     'stats.noData': 'データがまだありません',
+    'stats.loading': '読み込み中...',
+    'stats.consecutiveDays': '日連続',
+    'stats.longestRecord': '最長記録',
+    'stats.days': '日',
 
     // 日記画面
     'diary.title': '日記',
@@ -1661,9 +1674,22 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Stats screen
     'stats.title': 'Statistics & Charts',
+    'stats.nutrients': 'Nutrients',
+    'stats.weight': 'Weight',
+    'stats.habits': 'Habits',
+    'stats.daily': 'Daily',
+    'stats.weekly': 'Weekly',
+    'stats.monthly': 'Monthly',
+    'stats.selectNutrient': 'Select nutrient',
+    'stats.trend': ' trend',
+    'stats.weightTrend': 'Weight trend',
     'stats.nutrientTrends': 'Nutrient Trends',
     'stats.weightTrends': 'Weight Trends',
     'stats.noData': 'No data yet',
+    'stats.loading': 'Loading...',
+    'stats.consecutiveDays': 'consecutive days',
+    'stats.longestRecord': 'Longest record',
+    'stats.days': 'days',
 
     // Diary screen
     'diary.title': 'Diary',
