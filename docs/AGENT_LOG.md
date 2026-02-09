@@ -860,3 +860,15 @@
   - supabase/functions/create-checkout-session/index.ts
   - docs/WINDSURF_TASK_STRIPE_PAYMENT.md（新規）
 - 動作影響: Edge Functionのフォールバックoriginが正しいURLに。
+
+---
+
+## 2026-02-09 11:10 (Agent: Windsurf/Cascade)
+- 目的: Netlify paused問題の診断、Claude Code向けStripe設定ガイドmd書き直し
+- 変更点:
+  - **Netlify paused診断**: スクショから「This team has exceeded the credit limit」を確認。無料プランのクレジット上限超過が原因。来月自動復旧 or 有料プラン($19/月) or Vercel移行の3案を整理。
+  - **委託md書き直し**: `docs/WINDSURF_TASK_STRIPE_PAYMENT.md`を「Claude Codeが人間操作をガイドする形式」に全面書き直し。Netlify復旧ガイド＋Stripe決済セットアップ（商品作成・Secret Key設定・PaywallScreen接続・Webhook）＋GiftScreen型エラー修正の3ガイドを記載。
+- 根拠・ストーリー（Why）: ユーザーの意図は「別Agentへの作業委託」ではなく「Claude Codeに人間操作をガイドしてもらう」形式。Netlifyはクレジット超過でpaused状態であり、Claude Codeが「デプロイ済み」と報告したのは誤り。
+- 触ったファイル:
+  - docs/WINDSURF_TASK_STRIPE_PAYMENT.md（全面書き直し）
+- 動作影響: なし（ガイドmdのみ）。
