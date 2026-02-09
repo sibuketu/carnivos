@@ -36,7 +36,7 @@ serve(async (req) => {
         })
 
         // Get origin for redirect URLs
-        const origin = req.headers.get('origin') || 'https://carnivoslol.netlify.app'
+        const origin = req.headers.get('origin') || 'https://carnivos.vercel.app'
         const defaultSuccessUrl = successUrl || `${origin}/?payment=success`
         const defaultCancelUrl = cancelUrl || `${origin}/?payment=canceled`
 
