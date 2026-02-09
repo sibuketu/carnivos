@@ -97,17 +97,17 @@ export default function RecoveryProtocolScreen({
             fontSize: '0.875rem',
             color: '#92400e'
           }}>
-            ⚠️ この機能は現在監視中です。ユーザーの使い方によって機能が正しいかどうかを確認しています。フィードバックをお待ちしています。
+            {t('recovery.betaNotice')}
           </div>
           <div className="recovery-protocol-section">
-            <h3 className="recovery-protocol-section-title">違反タイプ</h3>
+            <h3 className="recovery-protocol-section-title">{t('recovery.violationType')}</h3>
             <div className="recovery-protocol-violation-type">
               {protocol.violationType.replace('_', ' ').toUpperCase()}
             </div>
           </div>
 
           <div className="recovery-protocol-section">
-            <h3 className="recovery-protocol-section-title">断食時間</h3>
+            <h3 className="recovery-protocol-section-title">{t('recovery.fastingHours')}</h3>
             <div className="recovery-protocol-fasting-row">
               <input
                 type="number"
@@ -115,10 +115,10 @@ export default function RecoveryProtocolScreen({
                 value={fastingHours.toString()}
                 onChange={(e) => setFastingHours(Number(e.target.value) || 16)}
               />
-              <span className="recovery-protocol-fasting-label">時間</span>
+              <span className="recovery-protocol-fasting-label">{t('recovery.hours')}</span>
             </div>
             <div className="recovery-protocol-fasting-hint">
-              目標断食終了時刻: {calculateTargetFastEnd(fastingHours)}
+              {t('recovery.targetFastEnd')}: {calculateTargetFastEnd(fastingHours)}
             </div>
             <button
               onClick={async () => {
@@ -128,7 +128,7 @@ export default function RecoveryProtocolScreen({
                 const endAt = new Date(Date.now() + fastingHours * 60 * 60 * 1000).toISOString();
                 localStorage.setItem('primal_logic_fasting_timer_end', endAt);
                 (window as unknown as { showToast?: (msg: string) => void }).showToast?.(
-                  `${fastingHours}時間の断食タイマーを開始しました`
+                  `${fastingHours}${t('recovery.fastingTimerStarted')}`
                 );
               }}
               style={{
@@ -142,7 +142,7 @@ export default function RecoveryProtocolScreen({
                 fontSize: '14px',
               }}
             >
-              ⏱ 断食タイマーを今すぐ開始
+              {t('recovery.startFastingTimer')}
             </button>
             <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
               {Object.entries(FASTING_TEMPLATES).map(([key, { name, hours }]) => (
@@ -166,7 +166,7 @@ export default function RecoveryProtocolScreen({
 
           {protocol.activities && protocol.activities.length > 0 && (
             <div className="recovery-protocol-section">
-              <h3 className="recovery-protocol-section-title">推奨アクティビティ</h3>
+              <h3 className="recovery-protocol-section-title">{t('recovery.recommendedActivities')}</h3>
               {protocol.activities.map((activity, index) => (
                 <div key={index} className="recovery-protocol-list-item">
                   <span className="recovery-protocol-list-bullet">•</span>
@@ -178,7 +178,7 @@ export default function RecoveryProtocolScreen({
 
           {protocol.dietRecommendations && protocol.dietRecommendations.length > 0 && (
             <div className="recovery-protocol-section">
-              <h3 className="recovery-protocol-section-title">食事の推奨事項</h3>
+              <h3 className="recovery-protocol-section-title">{t('recovery.dietRecommendations')}</h3>
               {protocol.dietRecommendations.map((rec, index) => (
                 <div key={index} className="recovery-protocol-list-item">
                   <span className="recovery-protocol-list-bullet">•</span>
@@ -203,7 +203,7 @@ export default function RecoveryProtocolScreen({
                   fontSize: '14px',
                 }}
               >
-                🍽 電解質の多い食品を表示
+                {t('recovery.showElectrolyteFoods')}
               </button>
             </div>
           )}
@@ -214,7 +214,7 @@ export default function RecoveryProtocolScreen({
               onClick={() => {
                 updateWaterIntake(2000);
                 (window as unknown as { showToast?: (msg: string) => void }).showToast?.(
-                  '水分 +2000ml を記録しました'
+                  t('recovery.waterRecorded')
                 );
               }}
               style={{
@@ -228,7 +228,7 @@ export default function RecoveryProtocolScreen({
                 width: '100%',
               }}
             >
-              💧 水分 +2L を記録
+              {t('recovery.recordWater')}
             </button>
             <button
               onClick={() => {
@@ -247,13 +247,13 @@ export default function RecoveryProtocolScreen({
                 width: '100%',
               }}
             >
-              水分入力画面を開く
+              {t('recovery.openWaterInput')}
             </button>
           </div>
 
           {protocol.supplements && protocol.supplements.length > 0 && (
             <div className="recovery-protocol-section">
-              <h3 className="recovery-protocol-section-title">サプリメント（任意）</h3>
+              <h3 className="recovery-protocol-section-title">{t('recovery.supplements')}</h3>
               {protocol.supplements.map((supp, index) => (
                 <div key={index} className="recovery-protocol-list-item">
                   <span className="recovery-protocol-list-bullet">•</span>
@@ -265,7 +265,7 @@ export default function RecoveryProtocolScreen({
 
           {protocol.warnings && protocol.warnings.length > 0 && (
             <div className="recovery-protocol-warning-section">
-              <h3 className="recovery-protocol-warning-title">⚠️ 警告</h3>
+              <h3 className="recovery-protocol-warning-title">{t('recovery.warnings')}</h3>
               {protocol.warnings.map((warning, index) => (
                 <div key={index} className="recovery-protocol-list-item">
                   <span className="recovery-protocol-list-bullet">⚠️</span>
@@ -278,7 +278,7 @@ export default function RecoveryProtocolScreen({
           {/* Recovery Quest: Todoリスト */}
           {protocol.todos && protocol.todos.length > 0 && (
             <div className="recovery-protocol-section">
-              <h3 className="recovery-protocol-section-title">📋 実行すべきタスク</h3>
+              <h3 className="recovery-protocol-section-title">{t('recovery.tasks')}</h3>
               {protocol.todos.map((todo) => (
                 <div
                   key={todo.id}
@@ -352,11 +352,11 @@ export default function RecoveryProtocolScreen({
           )}
 
           <button className="recovery-protocol-set-button" onClick={handleSetProtocol}>
-            プロトコルを設定
+            {t('recovery.setProtocol')}
           </button>
 
           <div className="recovery-protocol-footer-note">
-            このプロトコルは明日のログに追加され、今夜8時に解凍リマインダーが設定されます。
+            {t('recovery.footerNote')}
           </div>
         </div>
       </div>

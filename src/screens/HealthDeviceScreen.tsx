@@ -89,7 +89,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
       setTimeout(() => setSaved(false), 2000);
     } catch (error) {
       logError(error, { component: 'HealthDeviceScreen', action: 'handleSave' });
-      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('データの保存に失敗しました');
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('healthDevice.saveFailed'));
     }
   };
 
@@ -97,11 +97,11 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
     <div className="health-device-screen">
       <div className="health-device-container">
         <button onClick={onBack} className="health-device-back-button">
-          ← 戻る
+          {t('healthDevice.back')}
         </button>
-        <h1 className="health-device-title">健康デバイス連携</h1>
+        <h1 className="health-device-title">{t('healthDevice.title')}</h1>
         <p className="health-device-description">
-          体重・体脂肪・歩数などは手動で入力できます。デバイス連携は審査中に実装予定です。
+          {t('healthDevice.description')}
         </p>
         <div style={{ marginBottom: '1rem' }}>
           <button
@@ -135,11 +135,11 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
               fontSize: '0.875rem',
             }}
           >
-            {isLoadingGoogleFit ? '読み込み中...' : '🔄 Google Fitから取得'}
+            {isLoadingGoogleFit ? t('healthDevice.loading') : t('healthDevice.fetchGoogleFit')}
           </button>
           {googleFitData && (
             <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#666' }}>
-              Google Fitデータを取得しました
+              {t('healthDevice.googleFitFetched')}
             </div>
           )}
         </div>
@@ -147,7 +147,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
         <div className="health-device-form">
           <div className="health-device-input-group">
             <label className="health-device-label">
-              歩数
+              {t('healthDevice.steps')}
               <input
                 type="number"
                 value={healthData.steps || ''}
@@ -166,7 +166,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
 
           <div className="health-device-input-group">
             <label className="health-device-label">
-              心拍数 (bpm)
+              {t('healthDevice.heartRate')}
               <input
                 type="number"
                 value={healthData.heartRate || ''}
@@ -186,7 +186,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
 
           <div className="health-device-input-group">
             <label className="health-device-label">
-              活動時間 (分)
+              {t('healthDevice.activeMinutes')}
               <input
                 type="number"
                 value={healthData.activeMinutes || ''}
@@ -205,7 +205,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
 
           <div className="health-device-input-group">
             <label className="health-device-label">
-              消費カロリー (kcal)
+              {t('healthDevice.caloriesBurned')}
               <input
                 type="number"
                 value={healthData.caloriesBurned || ''}
@@ -224,7 +224,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
 
           <div className="health-device-input-group">
             <label className="health-device-label">
-              体重 (kg)
+              {t('healthDevice.weight')}
               <input
                 type="number"
                 value={healthData.weight ?? ''}
@@ -244,7 +244,7 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
 
           <div className="health-device-input-group">
             <label className="health-device-label">
-              体脂肪率 (%)
+              {t('healthDevice.bodyFat')}
               <input
                 type="number"
                 value={healthData.bodyFatPercentage ?? ''}
@@ -264,15 +264,15 @@ export default function HealthDeviceScreen({ onBack }: HealthDeviceScreenProps) 
           </div>
 
           <button onClick={handleSave} className="health-device-save-button">
-            {saved ? '✓ 保存しました' : '保存'}
+            {saved ? t('healthDevice.saved') : t('healthDevice.save')}
           </button>
         </div>
 
         <div className="health-device-info">
-          <h3>連携について</h3>
+          <h3>{t('healthDevice.aboutIntegration')}</h3>
           <ul>
-            <li>体重・体脂肪: 手動入力で保存時に今日の日記にも反映されます。</li>
-            <li>デバイスAPI連携: 審査中に実装予定です。</li>
+            <li>{t('healthDevice.weightNote')}</li>
+            <li>{t('healthDevice.deviceApiNote')}</li>
           </ul>
         </div>
       </div>
