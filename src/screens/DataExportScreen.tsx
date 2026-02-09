@@ -61,30 +61,29 @@ export default function DataExportScreen() {
           }}
           className="data-export-back-button"
         >
-          ← 設定に戻る
+          {t('dataExport.backToSettings')}
         </button>
-        <h1 className="data-export-title">データエクスポート</h1>
+        <h1 className="data-export-title">{t('dataExport.title')}</h1>
         <p className="data-export-description">
-          あなたのデータをJSON形式でダウンロードできます。
-          これには、食事記録、プロファイル情報、設定などが含まれます。
+          {t('dataExport.description')}
         </p>
 
         <button onClick={handleExport} disabled={exporting} className="data-export-button">
-          {exporting ? 'エクスポート中...' : 'データをエクスポート'}
+          {exporting ? t('dataExport.exporting') : t('dataExport.exportButton')}
         </button>
 
         {exported && (
-          <div className="data-export-success">✅ データのエクスポートが完了しました</div>
+          <div className="data-export-success">{t('dataExport.success')}</div>
         )}
 
         <div className="data-export-info">
-          <h3>エクスポートされるデータ</h3>
+          <h3>{t('dataExport.dataIncluded')}</h3>
           <ul>
-            <li>プロファイル情報（性別、年齢、体重など）</li>
-            <li>食事記録（全履歴）</li>
-            <li>日記</li>
-            <li>体重・体脂肪率の記録</li>
-            <li>アプリ設定</li>
+            <li>{t('dataExport.profileInfo')}</li>
+            <li>{t('dataExport.mealRecords')}</li>
+            <li>{t('dataExport.diary')}</li>
+            <li>{t('dataExport.weightRecords')}</li>
+            <li>{t('dataExport.appSettings')}</li>
           </ul>
         </div>
       </div>

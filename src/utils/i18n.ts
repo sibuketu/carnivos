@@ -218,6 +218,29 @@ const translations: Record<Language, Record<string, string>> = {
     'settings.notificationDeniedDesc': 'ブラウザの設定から通知を許可してください。',
     'settings.bugReport': 'バグ報告・フィードバック',
 
+    // データエクスポート画面
+    'dataExport.backToSettings': '← 設定に戻る',
+    'dataExport.title': 'データエクスポート',
+    'dataExport.description': 'あなたのデータをJSON形式でダウンロードできます。これには、食事記録、プロファイル情報、設定などが含まれます。',
+    'dataExport.exporting': 'エクスポート中...',
+    'dataExport.exportButton': 'データをエクスポート',
+    'dataExport.success': '✅ データのエクスポートが完了しました',
+    'dataExport.dataIncluded': 'エクスポートされるデータ',
+    'dataExport.profileInfo': 'プロファイル情報（性別、年齢、体重など）',
+    'dataExport.mealRecords': '食事記録（全履歴）',
+    'dataExport.diary': '日記',
+    'dataExport.weightRecords': '体重・体脂肪率の記録',
+    'dataExport.appSettings': 'アプリ設定',
+
+    // 塩ミル設定画面
+    'salt.title': '塩ミル設定',
+    'salt.defaultHint': 'デフォルト: 0.5g/削り',
+
+    // レシピ画面
+    'recipe.quantity': '数量',
+    'recipe.piece': '個',
+    'recipe.antiNutrientsAdvanced': '抗栄養素（詳細）',
+
     // 履歴画面
     'history.sleepScore': '睡眠スコア:',
     'history.sunExposure': '太陽光暴露:',
@@ -1329,6 +1352,29 @@ const translations: Record<Language, Record<string, string>> = {
     'settings.notificationButton': '🔔 Enable Notifications',
     'settings.notificationDeniedDesc': 'Please allow notifications in your browser settings.',
     'settings.bugReport': 'Bug Report / Feedback',
+
+    // Data Export screen
+    'dataExport.backToSettings': '← Back to Settings',
+    'dataExport.title': 'Data Export',
+    'dataExport.description': 'You can download your data in JSON format. This includes meal records, profile information, settings, and more.',
+    'dataExport.exporting': 'Exporting...',
+    'dataExport.exportButton': 'Export Data',
+    'dataExport.success': '✅ Data export completed',
+    'dataExport.dataIncluded': 'Data included in export',
+    'dataExport.profileInfo': 'Profile information (gender, age, weight, etc.)',
+    'dataExport.mealRecords': 'Meal records (full history)',
+    'dataExport.diary': 'Diary',
+    'dataExport.weightRecords': 'Weight & body fat records',
+    'dataExport.appSettings': 'App settings',
+
+    // Salt Mill Settings screen
+    'salt.title': 'Salt Mill Settings',
+    'salt.defaultHint': 'Default: 0.5g/grind',
+
+    // Recipe screen
+    'recipe.quantity': 'Quantity',
+    'recipe.piece': 'piece',
+    'recipe.antiNutrientsAdvanced': 'Anti-nutrients (Advanced)',
 
     // History screen
     'history.sleepScore': 'Sleep score:',

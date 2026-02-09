@@ -662,7 +662,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
 
                     {/* 数量入力 */}
                     <label style={{ marginTop: '1rem', display: 'block' }}>
-                      <strong>数量</strong>
+                      <strong>{t('recipe.quantity')}</strong>
                       <div
                         style={{
                           display: 'flex',
@@ -704,7 +704,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                           }}
                         >
                           <option value="g">g</option>
-                          <option value="個">個</option>
+                          <option value="個">{t('recipe.piece')}</option>
                         </select>
                       </div>
                     </label>
@@ -1805,7 +1805,7 @@ export default function RecipeScreen({ onBack }: RecipeScreenProps) {
                           >
                             6
                           </span>
-                          <strong style={{ fontSize: '16px' }}>抗栄養素（詳細）</strong>
+                          <strong style={{ fontSize: '16px' }}>{t('recipe.antiNutrientsAdvanced')}</strong>
                         </div>
                         <button
                           onClick={() => setShowAdvancedAntiNutrients(!showAdvancedAntiNutrients)}

@@ -70,7 +70,7 @@ export default function SaltSettingsScreen({ onBack }: SaltSettingsScreenProps) 
           <button className="back-button" onClick={onBack} aria-label={t('common.backAriaLabel')}>
             ←
           </button>
-          <h1 className="screen-header-title">塩ミル設定</h1>
+          <h1 className="screen-header-title">{t('salt.title')}</h1>
         </div>
 
         <div className="salt-settings-screen-section">
@@ -112,7 +112,7 @@ export default function SaltSettingsScreen({ onBack }: SaltSettingsScreenProps) 
             />
             <span className="salt-settings-screen-input-unit">g</span>
           </div>
-          <p className="salt-settings-screen-hint">デフォルト: 0.5g/削り</p>
+          <p className="salt-settings-screen-hint">{t('salt.defaultHint')}</p>
           <button
             className="salt-settings-screen-reset-button"
             onClick={() => handleUnitWeightChange(0.5)}
