@@ -704,10 +704,10 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
     const displayMode = getNutrientDisplayMode();
 
     const modeLabel: Record<NutrientDisplayMode, string> = {
-      simple: 'シンプル',
-      standard: '標準',
-      detailed: '詳細',
-      custom: 'カスタム',
+      simple: t('home.modeSimple'),
+      standard: t('home.modeStandard'),
+      detailed: t('home.modeDetailed'),
+      custom: t('home.modeCustom'),
     };
 
     const handleCycleNutrientMode = () => {
@@ -776,14 +776,14 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
       <div className="space-y-6">
         {/* 表示モード切替: シンプル→もっと見る→標準→詳細→簡略表示 */}
         <div className="flex items-center justify-between gap-2 mb-1 text-sm text-gray-500">
-          <span>表示: {modeLabel[displayMode]}</span>
+          <span>{t('home.displayLabel')} {modeLabel[displayMode]}</span>
           {displayMode !== 'custom' && (
             <button
               type="button"
               onClick={handleCycleNutrientMode}
               className="text-amber-600 hover:underline font-medium"
             >
-              {displayMode === 'detailed' ? '簡略表示' : 'もっと見る'}
+              {displayMode === 'detailed' ? t('home.showLess') : t('home.showMore')}
             </button>
           )}
         </div>
@@ -1717,7 +1717,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
               >
                 ×
               </button>
-              <h2 style={{ marginBottom: '1rem' }}>全栄養素レポート</h2>
+              <h2 style={{ marginBottom: '1rem' }}>{t('home.allNutrientReport')}</h2>
               {(() => {
                 const calculatedMetrics = dailyLog.calculatedMetrics;
                 if (!calculatedMetrics) return null;
@@ -1731,86 +1731,86 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
                   >
                     {/* 主要マクロ */}
                     <div>
-                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>主要マクロ</h3>
+                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{t('home.macros')}</h3>
                       <div>
-                        タンパク質（有効）: {calculatedMetrics.effectiveProtein.toFixed(1)} /{' '}
+                        {t('home.proteinEffective')}: {calculatedMetrics.effectiveProtein.toFixed(1)} /{' '}
                         {calculatedMetrics.proteinRequirement.toFixed(1)} g
                       </div>
-                      <div>脂質: {calculatedMetrics.fatTotal.toFixed(1)} g</div>
+                      <div>{t('home.fat')}: {calculatedMetrics.fatTotal.toFixed(1)} g</div>
                       <div>
-                        正味炭水化物: {calculatedMetrics.netCarbs.toFixed(1)} g{' '}
-                        <span style={{ color: '#999', fontSize: '0.9rem' }}>(不要)</span>
+                        {t('home.netCarbs')}: {calculatedMetrics.netCarbs.toFixed(1)} g{' '}
+                        <span style={{ color: '#999', fontSize: '0.9rem' }}>({t('home.unnecessary')})</span>
                       </div>
                     </div>
                     {/* カーニボア重要項目 */}
                     <div>
-                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>カーニボア重要項目</h3>
+                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{t('home.carnivoreEssentials')}</h3>
                       <div>
-                        ビタミンB12: {calculatedMetrics.vitaminB12Total?.toFixed(1) || '0.0'} μg
+                        B12: {calculatedMetrics.vitaminB12Total?.toFixed(1) || '0.0'} μg
                       </div>
                       <div>
-                        亜鉛（有効）: {calculatedMetrics.effectiveZinc.toFixed(1)} / 11.0 mg
+                        {t('home.zincEffective')}: {calculatedMetrics.effectiveZinc.toFixed(1)} / 11.0 mg
                       </div>
                       <div>
-                        鉄分（有効）: {calculatedMetrics.effectiveIron.toFixed(1)} /{' '}
+                        {t('home.ironEffective')}: {calculatedMetrics.effectiveIron.toFixed(1)} /{' '}
                         {calculatedMetrics.ironRequirement.toFixed(1)} mg
                       </div>
-                      <div>ビタミンA: {calculatedMetrics.effectiveVitC > 0 ? 'あり' : '0'} μg</div>
+                      <div>Vitamin A: {calculatedMetrics.effectiveVitC > 0 ? t('home.vitaminAPresent') : '0'} μg</div>
                     </div>
                     {/* ビタミンB群 */}
                     <div>
-                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>ビタミンB群</h3>
+                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{t('home.bVitamins')}</h3>
                       <div>
-                        ビタミンB1: {calculatedMetrics.vitaminB1Total?.toFixed(2) || '0.00'} mg
+                        B1: {calculatedMetrics.vitaminB1Total?.toFixed(2) || '0.00'} mg
                       </div>
                       <div>
-                        ビタミンB2: {calculatedMetrics.vitaminB2Total?.toFixed(2) || '0.00'} mg
+                        B2: {calculatedMetrics.vitaminB2Total?.toFixed(2) || '0.00'} mg
                       </div>
                       <div>
-                        ビタミンB3: {calculatedMetrics.vitaminB3Total?.toFixed(2) || '0.00'} mg
+                        B3: {calculatedMetrics.vitaminB3Total?.toFixed(2) || '0.00'} mg
                       </div>
                       <div>
-                        ビタミンB6: {calculatedMetrics.vitaminB6Total?.toFixed(2) || '0.00'} mg
+                        B6: {calculatedMetrics.vitaminB6Total?.toFixed(2) || '0.00'} mg
                       </div>
                       <div>
-                        ビタミンB12: {calculatedMetrics.vitaminB12Total?.toFixed(1) || '0.0'} μg
+                        B12: {calculatedMetrics.vitaminB12Total?.toFixed(1) || '0.0'} μg
                       </div>
                     </div>
                     {/* ビタミン */}
                     <div>
-                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>ビタミン</h3>
+                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{t('home.vitamins')}</h3>
                       <div>
-                        ビタミンC: {calculatedMetrics.effectiveVitC.toFixed(1)} /{' '}
+                        Vitamin C: {calculatedMetrics.effectiveVitC.toFixed(1)} /{' '}
                         {calculatedMetrics.vitCRequirement.toFixed(1)} mg
                       </div>
                       <div>
-                        ビタミンK（有効）: {calculatedMetrics.effectiveVitK.toFixed(1)} / 120.0 μg
+                        {t('home.vitKEffective')}: {calculatedMetrics.effectiveVitK.toFixed(1)} / 120.0 μg
                       </div>
                       <div>
-                        ビタミンE: {calculatedMetrics.vitaminETotal?.toFixed(2) || '0.00'} mg
+                        Vitamin E: {calculatedMetrics.vitaminETotal?.toFixed(2) || '0.00'} mg
                       </div>
                     </div>
                     {/* ミネラル */}
                     <div>
-                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>ミネラル</h3>
-                      <div>ナトリウム: {calculatedMetrics.sodiumTotal.toFixed(0)} / 5000 mg</div>
+                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{t('home.minerals')}</h3>
+                      <div>Na: {calculatedMetrics.sodiumTotal.toFixed(0)} / 5000 mg</div>
                       <div>
-                        マグネシウム: {calculatedMetrics.magnesiumTotal.toFixed(0)} / 400 mg
+                        Mg: {calculatedMetrics.magnesiumTotal.toFixed(0)} / 400 mg
                       </div>
-                      <div>カルシウム: {calculatedMetrics.calciumTotal?.toFixed(0) || '0'} mg</div>
-                      <div>リン: {calculatedMetrics.phosphorusTotal?.toFixed(0) || '0'} mg</div>
-                      <div>セレン: {calculatedMetrics.seleniumTotal?.toFixed(1) || '0.0'} μg</div>
-                      <div>銅: {calculatedMetrics.copperTotal?.toFixed(2) || '0.00'} mg</div>
+                      <div>Ca: {calculatedMetrics.calciumTotal?.toFixed(0) || '0'} mg</div>
+                      <div>P: {calculatedMetrics.phosphorusTotal?.toFixed(0) || '0'} mg</div>
+                      <div>Se: {calculatedMetrics.seleniumTotal?.toFixed(1) || '0.0'} μg</div>
+                      <div>Cu: {calculatedMetrics.copperTotal?.toFixed(2) || '0.00'} mg</div>
                       <div>
-                        マンガン: {calculatedMetrics.manganeseTotal?.toFixed(2) || '0.00'} mg
+                        Mn: {calculatedMetrics.manganeseTotal?.toFixed(2) || '0.00'} mg
                       </div>
                     </div>
                     {/* 要注意項目 */}
                     <div>
-                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>要注意項目</h3>
+                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{t('home.caution')}</h3>
                       <div>
-                        食物繊維: {calculatedMetrics.fiberTotal.toFixed(1)} g{' '}
-                        <span style={{ color: '#999', fontSize: '0.9rem' }}>(0が理想)</span>
+                        {t('home.fiber')}: {calculatedMetrics.fiberTotal.toFixed(1)} g{' '}
+                        <span style={{ color: '#999', fontSize: '0.9rem' }}>({t('home.fiberIdeal')})</span>
                       </div>
                     </div>
                   </div>
@@ -2070,7 +2070,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             gap: '1rem',
           }}
         >
-          <p style={{ color: '#fda4af', fontWeight: 600, margin: 0 }}>写真を解析中...</p>
+          <p style={{ color: '#fda4af', fontWeight: 600, margin: 0 }}>{t('home.analyzingPhoto')}</p>
           <div
             style={{
               width: '100%',
@@ -2091,7 +2091,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
             />
           </div>
           <p style={{ color: '#a1a1aa', fontSize: '14px', margin: 0 }}>
-            解析中... {photoAnalysisProgress}%
+            {t('home.analyzing')} {photoAnalysisProgress}%
           </p>
           {photoAnalyzingTip && (
             <div
@@ -2159,10 +2159,10 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
               onClick={(e) => e.stopPropagation()}
             >
               <h3 style={{ margin: '0 0 1rem 0', fontSize: '18px', fontWeight: '600' }}>
-                追加方法を選択
+                {t('home.addMethodTitle')}
               </h3>
               <p style={{ margin: '0 0 1.5rem 0', fontSize: '14px', color: '#6b7280' }}>
-                写真から追加するか、バーコードを読み取りますか？
+                {t('home.addMethodDesc')}
               </p>
               <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                 <button
@@ -2233,7 +2233,7 @@ export default function HomeScreen({ onOpenFatTabReady, onAddFoodReady }: HomeSc
                         const { getUserFriendlyErrorMessage } = await import('../utils/errorHandler');
                         (window as unknown as { showToast?: (msg: string) => void }).showToast?.(
                           getUserFriendlyErrorMessage(error) ||
-                          '写真の解析に失敗しました。もう一度お試しください。'
+                          t('home.photoAnalysisFailed')
                         );
                         document.body.removeChild(input);
                       }
