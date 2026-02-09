@@ -21,7 +21,7 @@ serve(async (req) => {
 
         // Validate input
         if (isGift && (!amount || amount < 100)) {
-            throw new Error('Gift amount must be at least 100 yen')
+            throw new Error('Gift amount must be at least $1.00 (100 cents)')
         }
         if (isSubscription && !priceId) {
             throw new Error('Subscription requires priceId')
@@ -67,7 +67,7 @@ serve(async (req) => {
                 payment_method_types: ['card'],
                 line_items: [{
                     price_data: {
-                        currency: 'jpy',
+                        currency: 'usd',
                         product_data: {
                             name: 'CarnivOS Gift',
                             description: 'Support new carnivore community members',

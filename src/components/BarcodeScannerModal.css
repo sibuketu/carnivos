@@ -12,7 +12,7 @@
 }
 
 .barcode-scanner-modal {
-  background-color: white;
+  background-color: var(--color-bg-secondary);
   border-radius: 16px;
   padding: 2rem;
   max-width: 500px;
@@ -32,14 +32,14 @@
 .barcode-scanner-modal-title {
   font-size: 20px;
   font-weight: bold;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .barcode-scanner-modal-close {
   background: none;
   border: none;
   font-size: 24px;
-  color: #78716c;
+  color: var(--color-text-secondary);
   cursor: pointer;
   padding: 0;
   width: 32px;
@@ -50,7 +50,7 @@
 }
 
 .barcode-scanner-modal-close:hover {
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .barcode-scanner-modal-content {
@@ -66,7 +66,7 @@
 
 .barcode-scanner-modal-start-button {
   padding: 0.75rem 1.5rem;
-  background-color: #dc2626;
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -77,7 +77,7 @@
 }
 
 .barcode-scanner-modal-start-button:hover {
-  background-color: #b91c1c;
+  background-color: var(--color-accent-hover, #e11d48);
 }
 
 .barcode-scanner-modal-scanning {
@@ -123,7 +123,7 @@
 
 .barcode-scanner-modal-scanning-text {
   text-align: center;
-  color: #78716c;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -135,8 +135,8 @@
 
 .barcode-scanner-modal-retry-button {
   padding: 0.75rem 1.5rem;
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -146,7 +146,7 @@
 }
 
 .barcode-scanner-modal-retry-button:hover {
-  background-color: #e5e7eb;
+  background-color: var(--color-bg-secondary);
 }
 
 .barcode-scanner-modal-result {
@@ -162,19 +162,19 @@
 
 .barcode-scanner-modal-barcode {
   font-size: 12px;
-  color: #78716c;
+  color: var(--color-text-secondary);
   margin-bottom: 1rem;
 }
 
 .barcode-scanner-modal-loading {
-  color: #78716c;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
 .barcode-scanner-modal-food-info {
   margin-top: 1rem;
   padding: 1rem;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-tertiary);
   border-radius: 8px;
 }
 
@@ -182,12 +182,12 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .barcode-scanner-modal-add-button {
   padding: 0.75rem 1.5rem;
-  background-color: #dc2626;
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -198,5 +198,5 @@
 }
 
 .barcode-scanner-modal-add-button:hover {
-  background-color: #b91c1c;
+  background-color: var(--color-accent-hover, #e11d48);
 }

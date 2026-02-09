@@ -1,13 +1,13 @@
 .health-device-screen {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-primary);
   padding: 2rem 1rem;
 }
 
 .health-device-container {
   max-width: 600px;
   margin: 0 auto;
-  background-color: white;
+  background-color: var(--color-bg-secondary);
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -15,25 +15,25 @@
 
 .health-device-back-button {
   padding: 0.5rem 1rem;
-  background-color: #f3f4f6;
+  background-color: var(--color-bg-tertiary);
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  color: #374151;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
 .health-device-title {
   font-size: 24px;
   font-weight: bold;
-  color: #111827;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
 .health-device-description {
   font-size: 14px;
-  color: #78716c;
+  color: var(--color-text-secondary);
   margin-bottom: 2rem;
 }
 
@@ -53,12 +53,12 @@
 .health-device-label {
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .health-device-input {
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
@@ -66,7 +66,7 @@
 
 .health-device-save-button {
   padding: 0.75rem 1.5rem;
-  background-color: #dc2626;
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -79,7 +79,7 @@
 .health-device-info {
   margin-top: 2rem;
   padding: 1rem;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-tertiary);
   border-radius: 8px;
 }
 
@@ -87,13 +87,13 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .health-device-info ul {
   list-style: disc;
   padding-left: 1.5rem;
-  color: #78716c;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 

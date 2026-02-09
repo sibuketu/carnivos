@@ -1,8 +1,8 @@
 .streak-calendar-container {
   width: 100%;
-  background-color: white;
+  background-color: var(--color-bg-secondary);
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   padding: 1.5rem;
 }
 
@@ -18,20 +18,20 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   padding: 0.5rem;
   border-radius: 8px;
   transition: background-color 0.2s;
 }
 
 .streak-calendar-nav-button:hover {
-  background-color: #f3f4f6;
+  background-color: var(--color-bg-tertiary);
 }
 
 .streak-calendar-month-title {
   font-size: 18px;
   font-weight: bold;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -46,7 +46,7 @@
   text-align: center;
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   padding: 0.5rem;
 }
 
@@ -69,8 +69,8 @@
   justify-content: center;
   border-radius: 8px;
   position: relative;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
   transition: all 0.2s;
   overflow: visible;
 }
@@ -81,13 +81,13 @@
 }
 
 .streak-calendar-day.normal {
-  background-color: #f9fafb;
-  border-color: #e5e7eb;
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border);
 }
 
 .streak-calendar-day.hasLog {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-text-secondary);
 }
 
 .streak-calendar-day.hasViolation {
@@ -122,7 +122,7 @@
   gap: 1.5rem;
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .streak-calendar-legend-item {
@@ -130,12 +130,12 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .streak-calendar-legend-color {
   width: 16px;
   height: 16px;
   border-radius: 4px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }

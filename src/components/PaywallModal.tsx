@@ -29,54 +29,54 @@ export default function PaywallModal({ trialStatus: _trialStatus, onSubscribe }:
     <div className="paywall-overlay">
       <div className="paywall-modal">
         <div className="paywall-icon">⏰</div>
-        <h2 className="paywall-title">無料トライアル終了</h2>
+        <h2 className="paywall-title">Free Trial Ended</h2>
         <p className="paywall-description">
-          7日間の無料トライアルが終了しました。
+          Your 7-day free trial has ended.
           <br />
-          引き続きCarnivOSをご利用いただくには、サブスクリプションの登録が必要です。
+          Subscribe to continue using CarnivOS.
         </p>
 
         <div className="paywall-pricing">
           <div className="paywall-plan">
-            <div className="paywall-plan-badge">おすすめ</div>
-            <div className="paywall-plan-name">年額プラン</div>
+            <div className="paywall-plan-badge">Best Value</div>
+            <div className="paywall-plan-name">Annual</div>
             <div className="paywall-plan-price">
-              <span className="paywall-plan-price-amount">¥9,999</span>
-              <span className="paywall-plan-price-period">/年</span>
+              <span className="paywall-plan-price-amount">$99</span>
+              <span className="paywall-plan-price-period">/yr</span>
             </div>
-            <div className="paywall-plan-note">月額換算 ¥833/月（2ヶ月分お得）</div>
+            <div className="paywall-plan-note">$8.25/mo — Save 2 months</div>
           </div>
 
           <div className="paywall-plan">
-            <div className="paywall-plan-name">月額プラン</div>
+            <div className="paywall-plan-name">Monthly</div>
             <div className="paywall-plan-price">
-              <span className="paywall-plan-price-amount">¥1,999</span>
-              <span className="paywall-plan-price-period">/月</span>
+              <span className="paywall-plan-price-amount">$9.99</span>
+              <span className="paywall-plan-price-period">/mo</span>
             </div>
-            <div className="paywall-plan-note">いつでもキャンセル可能</div>
+            <div className="paywall-plan-note">Cancel anytime</div>
           </div>
         </div>
 
         <div className="paywall-features">
           <div className="paywall-feature">
             <span className="paywall-feature-icon">✅</span>
-            <span>無制限の食事記録</span>
+            <span>Unlimited meal logging</span>
           </div>
           <div className="paywall-feature">
             <span className="paywall-feature-icon">✅</span>
-            <span>AI栄養分析</span>
+            <span>AI nutrition analysis</span>
           </div>
           <div className="paywall-feature">
             <span className="paywall-feature-icon">✅</span>
-            <span>詳細な栄養素ゲージ</span>
+            <span>Detailed nutrient gauges</span>
           </div>
           <div className="paywall-feature">
             <span className="paywall-feature-icon">✅</span>
-            <span>カスタム目標設定</span>
+            <span>Custom nutrient targets</span>
           </div>
           <div className="paywall-feature">
             <span className="paywall-feature-icon">✅</span>
-            <span>クラウド同期</span>
+            <span>Cloud sync</span>
           </div>
         </div>
 
@@ -85,11 +85,11 @@ export default function PaywallModal({ trialStatus: _trialStatus, onSubscribe }:
           onClick={handleSubscribe}
           disabled={isLoading}
         >
-          {isLoading ? '処理中...' : 'サブスクリプションに登録'}
+          {isLoading ? 'Processing...' : 'Subscribe'}
         </button>
 
         <p className="paywall-note">
-          いつでもキャンセル可能。登録後すぐにご利用いただけます。
+          Cancel anytime. Instant access after subscribing.
         </p>
       </div>
     </div>

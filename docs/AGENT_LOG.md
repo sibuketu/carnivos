@@ -809,3 +809,41 @@
   - src/screens/RecoveryProtocolScreen.tsx
   - src/screens/ShopScreen.tsx
 - 動作影響: 型チェック0エラー、ビルド成功。alert()がsrc内で0件に。Netlifyへ自動デプロイ済み。
+
+---
+
+## 2026-02-10 (Agent: Windsurf/Cascade)
+- 目的: 全画面ダークモード対応（CSS変数化）、価格USD化、Stripe接続修正
+- 変更点:
+  - **ダークモードCSS変数化（約20ファイル）**: ShopScreen, GiftScreen, RecipeScreen, AuthScreen, OthersScreen, DataImportScreen, DataExportScreen, DataDeleteScreen, HealthDeviceScreen, FeedbackScreen, PrivacyPolicyScreen, TermsOfServiceScreen, CommunityScreen, StreakTrackerScreen, StreakCalendar, BarcodeScannerModal, OnboardingScreenの全ハードコードカラーをCSS変数に置換。`[data-theme='dark']`や`@media (prefers-color-scheme: dark)`の冗長オーバーライドを削除。
+  - **価格USD化**: PaywallScreen/PaywallModal/GiftScreen/Supabase Edge Function/i18n翻訳キーの全価格を円建て→ドル建てに変更（$99/yr, $9.99/mo）。
+  - **Stripe接続修正**: ShopScreenの`/api/create-checkout-session`（存在しないNetlify関数）を`${VITE_SUPABASE_URL}/functions/v1/create-checkout-session`（Supabase Edge Function）に修正。Authorization headerも追加。
+  - **PaywallModalテキスト英語化**: ハードコード日本語→英語に変更。
+  - **決定事項ログ更新**: 上記4件の決定を`決定事項ログ.md`に記録。
+- 根拠・ストーリー（Why）: ダークモードは夜間使用・目の負担軽減に必須。CSS変数化で将来のテーマ追加も容易。USD化はグローバル市場対応。Stripe接続はGiftScreenが既にSupabase Edge Functionを使用しており、ShopScreenだけが古いパスだった。
+- 触ったファイル:
+  - src/screens/ShopScreen.css
+  - src/screens/ShopScreen.tsx
+  - src/screens/GiftScreen.css
+  - src/screens/GiftScreen.tsx
+  - src/screens/RecipeScreen.css
+  - src/screens/AuthScreen.css
+  - src/screens/OthersScreen.css
+  - src/screens/DataImportScreen.css
+  - src/screens/DataExportScreen.css
+  - src/screens/DataDeleteScreen.css
+  - src/screens/HealthDeviceScreen.css
+  - src/screens/FeedbackScreen.css
+  - src/screens/PrivacyPolicyScreen.css
+  - src/screens/TermsOfServiceScreen.css
+  - src/screens/CommunityScreen.css
+  - src/screens/StreakTrackerScreen.css
+  - src/screens/OnboardingScreen.css
+  - src/screens/PaywallScreen.tsx
+  - src/components/PaywallModal.tsx
+  - src/components/StreakCalendar.css
+  - src/components/BarcodeScannerModal.css
+  - src/utils/i18n.ts
+  - supabase/functions/create-checkout-session/index.ts
+  - docs/second-brain/10_Planning_Requirements/決定事項ログ.md
+- 動作影響: 型チェック0エラー、ビルド成功。全画面がCSS変数ベースでダークモード対応。

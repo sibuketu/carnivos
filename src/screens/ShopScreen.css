@@ -1,6 +1,6 @@
 .shop-screen-container {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-primary);
   padding: 1rem;
 }
 
@@ -9,31 +9,9 @@
   margin: 0 auto;
 }
 
-.screen-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  color: #374151;
-}
-
-.screen-header-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 0;
-}
-
 .shop-debug-notice {
-  background-color: #fef3c7;
-  border: 1px solid #fbbf24;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1.5rem;
@@ -42,7 +20,7 @@
 .shop-debug-notice p {
   margin: 0;
   font-size: 0.875rem;
-  color: #78350f;
+  color: var(--color-text-secondary);
 }
 
 .shop-items-section {
@@ -53,7 +31,7 @@
   font-size: 1.25rem;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .shop-items-list {
@@ -63,8 +41,8 @@
 }
 
 .shop-item-card {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -88,18 +66,18 @@
   font-size: 1.125rem;
   font-weight: bold;
   margin: 0 0 0.5rem 0;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .shop-item-description {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   margin: 0;
   line-height: 1.6;
 }
 
 .shop-item-footer {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
   padding-top: 1rem;
 }
 
@@ -112,7 +90,7 @@
 .shop-item-price {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .shop-item-price-free {
@@ -122,7 +100,7 @@
 
 .shop-item-purchase-button {
   padding: 0.75rem 1.5rem;
-  background-color: #f43f5e;
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -133,7 +111,7 @@
 }
 
 .shop-item-purchase-button:hover {
-  background-color: #2563eb;
+  background-color: var(--color-accent-hover, #e11d48);
 }
 
 .shop-item-actions {
@@ -146,7 +124,7 @@
 .shop-item-use-button,
 .shop-item-disable-button {
   padding: 0.75rem 1.5rem;
-  background-color: #f43f5e;
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -161,11 +139,11 @@
 }
 
 .shop-item-disable-button {
-  background-color: #6b7280;
+  background-color: var(--color-text-secondary);
 }
 
 .shop-item-disable-button:hover {
-  background-color: #4b5563;
+  background-color: var(--color-text-tertiary);
 }
 
 .shop-item-purchased-badge {

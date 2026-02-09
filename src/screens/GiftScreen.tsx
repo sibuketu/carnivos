@@ -61,12 +61,12 @@ export default function GiftScreen({ onBack }: GiftScreenProps) {
   const [showMessages, setShowMessages] = useState(false);
   const [myMessages, setMyMessages] = useState<GiftMessage[]>([]);
   const [publicMessages, setPublicMessages] = useState<GiftMessage[]>([]);
-  const [giftAmount, setGiftAmount] = useState<number>(1350); // 9ドル = 約1350円（1ドル=150円換算）
+  const [giftAmount, setGiftAmount] = useState<number>(999); // $9.99 in cents
   const [giftMode, setGiftMode] = useState<'amount' | 'people'>('people'); // 'amount': 金額指定, 'people': 人数指定（デフォルト: 人数指定で利他性を刺激）
   const [giftPeopleCount, setGiftPeopleCount] = useState<number>(1.0); // 何人分送るか（小数対応）
   const [replyingTo, setReplyingTo] = useState<string | null>(null); // 返信対象のメッセージID
   const [replyText, setReplyText] = useState<string>(''); // 返信テキスト
-  const MONTHLY_PRICE = 1350; // 1ヶ月分の価格（9ドル = 約1350円）
+  const MONTHLY_PRICE = 999; // $9.99 monthly price in cents
 
   // ギフトデータを取得
   useEffect(() => {

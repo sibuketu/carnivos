@@ -1,6 +1,6 @@
 .streak-tracker-screen-container {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-primary);
   padding: 1rem;
   position: relative;
   z-index: 1;
@@ -11,14 +11,4 @@
   margin: 0 auto;
   position: relative;
   z-index: 1;
-}
-
-@media (prefers-color-scheme: dark) {
-  .streak-tracker-screen-container {
-    background-color: #1f2937;
-  }
-}
-
-[data-theme='dark'] .streak-tracker-screen-container {
-  background-color: #1f2937;
 }

@@ -1,6 +1,6 @@
 .recipe-screen-container {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-primary);
   padding-bottom: 80px;
 }
 
@@ -19,24 +19,24 @@
 
 .recipe-screen-back-button {
   padding: 0.5rem 1rem;
-  background-color: #f3f4f6;
+  background-color: var(--color-bg-tertiary);
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-title {
   font-size: 24px;
   font-weight: bold;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-create-button {
   width: 100%;
   padding: 0.75rem 1.5rem;
-  background-color: #dc2626;
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -47,7 +47,7 @@
 }
 
 .recipe-screen-create-button:hover {
-  background-color: #b91c1c;
+  background-color: var(--color-accent-hover, #e11d48);
 }
 
 .recipe-screen-list {
@@ -59,12 +59,12 @@
 .recipe-screen-empty {
   text-align: center;
   padding: 3rem 1rem;
-  color: #78716c;
+  color: var(--color-text-secondary);
 }
 
 .recipe-screen-item {
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 1rem;
 }
@@ -79,7 +79,7 @@
 .recipe-screen-item-name {
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-item-actions {
@@ -97,13 +97,13 @@
 }
 
 .recipe-screen-item-use {
-  background-color: #dc2626;
+  background-color: var(--color-accent);
   color: white;
 }
 
 .recipe-screen-item-edit {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-item-delete {
@@ -113,14 +113,14 @@
 
 .recipe-screen-item-description {
   font-size: 14px;
-  color: #78716c;
+  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
 }
 
 .recipe-screen-item-foods {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
 }
 
 .recipe-screen-modal-overlay {
@@ -137,7 +137,7 @@
 }
 
 .recipe-screen-modal {
-  background-color: white;
+  background-color: var(--color-bg-secondary);
   border-radius: 16px;
   padding: 2rem;
   max-width: 500px;
@@ -150,7 +150,7 @@
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 1.5rem;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-modal-form {
@@ -165,16 +165,18 @@
   gap: 0.5rem;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-modal-input,
 .recipe-screen-modal-textarea {
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-modal-textarea {
@@ -196,13 +198,13 @@
 
 .recipe-screen-modal-add-food {
   padding: 0.5rem 1rem;
-  background-color: #f3f4f6;
+  background-color: var(--color-bg-tertiary);
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-modal-foods-list {
@@ -219,9 +221,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-tertiary);
   border-radius: 4px;
   font-size: 14px;
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-modal-remove-food {
@@ -253,11 +256,11 @@
 }
 
 .recipe-screen-modal-cancel {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
 }
 
 .recipe-screen-modal-save {
-  background-color: #dc2626;
+  background-color: var(--color-accent);
   color: white;
 }

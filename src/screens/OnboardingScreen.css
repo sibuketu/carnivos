@@ -63,7 +63,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #d1d5db;
+  background-color: var(--color-border);
   transition: all 0.3s;
 }
 
@@ -557,7 +557,7 @@
 }
 
 .onboarding-payment-modal-button-primary:hover {
-  background-color: #c91c3b;
+  background-color: var(--color-accent-hover, #e11d48);
   transform: translateY(-1px);
 }
 
@@ -567,7 +567,7 @@
 }
 
 .onboarding-payment-modal-button-secondary:hover {
-  background-color: #e5e7eb;
+  background-color: var(--color-bg-tertiary);
 }
 
 /* プラン選択 */

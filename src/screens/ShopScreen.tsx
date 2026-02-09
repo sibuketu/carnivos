@@ -90,16 +90,23 @@ export default function ShopScreen({ onBack }: ShopScreenProps) {
     if (stripeKey && typeof window !== 'undefined' && (window as Window & { Stripe?: (key: string) => { redirectToCheckout: (opts: { sessionId: string }) => Promise<unknown> } }).Stripe) {
       try {
         // Stripe Checkout Sessionを作成
-        const response = await fetch('/api/create-checkout-session', {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        const response = await fetch(`${supabaseUrl}/functions/v1/create-checkout-session`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+          },
           body: JSON.stringify({
             amount: item.price,
-            currency: 'jpy',
+            currency: 'usd',
             metadata: {
               itemId: item.id,
               itemName: item.name,
             },
+            successUrl: `${window.location.origin}/?screen=shop&success=true`,
+            cancelUrl: `${window.location.origin}/?screen=shop&canceled=true`,
           }),
         });
 

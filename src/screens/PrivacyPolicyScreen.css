@@ -1,13 +1,13 @@
 .privacy-policy-screen {
   min-height: 100vh;
   padding: 1rem;
-  background-color: #f9fafb;
+  background-color: var(--color-bg-primary);
 }
 
 .privacy-policy-container {
   max-width: 800px;
   margin: 0 auto;
-  background: white;
+  background: var(--color-bg-secondary);
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -16,7 +16,7 @@
 .privacy-policy-back-button {
   background: none;
   border: none;
-  color: #dc2626;
+  color: var(--color-accent);
   font-size: 14px;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -25,25 +25,25 @@
 }
 
 .privacy-policy-back-button:hover {
-  color: #b91c1c;
+  color: var(--color-accent-hover, #e11d48);
 }
 
 .privacy-policy-title {
   font-size: 28px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
 .privacy-policy-updated {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   margin-bottom: 2rem;
 }
 
 .privacy-policy-content {
   line-height: 1.8;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .privacy-policy-section {
@@ -53,7 +53,7 @@
 .privacy-policy-section h2 {
   font-size: 20px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
   margin-top: 1.5rem;
 }
@@ -61,7 +61,7 @@
 .privacy-policy-section h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
   margin-top: 1rem;
 }
