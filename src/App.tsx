@@ -643,7 +643,7 @@ function AppContent() {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  priceId: 'price_monthly',
+                  priceId: 'price_1SqsMI06Z0q3rla2rQkRS6gq',
                   successUrl: `${origin}/?payment=success`,
                   cancelUrl: `${origin}/?payment=canceled`,
                 }),

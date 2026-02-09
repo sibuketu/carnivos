@@ -70,8 +70,8 @@ export default function OthersScreen() {
           <button className="labs-card" data-testid="labs-trophies" onClick={() => setShowTrophyModal(true)}>
             <span className="labs-card-icon">🏆</span>
             <div className="labs-card-content">
-              <h3 className="labs-card-title">トロフィー</h3>
-              <p className="labs-card-description">{unlockedCount} / {TROPHIES.length} 達成</p>
+              <h3 className="labs-card-title">{t('trophy.title')}</h3>
+              <p className="labs-card-description">{unlockedCount} / {TROPHIES.length} {t('trophy.achieved')}</p>
             </div>
           </button>
         </div>

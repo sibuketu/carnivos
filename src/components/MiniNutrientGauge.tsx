@@ -14,6 +14,7 @@ import {
 } from '../utils/nutrientImpactFactors';
 import { getNutrientExplanation } from '../utils/nutrientExplanationHelper';
 import { CARNIVORE_NUTRIENT_TARGETS, getCarnivoreTargets } from '../data/carnivoreTargets';
+import { getLanguage } from '../utils/i18n';
 
 interface MiniNutrientGaugeProps {
   label: string;
@@ -166,7 +167,8 @@ function MiniNutrientGauge({
     unit: string
   ): string | null => {
     if (!nutrientKey) return null;
-    const defaultExplanations: Record<string, string> = {
+    const lang = getLanguage();
+    const jaExplanations: Record<string, string> = {
       protein: `タンパク質は筋肉、臓器、ホルモン、酵素などの構成要素として必要不可欠です。カーニボアダイエットでは、体重1kgあたり約1.6gが推奨されており、標準的な目標値は${targetValue}${unit}です。肉、魚、卵、内臓などから十分に摂取できます。`,
       fat: `脂質はカーニボアダイエットの主要なエネルギー源です。タンパク質の約1.4倍が推奨され、標準的な目標値は${targetValue}${unit}です。脂質が不足するとエネルギー不足やホルモン産生の低下につながる可能性があります。脂身の多い肉を中心に摂取することを推奨します。`,
       iron: `鉄分は赤血球の生成や酸素運搬に必要です。カーニボアダイエットでは、赤身肉や内臓（特にレバー）から十分に摂取できます。標準的な目標値は${targetValue}${unit}です。女性は月経による損失があるため、より多くの摂取が推奨されます。`,
@@ -187,7 +189,29 @@ function MiniNutrientGauge({
       methionine: `メチオニンはタンパク質合成、解毒作用に重要です。カーニボアダイエットでは、肉から十分に摂取できます。標準的な目標値は${targetValue}${unit}です。`,
       taurine: `タウリンは心臓の健康、視力、抗酸化作用に重要です。カーニボアダイエットでは、肉や魚から十分に摂取できます。標準的な目標値は${targetValue}${unit}です。`,
     };
-    return defaultExplanations[nutrientKey] || null;
+    const enExplanations: Record<string, string> = {
+      protein: `Protein is essential for muscles, organs, hormones, and enzymes. On a carnivore diet, ~1.6g per kg body weight is recommended. Target: ${targetValue}${unit}. Easily obtained from meat, fish, eggs, and organs.`,
+      fat: `Fat is the primary energy source on a carnivore diet. ~1.4x protein intake is recommended. Target: ${targetValue}${unit}. Insufficient fat can lead to low energy and hormonal issues. Prioritize fatty cuts of meat.`,
+      iron: `Iron is needed for red blood cell production and oxygen transport. On a carnivore diet, red meat and organs (especially liver) provide ample iron. Target: ${targetValue}${unit}. Women may need more due to menstrual losses.`,
+      magnesium: `Magnesium is involved in 300+ enzyme reactions, muscle contraction, and energy production. Stress and exercise increase demand. Target: ${targetValue}${unit}.`,
+      vitamin_d: `Vitamin D is important for bone health, immunity, and hormone production. Produced via sun exposure; supplement if needed. Target: ${targetValue}${unit}.`,
+      sodium: `Sodium maintains electrolyte balance and nerve function. Low insulin on carnivore increases sodium excretion, so higher intake is needed. Target: ${targetValue}${unit}. Use salt or mineral water.`,
+      potassium: `Potassium works with sodium for electrolyte balance, muscle contraction, and nerve function. Meat and fish provide sufficient amounts. Target: ${targetValue}${unit}.`,
+      zinc: `Zinc supports immunity, protein synthesis, and wound healing. Red meat and organs are excellent sources with high bioavailability. Target: ${targetValue}${unit}.`,
+      vitamin_c: `Vitamin C requirements drop significantly on low-carb diets (Glucose-Ascorbate Antagonism). Meat provides ~30mg, well above the ~10mg minimum needed in ketosis. Target: ${targetValue}${unit}.`,
+      vitamin_a: `Vitamin A (retinol) supports vision, immunity, and skin health. Liver and organ meats are excellent sources. Target: ${targetValue}${unit}. Be cautious of excess intake.`,
+      vitamin_k2: `Vitamin K2 (MK-4) supports bone health and blood clotting. Organ meats and fermented foods are good sources. Target: ${targetValue}${unit}.`,
+      vitamin_b12: `Vitamin B12 is essential for red blood cell production and nerve function. Meat, fish, and organs provide ample B12. Target: ${targetValue}${unit}.`,
+      choline: `Choline supports brain health, memory, and learning. Liver and eggs are excellent sources. Target: ${targetValue}${unit}.`,
+      selenium: `Selenium has antioxidant properties and supports thyroid and immune function. Meat and fish provide sufficient amounts. Target: ${targetValue}${unit}.`,
+      calcium: `Calcium supports bone health, muscle contraction, and nerve function. Bone-in meat and bone broth are good sources. Target: ${targetValue}${unit}.`,
+      phosphorus: `Phosphorus supports bone health, energy production, and DNA synthesis. Meat provides sufficient amounts. Target: ${targetValue}${unit}.`,
+      glycine: `Glycine is a collagen building block, supports sleep quality and reduces inflammation. Bone broth and skin-on meat are good sources. Target: ${targetValue}${unit}.`,
+      methionine: `Methionine supports protein synthesis and detoxification. Meat provides sufficient amounts. Target: ${targetValue}${unit}.`,
+      taurine: `Taurine supports heart health, vision, and has antioxidant properties. Meat and fish provide sufficient amounts. Target: ${targetValue}${unit}.`,
+    };
+    const explanations = lang === 'ja' ? jaExplanations : enExplanations;
+    return explanations[nutrientKey] || null;
   };
 
   // 栄養素説明を取得
@@ -362,7 +386,7 @@ function MiniNutrientGauge({
                     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
                   }}
                 >
-                  Low is OK (カーニボアロジック)
+                  {getLanguage() === 'ja' ? 'Low is OK (カーニボアロジック)' : 'Low is OK (Carnivore Logic)'}
                 </div>
               )}
             </span>
@@ -771,7 +795,10 @@ function MiniNutrientGauge({
                           if (nutrient === 'protein') {
                             const weight = profile?.weight || 70;
                             const base = weight * 1.6;
-                            let formula = `【基本値】\n体重(${weight}kg) × 1.6g/kg = ${base.toFixed(1)}g/日`;
+                            const _isJaP = getLanguage() === 'ja';
+                            let formula = _isJaP
+                              ? `【基本値】\n体重(${weight}kg) × 1.6g/kg = ${base.toFixed(1)}g/日`
+                              : `Base:\nWeight(${weight}kg) × 1.6g/kg = ${base.toFixed(1)}g/day`;
                             let current = base;
                             const adjustments: Array<{
                               name: string;
@@ -781,10 +808,10 @@ function MiniNutrientGauge({
 
                             // 妊娠中・授乳中の調整（最優先）
                             if (profile?.isPregnant) {
-                              adjustments.push({ name: '妊娠中', target: 120, applied: false });
+                              adjustments.push({ name: getLanguage() === 'ja' ? '妊娠中' : 'Pregnant', target: 120, applied: false });
                             }
                             if (profile?.isBreastfeeding) {
-                              adjustments.push({ name: '授乳中', target: 130, applied: false });
+                              adjustments.push({ name: getLanguage() === 'ja' ? '授乳中' : 'Breastfeeding', target: 130, applied: false });
                             }
 
                             // 運動強度・頻度による調整
@@ -792,13 +819,13 @@ function MiniNutrientGauge({
                               profile?.exerciseIntensity === 'intense' ||
                               profile?.exerciseFrequency === '5+'
                             ) {
-                              adjustments.push({ name: '激しい運動', target: 130, applied: false });
+                              adjustments.push({ name: getLanguage() === 'ja' ? '激しい運動' : 'Intense exercise', target: 130, applied: false });
                             } else if (
                               profile?.exerciseIntensity === 'moderate' ||
                               profile?.exerciseFrequency === '3-4'
                             ) {
                               adjustments.push({
-                                name: '中程度の運動',
+                                name: getLanguage() === 'ja' ? '中程度の運動' : 'Moderate exercise',
                                 target: 115,
                                 applied: false,
                               });
@@ -806,10 +833,10 @@ function MiniNutrientGauge({
 
                             // 活動量による調整
                             if (profile?.activityLevel === 'active') {
-                              adjustments.push({ name: '活動的', target: 120, applied: false });
+                              adjustments.push({ name: getLanguage() === 'ja' ? '活動的' : 'Active', target: 120, applied: false });
                             } else if (profile?.activityLevel === 'moderate') {
                               adjustments.push({
-                                name: '中程度の活動量',
+                                name: getLanguage() === 'ja' ? '中程度の活動量' : 'Moderate activity',
                                 target: 110,
                                 applied: false,
                               });
@@ -817,13 +844,13 @@ function MiniNutrientGauge({
 
                             // 年齢による調整
                             if (profile?.age && profile.age > 50) {
-                              adjustments.push({ name: '50歳以上', target: 110, applied: false });
+                              adjustments.push({ name: getLanguage() === 'ja' ? '50歳以上' : 'Age 50+', target: 110, applied: false });
                             }
 
                             // 消化器系の問題による調整
                             if (profile?.digestiveIssues) {
                               adjustments.push({
-                                name: '消化器系の問題',
+                                name: getLanguage() === 'ja' ? '消化器系の問題' : 'Digestive issues',
                                 target: 110,
                                 applied: false,
                               });
@@ -833,19 +860,22 @@ function MiniNutrientGauge({
                             adjustments.sort((a, b) => b.target - a.target);
 
                             // 各調整を適用して表示
+                            const isJa = getLanguage() === 'ja';
                             if (adjustments.length > 0) {
-                              formula += `\n\n【プロファイル設定による調整】`;
+                              formula += isJa ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
                               for (const adj of adjustments) {
                                 const prevCurrent = current;
                                 const newCurrent = Math.max(current, adj.target);
                                 const actualIncrement = newCurrent - prevCurrent;
                                 if (actualIncrement > 0) {
                                   current = newCurrent;
-                                  formula += `\n${adj.name}: 最低${adj.target}g（+${actualIncrement.toFixed(1)}g） → ${current.toFixed(1)}g`;
+                                  formula += isJa
+                                    ? `\n${adj.name}: 最低${adj.target}g（+${actualIncrement.toFixed(1)}g） → ${current.toFixed(1)}g`
+                                    : `\n${adj.name}: min ${adj.target}g (+${actualIncrement.toFixed(1)}g) → ${current.toFixed(1)}g`;
                                 }
                               }
                             } else {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
+                              formula += isJa ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             }
 
                             // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
@@ -854,12 +884,14 @@ function MiniNutrientGauge({
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}g（自動計算を上書き）`;
+                              formula += isJa ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += isJa
+                                ? `\nカスタム目標値: ${manualValue}g（自動計算を上書き）`
+                                : `\nCustom target: ${manualValue}g (overrides auto-calculation)`;
                               current = manualValue;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${current.toFixed(1)}g/日`;
+                              formula += isJa ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${current.toFixed(1)}g/${isJa ? '日' : 'day'}`;
                             }
 
                             // 実際の目標値を使用（計算式と表示を一致させる）
@@ -869,14 +901,15 @@ function MiniNutrientGauge({
                               current = currentTarget;
                               // 計算式の最終目標値を実際の目標値に更新
                               formula = formula.replace(
-                                /【最終目標値】\n.*$/,
-                                `【最終目標値】\n${currentTarget.toFixed(1)}g/日`
+                                /(?:【最終目標値】|Final Target:)\n.*$/,
+                                `${isJa ? '【最終目標値】' : 'Final Target:'}\n${currentTarget.toFixed(1)}g/${isJa ? '日' : 'day'}`
                               );
                             }
 
                             return formula;
                           } else if (nutrient === 'fat') {
-                            let formula = `【基本値】\n150g/日`;
+                            const _isJaF = getLanguage() === 'ja';
+                            let formula = _isJaF ? `【基本値】\n150g/日` : `Base:\n150g/day`;
                             let current = 150;
                             const adjustments: Array<{
                               name: string;
@@ -889,13 +922,13 @@ function MiniNutrientGauge({
                               profile?.exerciseIntensity === 'intense' ||
                               profile?.exerciseFrequency === '5+'
                             ) {
-                              adjustments.push({ name: '激しい運動', target: 190, applied: false });
+                              adjustments.push({ name: getLanguage() === 'ja' ? '激しい運動' : 'Intense exercise', target: 190, applied: false });
                             } else if (
                               profile?.exerciseIntensity === 'moderate' ||
                               profile?.exerciseFrequency === '3-4'
                             ) {
                               adjustments.push({
-                                name: '中程度の運動',
+                                name: getLanguage() === 'ja' ? '中程度の運動' : 'Moderate exercise',
                                 target: 170,
                                 applied: false,
                               });
@@ -903,10 +936,10 @@ function MiniNutrientGauge({
 
                             // 活動量による調整
                             if (profile?.activityLevel === 'active') {
-                              adjustments.push({ name: '活動的', target: 180, applied: false });
+                              adjustments.push({ name: getLanguage() === 'ja' ? '活動的' : 'Active', target: 180, applied: false });
                             } else if (profile?.activityLevel === 'moderate') {
                               adjustments.push({
-                                name: '中程度の活動量',
+                                name: getLanguage() === 'ja' ? '中程度の活動量' : 'Moderate activity',
                                 target: 160,
                                 applied: false,
                               });
@@ -933,14 +966,16 @@ function MiniNutrientGauge({
 
                             // 各調整を適用して表示
                             if (adjustments.length > 0) {
-                              formula += `\n\n【プロファイル設定による調整】`;
+                              formula += _isJaF ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
                               for (const adj of adjustments) {
                                 const prevCurrent = current;
                                 const newCurrent = Math.max(current, adj.target);
                                 const actualIncrement = newCurrent - prevCurrent;
                                 if (actualIncrement > 0) {
                                   current = newCurrent;
-                                  formula += `\n${adj.name}: 最低${adj.target}g（+${actualIncrement.toFixed(1)}g） → ${current.toFixed(1)}g`;
+                                  formula += _isJaF
+                                    ? `\n${adj.name}: 最低${adj.target}g（+${actualIncrement.toFixed(1)}g） → ${current.toFixed(1)}g`
+                                    : `\n${adj.name}: min ${adj.target}g (+${actualIncrement.toFixed(1)}g) → ${current.toFixed(1)}g`;
                                 }
                               }
                             }
@@ -951,7 +986,9 @@ function MiniNutrientGauge({
                               current = Math.max(current, prevCurrent * 1.5);
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0) {
-                                formula += `\n移行期間中: ${prevCurrent.toFixed(1)}g × 1.5倍（+${actualIncrement.toFixed(1)}g） → ${current.toFixed(1)}g`;
+                                formula += _isJaF
+                                  ? `\n移行期間中: ${prevCurrent.toFixed(1)}g × 1.5倍（+${actualIncrement.toFixed(1)}g） → ${current.toFixed(1)}g`
+                                  : `\nAdaptation phase: ${prevCurrent.toFixed(1)}g × 1.5x (+${actualIncrement.toFixed(1)}g) → ${current.toFixed(1)}g`;
                               }
                             }
 
@@ -989,7 +1026,9 @@ function MiniNutrientGauge({
                                 const prevCurrent = current;
                                 current = fatFromProtein;
                                 const actualIncrement = current - prevCurrent;
-                                formula += `\nタンパク質比: タンパク質目標値(${actualProteinTarget.toFixed(1)}g) × 1.2倍（+${actualIncrement.toFixed(1)}g） → ${current.toFixed(1)}g`;
+                                formula += _isJaF
+                                  ? `\nタンパク質比: タンパク質目標値(${actualProteinTarget.toFixed(1)}g) × 1.2倍（+${actualIncrement.toFixed(1)}g） → ${current.toFixed(1)}g`
+                                  : `\nProtein ratio: protein target(${actualProteinTarget.toFixed(1)}g) × 1.2x (+${actualIncrement.toFixed(1)}g) → ${current.toFixed(1)}g`;
                               }
                             } catch (error) {
                               console.error(
@@ -999,7 +1038,7 @@ function MiniNutrientGauge({
                             }
 
                             if (adjustments.length === 0 && !isAdaptationPhase) {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
+                              formula += _isJaF ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             }
 
                             // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
@@ -1008,15 +1047,18 @@ function MiniNutrientGauge({
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}g（自動計算を上書き）`;
+                              formula += _isJaF ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaF
+                                ? `\nカスタム目標値: ${manualValue}g（自動計算を上書き）`
+                                : `\nCustom target: ${manualValue}g (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(1)}g/日`;
+                              formula += _isJaF ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(1)}g/${_isJaF ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'magnesium') {
-                            let formula = '【基本値】\n600mg/日';
+                            const _isJaM = getLanguage() === 'ja';
+                            let formula = _isJaM ? '【基本値】\n600mg/日' : 'Base:\n600mg/day';
                             let current = 600;
                             const adjustments: Array<{
                               name: string;
@@ -1042,7 +1084,7 @@ function MiniNutrientGauge({
                                       : false;
                             if (isAdaptationPhase) {
                               adjustments.push({
-                                name: '移行期間中',
+                                name: getLanguage() === 'ja' ? '移行期間中' : 'Adaptation phase',
                                 target: 800,
                                 increment: 200,
                                 applied: false,
@@ -1052,7 +1094,7 @@ function MiniNutrientGauge({
                             // ストレスレベルによる調整
                             if (profile?.stressLevel === 'high') {
                               adjustments.push({
-                                name: '高ストレス',
+                                name: getLanguage() === 'ja' ? '高ストレス' : 'High stress',
                                 target: 700,
                                 increment: 100,
                                 applied: false,
@@ -1062,7 +1104,7 @@ function MiniNutrientGauge({
                             // 活動量による調整
                             if (profile?.activityLevel === 'active') {
                               adjustments.push({
-                                name: '活動的',
+                                name: getLanguage() === 'ja' ? '活動的' : 'Active',
                                 target: 700,
                                 increment: 100,
                                 applied: false,
@@ -1072,7 +1114,7 @@ function MiniNutrientGauge({
                             // 睡眠時間による調整
                             if (profile?.sleepHours && profile.sleepHours < 7) {
                               adjustments.push({
-                                name: '睡眠不足（7時間未満）',
+                                name: getLanguage() === 'ja' ? '睡眠不足（7時間未満）' : 'Sleep deficit (<7h)',
                                 target: 650,
                                 increment: 50,
                                 applied: false,
@@ -1085,7 +1127,7 @@ function MiniNutrientGauge({
                               profile?.exerciseFrequency === '5+'
                             ) {
                               adjustments.push({
-                                name: '激しい運動',
+                                name: getLanguage() === 'ja' ? '激しい運動' : 'Intense exercise',
                                 target: 750,
                                 increment: 150,
                                 applied: false,
@@ -1095,7 +1137,7 @@ function MiniNutrientGauge({
                               profile?.exerciseFrequency === '3-4'
                             ) {
                               adjustments.push({
-                                name: '中程度の運動',
+                                name: getLanguage() === 'ja' ? '中程度の運動' : 'Moderate exercise',
                                 target: 650,
                                 increment: 50,
                                 applied: false,
@@ -1105,7 +1147,7 @@ function MiniNutrientGauge({
                             // 妊娠中・授乳中の調整
                             if (profile?.isPregnant) {
                               adjustments.push({
-                                name: '妊娠中',
+                                name: getLanguage() === 'ja' ? '妊娠中' : 'Pregnant',
                                 target: 700,
                                 increment: 100,
                                 applied: false,
@@ -1113,7 +1155,7 @@ function MiniNutrientGauge({
                             }
                             if (profile?.isBreastfeeding) {
                               adjustments.push({
-                                name: '授乳中',
+                                name: getLanguage() === 'ja' ? '授乳中' : 'Breastfeeding',
                                 target: 700,
                                 increment: 100,
                                 applied: false,
@@ -1123,7 +1165,7 @@ function MiniNutrientGauge({
                             // 炎症レベルによる調整
                             if (profile?.inflammationLevel === 'high') {
                               adjustments.push({
-                                name: '高炎症',
+                                name: getLanguage() === 'ja' ? '高炎症' : 'High inflammation',
                                 target: 650,
                                 increment: 50,
                                 applied: false,
@@ -1133,7 +1175,7 @@ function MiniNutrientGauge({
                             // メンタルヘルス状態による調整
                             if (profile?.mentalHealthStatus === 'poor') {
                               adjustments.push({
-                                name: 'メンタルヘルス不良',
+                                name: getLanguage() === 'ja' ? 'メンタルヘルス不良' : 'Poor mental health',
                                 target: 700,
                                 increment: 100,
                                 applied: false,
@@ -1146,7 +1188,7 @@ function MiniNutrientGauge({
                               profile?.alcoholFrequency === 'weekly'
                             ) {
                               adjustments.push({
-                                name: 'アルコール摂取',
+                                name: getLanguage() === 'ja' ? 'アルコール摂取' : 'Alcohol intake',
                                 target: 700,
                                 increment: 100,
                                 applied: false,
@@ -1157,14 +1199,14 @@ function MiniNutrientGauge({
                             if (profile?.caffeineIntake === 'high') {
                               if (profile?.stressLevel === 'high') {
                                 adjustments.push({
-                                  name: '高カフェイン+高ストレス',
+                                  name: getLanguage() === 'ja' ? '高カフェイン+高ストレス' : 'High caffeine + high stress',
                                   target: 750,
                                   increment: 150,
                                   applied: false,
                                 });
                               } else {
                                 adjustments.push({
-                                  name: '高カフェイン',
+                                  name: getLanguage() === 'ja' ? '高カフェイン' : 'High caffeine',
                                   target: 700,
                                   increment: 100,
                                   applied: false,
@@ -1183,7 +1225,7 @@ function MiniNutrientGauge({
 
                             // 実際の計算ロジックに従って適用（getCarnivoreTargetsの順序を再現）
                             if (adjustments.length > 0 || metabolicIncrement > 0) {
-                              formula += `\n\n【プロファイル設定による調整】`;
+                              formula += _isJaM ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
 
                               // 各調整を順番に適用し、実際に値が変わる場合のみ表示
                               // 調整をtarget値の高い順にソートして適用
@@ -1195,24 +1237,30 @@ function MiniNutrientGauge({
                                 const actualIncrement = newCurrent - prevCurrent;
                                 if (actualIncrement > 0) {
                                   current = newCurrent;
-                                  formula += `\n${adj.name}: 最低${adj.target}mg（+${actualIncrement}mg） → ${current}mg`;
+                                  formula += _isJaM
+                                    ? `\n${adj.name}: 最低${adj.target}mg（+${actualIncrement}mg） → ${current}mg`
+                                    : `\n${adj.name}: min ${adj.target}mg (+${actualIncrement}mg) → ${current}mg`;
                                 }
                               }
 
                               // 代謝ストレス指標による累積的な増分（最後に適用）
                               if (metabolicIncrement > 0) {
                                 current = current + metabolicIncrement;
-                                formula += `\n代謝ストレス（夜間低血糖疑い）: +${metabolicIncrement}mg（累積増分） → ${current}mg`;
+                                formula += _isJaM
+                                  ? `\n代謝ストレス（夜間低血糖疑い）: +${metabolicIncrement}mg（累積増分） → ${current}mg`
+                                  : `\nMetabolic stress (suspected nocturnal hypoglycemia): +${metabolicIncrement}mg (cumulative) → ${current}mg`;
                               }
                             } else {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
+                              formula += _isJaM ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             }
 
                             // サプリメント摂取による調整
                             if (profile?.supplementMagnesium) {
                               current = Math.max(0, current - 200);
-                              formula += `\n\n【サプリメント調整】`;
-                              formula += `\nマグネシウムサプリメント摂取中: -200mg（サプリメント分を考慮） → ${current}mg`;
+                              formula += _isJaM ? `\n\n【サプリメント調整】` : `\n\nSupplement Adjustment:`;
+                              formula += _isJaM
+                                ? `\nマグネシウムサプリメント摂取中: -200mg（サプリメント分を考慮） → ${current}mg`
+                                : `\nMagnesium supplement: -200mg (supplement offset) → ${current}mg`;
                             }
 
                             // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
@@ -1221,42 +1269,51 @@ function MiniNutrientGauge({
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
+                              formula += _isJaM ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaM
+                                ? `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`
+                                : `\nCustom target: ${manualValue}mg (overrides auto-calculation)`;
                               current = manualValue;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(1)}mg/日`;
+                              formula += _isJaM ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(1)}mg/${_isJaM ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'iron') {
-                            let formula = `【基本値】\n8mg/日（男性）`;
+                            const _isJaI = getLanguage() === 'ja';
+                            let formula = _isJaI ? `【基本値】\n8mg/日（男性）` : `Base:\n8mg/day (male)`;
                             let current = 8;
 
                             // 性別による調整
                             if (profile?.gender === 'female') {
                               if (profile?.isPostMenopause) {
-                                // 閉経後は8mg（変更なし）
-                                formula += `\n\n【性別調整】`;
-                                formula += `\n女性（閉経後）: 8mg（月経がないため男性と同値）`;
+                                formula += _isJaI ? `\n\n【性別調整】` : `\n\nGender Adjustment:`;
+                                formula += _isJaI
+                                  ? `\n女性（閉経後）: 8mg（月経がないため男性と同値）`
+                                  : `\nFemale (post-menopause): 8mg (same as male, no menstruation)`;
                               } else {
                                 const prevCurrent = current;
                                 current = 18;
-                                formula += `\n\n【性別調整】`;
-                                formula += `\n女性（月経あり）: 18mg（+${(current - prevCurrent).toFixed(1)}mg） → ${current}mg`;
+                                formula += _isJaI ? `\n\n【性別調整】` : `\n\nGender Adjustment:`;
+                                formula += _isJaI
+                                  ? `\n女性（月経あり）: 18mg（+${(current - prevCurrent).toFixed(1)}mg） → ${current}mg`
+                                  : `\nFemale (menstruating): 18mg (+${(current - prevCurrent).toFixed(1)}mg) → ${current}mg`;
                               }
                             }
 
                             // 妊娠中・授乳中の調整
+                            const _profileAdj = _isJaI ? '【プロファイル設定による調整】' : 'Profile Adjustments:';
                             if (profile?.isPregnant) {
                               const prevCurrent = current;
                               current = Math.max(current, 27);
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0) {
-                                if (!formula.includes('【プロファイル設定による調整】')) {
-                                  formula += `\n\n【プロファイル設定による調整】`;
+                                if (!formula.includes(_profileAdj)) {
+                                  formula += `\n\n${_profileAdj}`;
                                 }
-                                formula += `\n妊娠中: 最低27mg（+${actualIncrement.toFixed(1)}mg） → ${current}mg`;
+                                formula += _isJaI
+                                  ? `\n妊娠中: 最低27mg（+${actualIncrement.toFixed(1)}mg） → ${current}mg`
+                                  : `\nPregnant: min 27mg (+${actualIncrement.toFixed(1)}mg) → ${current}mg`;
                               }
                             }
                             if (profile?.isBreastfeeding) {
@@ -1264,23 +1321,27 @@ function MiniNutrientGauge({
                               current = Math.max(current, 9);
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0 || current < prevCurrent) {
-                                if (!formula.includes('【プロファイル設定による調整】')) {
-                                  formula += `\n\n【プロファイル設定による調整】`;
+                                if (!formula.includes(_profileAdj)) {
+                                  formula += `\n\n${_profileAdj}`;
                                 }
                                 if (current < prevCurrent) {
-                                  formula += `\n授乳中: 9mg（月経がないため） → ${current}mg`;
+                                  formula += _isJaI
+                                    ? `\n授乳中: 9mg（月経がないため） → ${current}mg`
+                                    : `\nBreastfeeding: 9mg (no menstruation) → ${current}mg`;
                                 } else {
-                                  formula += `\n授乳中: 最低9mg（+${actualIncrement.toFixed(1)}mg） → ${current}mg`;
+                                  formula += _isJaI
+                                    ? `\n授乳中: 最低9mg（+${actualIncrement.toFixed(1)}mg） → ${current}mg`
+                                    : `\nBreastfeeding: min 9mg (+${actualIncrement.toFixed(1)}mg) → ${current}mg`;
                                 }
                               }
                             }
 
                             if (
-                              !formula.includes('【プロファイル設定による調整】') &&
+                              !formula.includes(_profileAdj) &&
                               !profile?.isPregnant &&
                               !profile?.isBreastfeeding
                             ) {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
+                              formula += _isJaI ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             }
 
                             // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
@@ -1289,15 +1350,18 @@ function MiniNutrientGauge({
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
+                              formula += _isJaI ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaI
+                                ? `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`
+                                : `\nCustom target: ${manualValue}mg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(1)}mg/日`;
+                              formula += _isJaI ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(1)}mg/${_isJaI ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'vitamin_d') {
-                            let formula = `【基本値】\n2000IU/日`;
+                            const _isJaD = getLanguage() === 'ja';
+                            let formula = _isJaD ? `【基本値】\n2000IU/日` : `Base:\n2000IU/day`;
                             let current = 2000;
                             const adjustments: Array<{
                               name: string;
@@ -1312,7 +1376,7 @@ function MiniNutrientGauge({
                             ) {
                               if (!profile?.supplementVitaminD) {
                                 adjustments.push({
-                                  name: '日光暴露なし（サプリメントなし）',
+                                  name: getLanguage() === 'ja' ? '日光暴露なし（サプリメントなし）' : 'No sun exposure (no supplement)',
                                   target: 4000,
                                   applied: false,
                                 });
@@ -1321,14 +1385,14 @@ function MiniNutrientGauge({
 
                             // 年齢による調整
                             if (profile?.age && profile.age > 50) {
-                              adjustments.push({ name: '50歳以上', target: 3000, applied: false });
+                              adjustments.push({ name: getLanguage() === 'ja' ? '50歳以上' : 'Age 50+', target: 3000, applied: false });
                             }
 
                             // メンタルヘルス状態による調整
                             if (profile?.mentalHealthStatus === 'poor') {
                               if (!profile?.supplementVitaminD) {
                                 adjustments.push({
-                                  name: 'メンタルヘルス不良（サプリメントなし）',
+                                  name: getLanguage() === 'ja' ? 'メンタルヘルス不良（サプリメントなし）' : 'Poor mental health (no supplement)',
                                   target: 3000,
                                   applied: false,
                                 });
@@ -1340,25 +1404,29 @@ function MiniNutrientGauge({
 
                             // 各調整を適用して表示
                             if (adjustments.length > 0) {
-                              formula += `\n\n【プロファイル設定による調整】`;
+                              formula += _isJaD ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
                               for (const adj of adjustments) {
                                 const prevCurrent = current;
                                 const newCurrent = Math.max(current, adj.target);
                                 const actualIncrement = newCurrent - prevCurrent;
                                 if (actualIncrement > 0) {
                                   current = newCurrent;
-                                  formula += `\n${adj.name}: 最低${adj.target}IU（+${actualIncrement.toFixed(0)}IU） → ${current.toFixed(0)}IU`;
+                                  formula += _isJaD
+                                    ? `\n${adj.name}: 最低${adj.target}IU（+${actualIncrement.toFixed(0)}IU） → ${current.toFixed(0)}IU`
+                                    : `\n${adj.name}: min ${adj.target}IU (+${actualIncrement.toFixed(0)}IU) → ${current.toFixed(0)}IU`;
                                 }
                               }
                             } else {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
+                              formula += _isJaD ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             }
 
                             // サプリメント摂取による調整
                             if (profile?.supplementVitaminD) {
                               current = Math.max(0, current - 1000);
-                              formula += `\n\n【サプリメント調整】`;
-                              formula += `\nビタミンDサプリメント摂取中: -1000IU（サプリメント分を考慮） → ${current.toFixed(0)}IU`;
+                              formula += _isJaD ? `\n\n【サプリメント調整】` : `\n\nSupplement Adjustment:`;
+                              formula += _isJaD
+                                ? `\nビタミンDサプリメント摂取中: -1000IU（サプリメント分を考慮） → ${current.toFixed(0)}IU`
+                                : `\nVitamin D supplement: -1000IU (supplement offset) → ${current.toFixed(0)}IU`;
                             }
 
                             // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
@@ -1367,15 +1435,18 @@ function MiniNutrientGauge({
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}IU（自動計算を上書き）`;
+                              formula += _isJaD ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaD
+                                ? `\nカスタム目標値: ${manualValue}IU（自動計算を上書き）`
+                                : `\nCustom target: ${manualValue}IU (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(0)}IU/日`;
+                              formula += _isJaD ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(0)}IU/${_isJaD ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'sodium') {
-                            let formula = `【基本値】\n5000mg/日`;
+                            const _isJaN = getLanguage() === 'ja';
+                            let formula = _isJaN ? `【基本値】\n5000mg/日` : `Base:\n5000mg/day`;
                             let current = 5000;
                             let hasAdjustment = false;
 
@@ -1400,8 +1471,10 @@ function MiniNutrientGauge({
                               current = Math.max(current, 7000);
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0) {
-                                formula += `\n\n【プロファイル設定による調整】`;
-                                formula += `\n移行期間中: 最低7000mg（+${actualIncrement.toFixed(0)}mg） → ${current.toFixed(0)}mg`;
+                                formula += _isJaN ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
+                                formula += _isJaN
+                                  ? `\n移行期間中: 最低7000mg（+${actualIncrement.toFixed(0)}mg） → ${current.toFixed(0)}mg`
+                                  : `\nAdaptation phase: min 7000mg (+${actualIncrement.toFixed(0)}mg) → ${current.toFixed(0)}mg`;
                                 hasAdjustment = true;
                               }
                             }
@@ -1413,10 +1486,12 @@ function MiniNutrientGauge({
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0) {
                                 if (!hasAdjustment) {
-                                  formula += `\n\n【プロファイル設定による調整】`;
+                                  formula += _isJaN ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
                                   hasAdjustment = true;
                                 }
-                                formula += `\n活動的: +1000mg（汗をかくため、累積増分） → ${current.toFixed(0)}mg`;
+                                formula += _isJaN
+                                  ? `\n活動的: +1000mg（汗をかくため、累積増分） → ${current.toFixed(0)}mg`
+                                  : `\nActive: +1000mg (sweating, cumulative) → ${current.toFixed(0)}mg`;
                               }
                             }
 
@@ -1430,10 +1505,12 @@ function MiniNutrientGauge({
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0) {
                                 if (!hasAdjustment) {
-                                  formula += `\n\n【プロファイル設定による調整】`;
+                                  formula += _isJaN ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
                                   hasAdjustment = true;
                                 }
-                                formula += `\n代謝ストレス（朝起きるのが辛い/疲労感）: +1500mg（副腎疲労疑い、累積増分） → ${current.toFixed(0)}mg`;
+                                formula += _isJaN
+                                  ? `\n代謝ストレス（朝起きるのが辛い/疲労感）: +1500mg（副腎疲労疑い、累積増分） → ${current.toFixed(0)}mg`
+                                  : `\nMetabolic stress (morning fatigue): +1500mg (suspected adrenal fatigue, cumulative) → ${current.toFixed(0)}mg`;
                               }
                             }
                             if (
@@ -1445,15 +1522,17 @@ function MiniNutrientGauge({
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0) {
                                 if (!hasAdjustment) {
-                                  formula += `\n\n【プロファイル設定による調整】`;
+                                  formula += _isJaN ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
                                   hasAdjustment = true;
                                 }
-                                formula += `\n代謝ストレス（コーヒー毎日2杯以上）: +500mg（ナトリウム排出増、累積増分） → ${current.toFixed(0)}mg`;
+                                formula += _isJaN
+                                  ? `\n代謝ストレス（コーヒー毎日2杯以上）: +500mg（ナトリウム排出増、累積増分） → ${current.toFixed(0)}mg`
+                                  : `\nMetabolic stress (2+ coffees/day): +500mg (increased sodium excretion, cumulative) → ${current.toFixed(0)}mg`;
                               }
                             }
 
                             if (!hasAdjustment) {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
+                              formula += _isJaN ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             }
 
                             // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
@@ -1462,15 +1541,18 @@ function MiniNutrientGauge({
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
+                              formula += _isJaN ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaN
+                                ? `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`
+                                : `\nCustom target: ${manualValue}mg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(0)}mg/日`;
+                              formula += _isJaN ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(0)}mg/${_isJaN ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'potassium') {
-                            let formula = `【基本値】\n4500mg/日（カーニボアロジック）`;
+                            const _isJaK = getLanguage() === 'ja';
+                            let formula = _isJaK ? `【基本値】\n4500mg/日（カーニボアロジック）` : `Base:\n4500mg/day (Carnivore Logic)`;
                             let current = 4500;
                             let hasAdjustment = false;
 
@@ -1494,14 +1576,16 @@ function MiniNutrientGauge({
                               current = Math.max(current, 5000);
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0) {
-                                formula += `\n\n【プロファイル設定による調整】`;
-                                formula += `\n移行期間中: 最低5000mg（+${actualIncrement.toFixed(0)}mg） → ${current.toFixed(0)}mg`;
+                                formula += _isJaK ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
+                                formula += _isJaK
+                                  ? `\n移行期間中: 最低5000mg（+${actualIncrement.toFixed(0)}mg） → ${current.toFixed(0)}mg`
+                                  : `\nAdaptation phase: min 5000mg (+${actualIncrement.toFixed(0)}mg) → ${current.toFixed(0)}mg`;
                                 hasAdjustment = true;
                               }
                             }
 
                             if (!hasAdjustment) {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
+                              formula += _isJaK ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             }
 
                             // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
@@ -1510,87 +1594,82 @@ function MiniNutrientGauge({
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
+                              formula += _isJaK ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaK
+                                ? `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`
+                                : `\nCustom target: ${manualValue}mg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(0)}mg/日`;
+                              formula += _isJaK ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(0)}mg/${_isJaK ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'zinc') {
-                            let formula = `【基本値】\n11mg/日（RDA基準、男性）`;
-
-                            formula += `\n\n（プロファイル設定による追加調整はありません）`;
-
-                            // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
+                            const _isJaZ = getLanguage() === 'ja';
+                            let formula = _isJaZ ? `【基本値】\n11mg/日（RDA基準、男性）` : `Base:\n11mg/day (RDA, male)`;
+                            formula += _isJaZ ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             if (
                               profile?.customNutrientTargets?.[nutrient]?.mode === 'manual' &&
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
+                              formula += _isJaZ ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaZ ? `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）` : `\nCustom target: ${manualValue}mg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(1)}mg/日`;
+                              formula += _isJaZ ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(1)}mg/${_isJaZ ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'vitamin_c') {
-                            let formula = `【基本値】\n10mg/日（カーニボアロジック）`;
-
-                            formula += `\n\n（プロファイル設定による追加調整はありません）`;
-
-                            // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
+                            const _isJaC = getLanguage() === 'ja';
+                            let formula = _isJaC ? `【基本値】\n10mg/日（カーニボアロジック）` : `Base:\n10mg/day (Carnivore Logic)`;
+                            formula += _isJaC ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             if (
                               profile?.customNutrientTargets?.[nutrient]?.mode === 'manual' &&
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
+                              formula += _isJaC ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaC ? `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）` : `\nCustom target: ${manualValue}mg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(1)}mg/日`;
+                              formula += _isJaC ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(1)}mg/${_isJaC ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'vitamin_a') {
-                            let formula = `【基本値】\n5000IU/日（レチノール、活性型ビタミンA）`;
-
-                            formula += `\n\n（プロファイル設定による追加調整はありません）`;
-
-                            // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
+                            const _isJaA = getLanguage() === 'ja';
+                            let formula = _isJaA ? `【基本値】\n5000IU/日（レチノール、活性型ビタミンA）` : `Base:\n5000IU/day (Retinol, active Vitamin A)`;
+                            formula += _isJaA ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             if (
                               profile?.customNutrientTargets?.[nutrient]?.mode === 'manual' &&
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}IU（自動計算を上書き）`;
+                              formula += _isJaA ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaA ? `\nカスタム目標値: ${manualValue}IU（自動計算を上書き）` : `\nCustom target: ${manualValue}IU (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(0)}IU/日`;
+                              formula += _isJaA ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(0)}IU/${_isJaA ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'vitamin_k2') {
-                            let formula = `【基本値】\n200μg/日（MK-4、メナキノン-4）`;
-
-                            formula += `\n\n（プロファイル設定による追加調整はありません）`;
-
-                            // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
+                            const _isJaK2 = getLanguage() === 'ja';
+                            let formula = _isJaK2 ? `【基本値】\n200μg/日（MK-4、メナキノン-4）` : `Base:\n200μg/day (MK-4, Menaquinone-4)`;
+                            formula += _isJaK2 ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             if (
                               profile?.customNutrientTargets?.[nutrient]?.mode === 'manual' &&
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}μg（自動計算を上書き）`;
+                              formula += _isJaK2 ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaK2 ? `\nカスタム目標値: ${manualValue}μg（自動計算を上書き）` : `\nCustom target: ${manualValue}μg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(0)}μg/日`;
+                              formula += _isJaK2 ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(0)}μg/${_isJaK2 ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'vitamin_b12') {
-                            let formula = `【基本値】\n2.4μg/日（RDA基準）`;
+                            const _isJaB12 = getLanguage() === 'ja';
+                            let formula = _isJaB12 ? `【基本値】\n2.4μg/日（RDA基準）` : `Base:\n2.4μg/day (RDA)`;
                             let current = 2.4;
                             let hasAdjustment = false;
 
@@ -1603,45 +1682,44 @@ function MiniNutrientGauge({
                               current = Math.max(current, 3.0);
                               const actualIncrement = current - prevCurrent;
                               if (actualIncrement > 0) {
-                                formula += `\n\n【プロファイル設定による調整】`;
-                                formula += `\nアルコール摂取: 最低3.0μg（+${actualIncrement.toFixed(1)}μg） → ${current.toFixed(1)}μg`;
+                                formula += _isJaB12 ? `\n\n【プロファイル設定による調整】` : `\n\nProfile Adjustments:`;
+                                formula += _isJaB12
+                                  ? `\nアルコール摂取: 最低3.0μg（+${actualIncrement.toFixed(1)}μg） → ${current.toFixed(1)}μg`
+                                  : `\nAlcohol intake: min 3.0μg (+${actualIncrement.toFixed(1)}μg) → ${current.toFixed(1)}μg`;
                                 hasAdjustment = true;
                               }
                             }
 
                             if (!hasAdjustment) {
-                              formula += `\n\n（プロファイル設定による追加調整はありません）`;
+                              formula += _isJaB12 ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             }
 
-                            // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
                             if (
                               profile?.customNutrientTargets?.[nutrient]?.mode === 'manual' &&
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}μg（自動計算を上書き）`;
+                              formula += _isJaB12 ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaB12 ? `\nカスタム目標値: ${manualValue}μg（自動計算を上書き）` : `\nCustom target: ${manualValue}μg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(1)}μg/日`;
+                              formula += _isJaB12 ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(1)}μg/${_isJaB12 ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (nutrient === 'choline') {
-                            let formula = `【基本値】\n450mg/日（RDA基準、男性）`;
-
-                            formula += `\n\n（プロファイル設定による追加調整はありません）`;
-
-                            // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
+                            const _isJaCh = getLanguage() === 'ja';
+                            let formula = _isJaCh ? `【基本値】\n450mg/日（RDA基準、男性）` : `Base:\n450mg/day (RDA, male)`;
+                            formula += _isJaCh ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             if (
                               profile?.customNutrientTargets?.[nutrient]?.mode === 'manual' &&
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
+                              formula += _isJaCh ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaCh ? `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）` : `\nCustom target: ${manualValue}mg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(0)}mg/日`;
+                              formula += _isJaCh ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(0)}mg/${_isJaCh ? '日' : 'day'}`;
                             }
                             return formula;
                           } else if (
@@ -1650,22 +1728,19 @@ function MiniNutrientGauge({
                             labelLower.includes('リン') ||
                             labelLower.includes('phosphorus')
                           ) {
-                            // リン（phosphorus）の計算式
-                            let formula = `【基本値】\n700mg/日（RDA基準）`;
-
-                            formula += `\n\n（プロファイル設定による追加調整はありません）`;
-
-                            // カスタム目標値の手動設定（最後に適用：全ての調整を上書き）
+                            const _isJaPh = getLanguage() === 'ja';
+                            let formula = _isJaPh ? `【基本値】\n700mg/日（RDA基準）` : `Base:\n700mg/day (RDA)`;
+                            formula += _isJaPh ? `\n\n（プロファイル設定による追加調整はありません）` : `\n\n(No additional profile adjustments)`;
                             if (
                               profile?.customNutrientTargets?.[nutrient]?.mode === 'manual' &&
                               profile.customNutrientTargets[nutrient].value !== undefined
                             ) {
                               const manualValue = profile.customNutrientTargets[nutrient].value!;
-                              formula += `\n\n【手動設定による上書き】`;
-                              formula += `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）`;
+                              formula += _isJaPh ? `\n\n【手動設定による上書き】` : `\n\nManual Override:`;
+                              formula += _isJaPh ? `\nカスタム目標値: ${manualValue}mg（自動計算を上書き）` : `\nCustom target: ${manualValue}mg (overrides auto-calculation)`;
                             } else {
-                              formula += `\n\n【最終目標値】`;
-                              formula += `\n${currentTarget.toFixed(0)}mg/日`;
+                              formula += _isJaPh ? `\n\n【最終目標値】` : `\n\nFinal Target:`;
+                              formula += `\n${currentTarget.toFixed(0)}mg/${_isJaPh ? '日' : 'day'}`;
                             }
                             return formula;
                           }

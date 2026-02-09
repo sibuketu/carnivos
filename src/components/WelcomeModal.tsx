@@ -4,49 +4,51 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from '../utils/i18n';
 
 interface WelcomeModalProps {
   onClose: () => void;
 }
 
 export default function WelcomeModal({ onClose }: WelcomeModalProps) {
+  const { t } = useTranslation();
   const [currentCard, setCurrentCard] = useState(0);
 
   const cards = [
     {
       emoji: '🤖',
-      title: 'AIアシスタントがサポート',
+      title: t('welcome.aiTitle'),
       description: (
         <>
           <p style={{ marginBottom: '0.75rem' }}>
-            CarnivOSには強力なAIアシスタントが搭載されています。
+            {t('welcome.aiDesc')}
           </p>
           <ul style={{ paddingLeft: '1.5rem', marginBottom: '0.75rem' }}>
-            <li>📸 写真から食品を自動認識</li>
-            <li>💬 栄養や健康について質問</li>
-            <li>🔬 科学的根拠に基づくアドバイス</li>
+            <li>{t('welcome.aiFeature1')}</li>
+            <li>{t('welcome.aiFeature2')}</li>
+            <li>{t('welcome.aiFeature3')}</li>
           </ul>
           <p style={{ fontSize: '0.875rem', color: '#78716c' }}>
-            困ったときはいつでもAIに聞いてください！
+            {t('welcome.aiHint')}
           </p>
         </>
       ),
     },
     {
       emoji: '🏆',
-      title: 'トロフィーで成長を実感',
+      title: t('welcome.trophyTitle'),
       description: (
         <>
           <p style={{ marginBottom: '0.75rem' }}>
-            あなたの行動は全てトロフィーとして記録されます。
+            {t('welcome.trophyDesc')}
           </p>
           <ul style={{ paddingLeft: '1.5rem', marginBottom: '0.75rem' }}>
-            <li>🦁 ハンター - 本能に従う人</li>
-            <li>🔬 科学者 - 探求する人</li>
-            <li>⚡ マスター - 真のカーニボア</li>
+            <li>{t('welcome.trophyExample1')}</li>
+            <li>{t('welcome.trophyExample2')}</li>
+            <li>{t('welcome.trophyExample3')}</li>
           </ul>
           <p style={{ fontSize: '0.875rem', color: '#78716c' }}>
-            画面右上の🏆ボタンから進捗を確認できます。
+            {t('welcome.trophyHint')}
           </p>
         </>
       ),
@@ -158,7 +160,7 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
               cursor: 'pointer',
             }}
           >
-            スキップ
+            {t('welcome.skip')}
           </button>
           <button
             onClick={handleNext}
@@ -174,7 +176,7 @@ export default function WelcomeModal({ onClose }: WelcomeModalProps) {
               cursor: 'pointer',
             }}
           >
-            {currentCard < cards.length - 1 ? '次へ' : '始める'}
+            {currentCard < cards.length - 1 ? t('welcome.next') : t('welcome.start')}
           </button>
         </div>
       </div>

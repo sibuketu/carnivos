@@ -41,16 +41,16 @@ export default function PaywallModal({ trialStatus: _trialStatus, onSubscribe }:
             <div className="paywall-plan-badge">Best Value</div>
             <div className="paywall-plan-name">Annual</div>
             <div className="paywall-plan-price">
-              <span className="paywall-plan-price-amount">$99</span>
+              <span className="paywall-plan-price-amount">$200</span>
               <span className="paywall-plan-price-period">/yr</span>
             </div>
-            <div className="paywall-plan-note">$8.25/mo — Save 2 months</div>
+            <div className="paywall-plan-note">$16.67/mo — Save 44%</div>
           </div>
 
           <div className="paywall-plan">
             <div className="paywall-plan-name">Monthly</div>
             <div className="paywall-plan-price">
-              <span className="paywall-plan-price-amount">$9.99</span>
+              <span className="paywall-plan-price-amount">$30</span>
               <span className="paywall-plan-price-period">/mo</span>
             </div>
             <div className="paywall-plan-note">Cancel anytime</div>

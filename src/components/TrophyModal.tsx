@@ -5,6 +5,7 @@
 import React from 'react';
 import { TROPHIES } from '../data/trophies';
 import type { TrophyProgress } from '../types/trophy';
+import { useTranslation } from '../utils/i18n';
 
 interface TrophyModalProps {
   progress: TrophyProgress;
@@ -12,7 +13,11 @@ interface TrophyModalProps {
 }
 
 export default function TrophyModal({ progress, onClose }: TrophyModalProps) {
+  const { t } = useTranslation();
   const unlockedCount = Object.values(progress).filter((p) => p.unlocked).length;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tt = (key: string): string => (t as any)(key) ?? key;
 
   return (
     <div
@@ -46,10 +51,10 @@ export default function TrophyModal({ progress, onClose }: TrophyModalProps) {
         {/* ヘッダー */}
         <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-            🏆 トロフィー
+            🏆 {t('trophy.title')}
           </h2>
           <p style={{ color: '#78716c', fontSize: '0.875rem' }}>
-            {unlockedCount} / {TROPHIES.length} 達成
+            {unlockedCount} / {TROPHIES.length} {t('trophy.achieved')}
           </p>
         </div>
 
@@ -85,7 +90,7 @@ export default function TrophyModal({ progress, onClose }: TrophyModalProps) {
                   {/* 内容 */}
                   <div style={{ flex: 1 }}>
                     <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
-                      {trophy.title.split(' ').slice(1).join(' ')}
+                      {tt(`trophy.${trophy.id}`) !== `trophy.${trophy.id}` ? tt(`trophy.${trophy.id}`).replace(/^[^\s]+\s/, '') : trophy.title.split(' ').slice(1).join(' ')}
                     </h3>
                     <p
                       style={{
@@ -95,7 +100,9 @@ export default function TrophyModal({ progress, onClose }: TrophyModalProps) {
                         marginBottom: '0.5rem',
                       }}
                     >
-                      {isUnlocked ? trophy.label : trophy.description}
+                      {isUnlocked
+                        ? (tt(`trophy.${trophy.id}Label`) !== `trophy.${trophy.id}Label` ? tt(`trophy.${trophy.id}Label`) : trophy.label)
+                        : (tt(`trophy.${trophy.id}Desc`) !== `trophy.${trophy.id}Desc` ? tt(`trophy.${trophy.id}Desc`) : trophy.description)}
                     </p>
 
                     {/* ヒント（未達成の場合のみ） */}
@@ -108,7 +115,7 @@ export default function TrophyModal({ progress, onClose }: TrophyModalProps) {
                           fontStyle: 'italic',
                         }}
                       >
-                        💡 {trophy.hint}
+                        💡 {tt(`trophy.${trophy.id}Hint`) !== `trophy.${trophy.id}Hint` ? tt(`trophy.${trophy.id}Hint`) : trophy.hint}
                       </p>
                     )}
 
@@ -141,7 +148,7 @@ export default function TrophyModal({ progress, onClose }: TrophyModalProps) {
                     {/* 達成日時 */}
                     {isUnlocked && trophyProgress.unlockedAt && (
                       <p style={{ fontSize: '0.75rem', color: '#78716c' }}>
-                        達成: {new Date(trophyProgress.unlockedAt).toLocaleDateString('ja-JP')}
+                        {t('trophy.achieved')}: {new Date(trophyProgress.unlockedAt).toLocaleDateString(t('common.locale'))}
                       </p>
                     )}
                   </div>
@@ -167,7 +174,7 @@ export default function TrophyModal({ progress, onClose }: TrophyModalProps) {
             cursor: 'pointer',
           }}
         >
-          閉じる
+          {t('common.close')}
         </button>
       </div>
     </div>

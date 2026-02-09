@@ -84,7 +84,7 @@ export default function PaywallScreen({ onGoToAuth, onContinue }: PaywallScreenP
             <div className="paywall-screen-plan-badge">{t('paywall.badge')}</div>
             <div className="paywall-screen-plan-name">{t('paywall.planYearly')}</div>
             <div className="paywall-screen-plan-price">
-              <span className="paywall-screen-plan-amount">$99</span>
+              <span className="paywall-screen-plan-amount">$200</span>
               <span className="paywall-screen-plan-period">/yr</span>
             </div>
             <div className="paywall-screen-plan-note">{t('paywall.noteYearly')}</div>
@@ -92,7 +92,7 @@ export default function PaywallScreen({ onGoToAuth, onContinue }: PaywallScreenP
           <div className="paywall-screen-plan">
             <div className="paywall-screen-plan-name">{t('paywall.planMonthly')}</div>
             <div className="paywall-screen-plan-price">
-              <span className="paywall-screen-plan-amount">$9.99</span>
+              <span className="paywall-screen-plan-amount">$30</span>
               <span className="paywall-screen-plan-period">/mo</span>
             </div>
             <div className="paywall-screen-plan-note">{t('paywall.noteMonthly')}</div>
