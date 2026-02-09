@@ -13,9 +13,11 @@ import {
   type KnowledgeItem,
 } from '../data/knowledgeBase';
 import { useTrophyProgress } from '../hooks/useTrophyProgress';
+import { useTranslation } from '../utils/i18n';
 // import './KnowledgeScreen.css'; // Deleted
 
 export default function TipsScreen() {
+  const { t } = useTranslation();
   const { updateProgress: updateTrophyProgress } = useTrophyProgress();
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<KnowledgeItem['category'] | 'All'>(
@@ -175,7 +177,7 @@ export default function TipsScreen() {
 
       {filteredKnowledge.length === 0 && (
         <div style={{ textAlign: 'center', padding: '2rem', color: '#78716c' }}>
-          <p>このカテゴリには知識がありません</p>
+          <p>{t('tips.noKnowledge')}</p>
         </div>
       )}
     </div>

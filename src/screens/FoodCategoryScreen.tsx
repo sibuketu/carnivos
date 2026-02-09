@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { searchFoodsByCategory, type FoodData } from '../data/foodsDatabase';
+import { useTranslation } from '../utils/i18n';
 import './FoodCategoryScreen.css';
 
 type Category = 'beef' | 'pork' | 'chicken' | 'egg' | 'fish';
@@ -27,6 +28,7 @@ const CATEGORIES: CategoryInfo[] = [
 ];
 
 export default function FoodCategoryScreen() {
+  const { t } = useTranslation();
   const { addFood } = useApp();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedFood, setSelectedFood] = useState<FoodData | null>(null);
@@ -189,12 +191,12 @@ export default function FoodCategoryScreen() {
                 }
               }}
             >
-              <option value="g">g</option>
-              <option value="個">個</option>
+              <option value="g">{t('foodCategory.gram')}</option>
+              <option value="個">{t('foodCategory.piece')}</option>
             </select>
           </div>
           <button className="food-category-add-button" onClick={handleAddFood}>
-            追加
+            {t('foodCategory.add')}
           </button>
         </div>
       )}

@@ -7,16 +7,18 @@
 import { useState } from 'react';
 import { supabase, isSupabaseAvailable } from '../lib/supabaseClient';
 import { logError, getUserFriendlyErrorMessage } from '../utils/errorHandler';
+import { useTranslation } from '../utils/i18n';
 import './DataDeleteScreen.css';
 
 export default function DataDeleteScreen() {
+  const { t } = useTranslation();
   const [confirmText, setConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [deleted, setDeleted] = useState(false);
 
   const handleDelete = async () => {
-    if (confirmText !== '削除') {
-      (window as unknown as { showToast?: (msg: string) => void }).showToast?.('「削除」と入力してください');
+    if (confirmText !== t('dataDelete.confirmWord')) {
+      (window as unknown as { showToast?: (msg: string) => void }).showToast?.(t('dataDelete.confirmLabel'));
       return;
     }
 
@@ -76,26 +78,26 @@ export default function DataDeleteScreen() {
           }}
           className="data-delete-back-button"
         >
-          ← 設定に戻る
+          {t('dataDelete.backToSettings')}
         </button>
-        <h1 className="data-delete-title">データ削除</h1>
+        <h1 className="data-delete-title">{t('dataDelete.title')}</h1>
         <div className="data-delete-warning">
-          <h2>⚠️ 警告</h2>
-          <p>この操作を実行すると、以下のデータが完全に削除されます：</p>
+          <h2>{t('dataDelete.warningTitle')}</h2>
+          <p>{t('dataDelete.warningDesc')}</p>
           <ul>
-            <li>全ての食事記録</li>
-            <li>プロファイル情報</li>
-            <li>日記</li>
-            <li>体重・体脂肪率の記録</li>
-            <li>アプリ設定</li>
-            <li>アカウント情報（認証済みユーザーの場合）</li>
+            <li>{t('dataDelete.allMealRecords')}</li>
+            <li>{t('dataDelete.profileInfo')}</li>
+            <li>{t('dataDelete.diary')}</li>
+            <li>{t('dataDelete.weightRecords')}</li>
+            <li>{t('dataDelete.appSettings')}</li>
+            <li>{t('dataDelete.accountInfo')}</li>
           </ul>
-          <p className="data-delete-warning-strong">この操作は取り消せません。</p>
+          <p className="data-delete-warning-strong">{t('dataDelete.irreversible')}</p>
         </div>
 
         <div className="data-delete-confirm">
           <label htmlFor="confirm-input" className="data-delete-label">
-            削除を確認するには、「削除」と入力してください：
+            {t('dataDelete.confirmLabel')}
           </label>
           <input
             id="confirm-input"
@@ -103,21 +105,21 @@ export default function DataDeleteScreen() {
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
             className="data-delete-input"
-            placeholder="削除"
+            placeholder={t('dataDelete.confirmWord')}
           />
         </div>
 
         <button
           onClick={handleDelete}
-          disabled={deleting || confirmText !== '削除'}
+          disabled={deleting || confirmText !== t('dataDelete.confirmWord')}
           className="data-delete-button"
         >
-          {deleting ? '削除中...' : '全てのデータを削除'}
+          {deleting ? t('dataDelete.deleting') : t('dataDelete.deleteAll')}
         </button>
 
         {deleted && (
           <div className="data-delete-success">
-            ✅ データの削除が完了しました。ページをリロードします...
+            {t('dataDelete.success')}
           </div>
         )}
       </div>

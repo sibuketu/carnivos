@@ -193,7 +193,7 @@ export default function NutrientTargetCustomizationScreen({
           <button className="back-button" onClick={onBack} aria-label={t('common.backAriaLabel')}>
             ←
           </button>
-          <h1 className="screen-header-title">栄養素目標値のカスタマイズ</h1>
+          <h1 className="screen-header-title">{t('nutrientTarget.title')}</h1>
         </div>
 
         <div className="nutrient-target-customization-screen-section">

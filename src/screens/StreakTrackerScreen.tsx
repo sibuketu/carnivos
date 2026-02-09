@@ -117,7 +117,7 @@ export default function StreakTrackerScreen({ onBack }: StreakTrackerScreenProps
           >
             {streakData.currentStreak}
           </div>
-          <div style={{ fontSize: '16px', color: '#6b7280', marginBottom: '1rem' }}>日連続</div>
+          <div style={{ fontSize: '16px', color: '#6b7280', marginBottom: '1rem' }}>{t('streak.consecutiveDays')}</div>
 
           {/* 最長連続日数 */}
           {streakData.longestStreak > 0 && (
@@ -132,7 +132,7 @@ export default function StreakTrackerScreen({ onBack }: StreakTrackerScreenProps
                 marginTop: '1rem',
               }}
             >
-              <span style={{ fontSize: '14px', color: '#6b7280' }}>最長記録</span>
+              <span style={{ fontSize: '14px', color: '#6b7280' }}>{t('streak.longestRecord')}</span>
               <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937' }}>
                 {streakData.longestStreak}日
               </span>

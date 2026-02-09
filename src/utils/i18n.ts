@@ -295,6 +295,52 @@ const translations: Record<Language, Record<string, string>> = {
     'recovery.setProtocol': 'プロトコルを設定',
     'recovery.footerNote': 'このプロトコルは明日のログに追加され、今夜8時に解凍リマインダーが設定されます。',
 
+    // データ削除画面
+    'dataDelete.backToSettings': '← 設定に戻る',
+    'dataDelete.title': 'データ削除',
+    'dataDelete.warningTitle': '⚠️ 警告',
+    'dataDelete.warningDesc': 'この操作を実行すると、以下のデータが完全に削除されます：',
+    'dataDelete.allMealRecords': '全ての食事記録',
+    'dataDelete.profileInfo': 'プロファイル情報',
+    'dataDelete.diary': '日記',
+    'dataDelete.weightRecords': '体重・体脂肪率の記録',
+    'dataDelete.appSettings': 'アプリ設定',
+    'dataDelete.accountInfo': 'アカウント情報（認証済みユーザーの場合）',
+    'dataDelete.irreversible': 'この操作は取り消せません。',
+    'dataDelete.confirmLabel': '削除を確認するには、「削除」と入力してください：',
+    'dataDelete.confirmWord': '削除',
+    'dataDelete.deleting': '削除中...',
+    'dataDelete.deleteAll': '全てのデータを削除',
+    'dataDelete.success': '✅ データの削除が完了しました。ページをリロードします...',
+
+    // 炭水化物ターゲット設定画面
+    'carbTarget.title': '炭水化物ターゲット設定',
+    'carbTarget.presets': 'プリセット:',
+    'carbTarget.strictCarnivore': '厳格なカーニボアモード: 炭水化物は0gを目標とします。',
+    'carbTarget.ketovore': 'ケトボアモード: 少量の低炭水化物植物を許可します。',
+    'carbTarget.transition': '移行期間モード: 炭水化物を段階的に減らしていきます。',
+
+    // ストリークトラッカー画面
+    'streak.consecutiveDays': '日連続',
+    'streak.longestRecord': '最長記録',
+
+    // 食品カテゴリ画面
+    'foodCategory.piece': '個',
+
+    // 栄養素目標値カスタマイズ画面
+    'nutrientTarget.title': '栄養素目標値のカスタマイズ',
+
+    // Tips画面
+    'tips.noKnowledge': 'このカテゴリには知識がありません',
+
+    // InputScreen追加
+    'input.currentValues': '現在の値',
+    'input.afterAddValues': '追加後の値',
+    'input.proteinEffective': 'タンパク質（有効）',
+    'input.fat': '脂質',
+    'input.ironEffective': '鉄分（有効）',
+    'input.zincEffective': '亜鉛（有効）',
+
     // 履歴画面
     'history.sleepScore': '睡眠スコア:',
     'history.sunExposure': '太陽光暴露:',
@@ -1483,6 +1529,52 @@ const translations: Record<Language, Record<string, string>> = {
     'recovery.tasks': '📋 Tasks to complete',
     'recovery.setProtocol': 'Set Protocol',
     'recovery.footerNote': 'This protocol will be added to tomorrow\'s log, and a defrost reminder will be set for 8 PM tonight.',
+
+    // Data Delete screen
+    'dataDelete.backToSettings': '← Back to Settings',
+    'dataDelete.title': 'Delete Data',
+    'dataDelete.warningTitle': '⚠️ Warning',
+    'dataDelete.warningDesc': 'Performing this action will permanently delete the following data:',
+    'dataDelete.allMealRecords': 'All meal records',
+    'dataDelete.profileInfo': 'Profile information',
+    'dataDelete.diary': 'Diary',
+    'dataDelete.weightRecords': 'Weight & body fat records',
+    'dataDelete.appSettings': 'App settings',
+    'dataDelete.accountInfo': 'Account information (for authenticated users)',
+    'dataDelete.irreversible': 'This action cannot be undone.',
+    'dataDelete.confirmLabel': 'To confirm deletion, type "DELETE":',
+    'dataDelete.confirmWord': 'DELETE',
+    'dataDelete.deleting': 'Deleting...',
+    'dataDelete.deleteAll': 'Delete all data',
+    'dataDelete.success': '✅ Data deletion completed. Reloading page...',
+
+    // Carb Target Settings screen
+    'carbTarget.title': 'Carb Target Settings',
+    'carbTarget.presets': 'Presets:',
+    'carbTarget.strictCarnivore': 'Strict Carnivore Mode: Target 0g carbs.',
+    'carbTarget.ketovore': 'Ketovore Mode: Allows small amounts of low-carb plants.',
+    'carbTarget.transition': 'Transition Mode: Gradually reduce carbs.',
+
+    // Streak Tracker screen
+    'streak.consecutiveDays': 'consecutive days',
+    'streak.longestRecord': 'Longest record',
+
+    // Food Category screen
+    'foodCategory.piece': 'piece',
+
+    // Nutrient Target Customization screen
+    'nutrientTarget.title': 'Customize Nutrient Targets',
+
+    // Tips screen
+    'tips.noKnowledge': 'No knowledge in this category',
+
+    // InputScreen additional
+    'input.currentValues': 'Current values',
+    'input.afterAddValues': 'After adding',
+    'input.proteinEffective': 'Protein (effective)',
+    'input.fat': 'Fat',
+    'input.ironEffective': 'Iron (effective)',
+    'input.zincEffective': 'Zinc (effective)',
 
     // History screen
     'history.sleepScore': 'Sleep score:',

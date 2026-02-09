@@ -1312,19 +1312,19 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                     }}
                   >
                     <div>
-                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>現在の値</h3>
-                      <div>タンパク質（有効）: {currentMetrics.effectiveProtein.toFixed(1)}g</div>
-                      <div>脂質: {currentMetrics.fatTotal.toFixed(1)}g</div>
+                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{t('input.currentValues')}</h3>
+                      <div>{t('input.proteinEffective')}: {currentMetrics.effectiveProtein.toFixed(1)}g</div>
+                      <div>{t('input.fat')}: {currentMetrics.fatTotal.toFixed(1)}g</div>
                       <div>
-                        ビタミンB12: {currentMetrics.vitaminB12Total?.toFixed(1) || '0.0'}μg
+                        {t('home.bVitamins')}B12: {currentMetrics.vitaminB12Total?.toFixed(1) || '0.0'}μg
                       </div>
-                      <div>鉄分（有効）: {currentMetrics.effectiveIron.toFixed(1)}mg</div>
-                      <div>亜鉛（有効）: {currentMetrics.effectiveZinc.toFixed(1)}mg</div>
+                      <div>{t('input.ironEffective')}: {currentMetrics.effectiveIron.toFixed(1)}mg</div>
+                      <div>{t('input.zincEffective')}: {currentMetrics.effectiveZinc.toFixed(1)}mg</div>
                     </div>
                     <div>
-                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>追加後の値</h3>
+                      <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{t('input.afterAddValues')}</h3>
                       <div>
-                        タンパク質（有効）: {previewMetrics.effectiveProtein.toFixed(1)}g{' '}
+                        {t('input.proteinEffective')}: {previewMetrics.effectiveProtein.toFixed(1)}g{' '}
                         <span style={{ color: '#34C759' }}>
                           (+
                           {(
@@ -1334,13 +1334,13 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                         </span>
                       </div>
                       <div>
-                        脂質: {previewMetrics.fatTotal.toFixed(1)}g{' '}
+                        {t('input.fat')}: {previewMetrics.fatTotal.toFixed(1)}g{' '}
                         <span style={{ color: '#34C759' }}>
                           (+{(previewMetrics.fatTotal - currentMetrics.fatTotal).toFixed(1)}g)
                         </span>
                       </div>
                       <div>
-                        ビタミンB12: {previewMetrics.vitaminB12Total?.toFixed(1) || '0.0'}μg{' '}
+                        {t('home.bVitamins')}B12: {previewMetrics.vitaminB12Total?.toFixed(1) || '0.0'}μg{' '}
                         <span style={{ color: '#34C759' }}>
                           (+
                           {(
@@ -1351,7 +1351,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                         </span>
                       </div>
                       <div>
-                        鉄分（有効）: {previewMetrics.effectiveIron.toFixed(1)}mg{' '}
+                        {t('input.ironEffective')}: {previewMetrics.effectiveIron.toFixed(1)}mg{' '}
                         <span style={{ color: '#34C759' }}>
                           (+
                           {(previewMetrics.effectiveIron - currentMetrics.effectiveIron).toFixed(1)}
@@ -1359,7 +1359,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                         </span>
                       </div>
                       <div>
-                        亜鉛（有効）: {previewMetrics.effectiveZinc.toFixed(1)}mg{' '}
+                        {t('input.zincEffective')}: {previewMetrics.effectiveZinc.toFixed(1)}mg{' '}
                         <span style={{ color: '#34C759' }}>
                           (+
                           {(previewMetrics.effectiveZinc - currentMetrics.effectiveZinc).toFixed(1)}

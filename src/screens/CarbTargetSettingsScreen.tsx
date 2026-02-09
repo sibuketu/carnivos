@@ -38,7 +38,7 @@ export default function CarbTargetSettingsScreen({ onBack }: CarbTargetSettingsS
           <button className="back-button" onClick={onBack} aria-label={t('common.backAriaLabel')}>
             ←
           </button>
-          <h1 className="screen-header-title">炭水化物ターゲット設定</h1>
+          <h1 className="screen-header-title">{t('carbTarget.title')}</h1>
         </div>
 
         <div className="carb-target-settings-screen-section">
@@ -65,7 +65,7 @@ export default function CarbTargetSettingsScreen({ onBack }: CarbTargetSettingsS
           </div>
 
           <div className="carb-target-settings-screen-presets">
-            <p className="carb-target-settings-screen-presets-label">プリセット:</p>
+            <p className="carb-target-settings-screen-presets-label">{t('carbTarget.presets')}</p>
             <div className="carb-target-settings-screen-preset-buttons">
               {presetValues.map((value) => (
                 <button
@@ -86,17 +86,17 @@ export default function CarbTargetSettingsScreen({ onBack }: CarbTargetSettingsS
             {targetCarbs === 0 ? (
               <div className="carb-target-settings-screen-info-item">
                 <span className="carb-target-settings-screen-info-icon">🥩</span>
-                <span>厳格なカーニボアモード: 炭水化物は0gを目標とします。</span>
+                <span>{t('carbTarget.strictCarnivore')}</span>
               </div>
             ) : targetCarbs <= 20 ? (
               <div className="carb-target-settings-screen-info-item">
                 <span className="carb-target-settings-screen-info-icon">🌿</span>
-                <span>ケトボアモード: 少量の低炭水化物植物を許可します。</span>
+                <span>{t('carbTarget.ketovore')}</span>
               </div>
             ) : (
               <div className="carb-target-settings-screen-info-item">
                 <span className="carb-target-settings-screen-info-icon">🔄</span>
-                <span>移行期間モード: 炭水化物を段階的に減らしていきます。</span>
+                <span>{t('carbTarget.transition')}</span>
               </div>
             )}
           </div>
