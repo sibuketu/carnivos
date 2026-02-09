@@ -29,7 +29,7 @@ interface InputScreenProps {
 }
 
 export default function InputScreen({ onClose }: InputScreenProps = {}) {
-  const { t: _t } = useTranslation();
+  const { t } = useTranslation();
   const {
     addFood,
     removeFood,
@@ -421,7 +421,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
     <div className="input-screen-container">
       <div className="input-screen-content">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 className="input-screen-title">日次入力</h1>
+          <h1 className="input-screen-title">{t('input.dailyInput')}</h1>
           {onClose && (
             <button
               onClick={onClose}
@@ -440,10 +440,10 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
 
         {/* Section B: Fuel (The Input) - 先に表示 */}
         <div className="input-screen-section">
-          <h2 className="input-screen-section-title">燃料（入力）</h2>
+          <h2 className="input-screen-section-title">{t('input.fuelSection')}</h2>
 
           <div className="input-screen-input-group">
-            <label className="input-screen-label">食品:</label>
+            <label className="input-screen-label">{t('input.foodLabel')}</label>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <input
                 type="text"
@@ -465,7 +465,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                     setSelectedFoodData(null);
                   }
                 }}
-                placeholder="e.g., 豚, Ribeye, Eggs, Butter..."
+                placeholder={t('input.foodPlaceholder')}
                 onFocus={() => setShowFoodSuggestions(foodInput.length >= 1)}
                 style={{ flex: 1 }}
               />
@@ -485,7 +485,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                   transition: 'all 0.2s',
                   boxShadow: isListening ? '0 0 0 3px rgba(239, 68, 68, 0.3)' : 'none',
                 }}
-                title={isListening ? '音声入力を停止' : '音声で入力'}
+                title={isListening ? t('input.voiceStop') : t('input.voiceStart')}
               >
                 {isListening ? (
                   <span style={{ fontSize: '1.2rem', animation: 'pulse 1.5s infinite' }}>⏹️</span>
@@ -526,72 +526,72 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
             {/* 入力前にも栄養情報を表示 */}
             {selectedFoodData && (
               <div className="food-info-display">
-                <h4 className="food-info-title">選択中の食品: {selectedFoodData.name}</h4>
+                <h4 className="food-info-title">{t('input.selectedFood')} {selectedFoodData.name}</h4>
                 <div className="food-info-grid">
-                  <div>タンパク質: {selectedFoodData.nutrientsRaw.protein || 0}g/100g</div>
-                  <div>脂質: {selectedFoodData.nutrientsRaw.fat || 0}g/100g</div>
+                  <div>{t('input.nutrient.protein')}: {selectedFoodData.nutrientsRaw.protein || 0}g/100g</div>
+                  <div>{t('input.nutrient.fat')}: {selectedFoodData.nutrientsRaw.fat || 0}g/100g</div>
                   {selectedFoodData.nutrientsRaw.vitaminB12 && (
-                    <div>ビタミンB12: {selectedFoodData.nutrientsRaw.vitaminB12}μg/100g</div>
+                    <div>{t('input.nutrient.vitaminB12')}: {selectedFoodData.nutrientsRaw.vitaminB12}μg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.vitaminB1 && (
-                    <div>ビタミンB1: {selectedFoodData.nutrientsRaw.vitaminB1}mg/100g</div>
+                    <div>{t('input.nutrient.vitaminB1')}: {selectedFoodData.nutrientsRaw.vitaminB1}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.vitaminB2 && (
-                    <div>ビタミンB2: {selectedFoodData.nutrientsRaw.vitaminB2}mg/100g</div>
+                    <div>{t('input.nutrient.vitaminB2')}: {selectedFoodData.nutrientsRaw.vitaminB2}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.vitaminB3 && (
-                    <div>ビタミンB3: {selectedFoodData.nutrientsRaw.vitaminB3}mg/100g</div>
+                    <div>{t('input.nutrient.vitaminB3')}: {selectedFoodData.nutrientsRaw.vitaminB3}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.vitaminB6 && (
-                    <div>ビタミンB6: {selectedFoodData.nutrientsRaw.vitaminB6}mg/100g</div>
+                    <div>{t('input.nutrient.vitaminB6')}: {selectedFoodData.nutrientsRaw.vitaminB6}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.vitaminA && (
-                    <div>ビタミンA: {selectedFoodData.nutrientsRaw.vitaminA}μg/100g</div>
+                    <div>{t('input.nutrient.vitaminA')}: {selectedFoodData.nutrientsRaw.vitaminA}μg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.vitaminC && (
-                    <div>ビタミンC: {selectedFoodData.nutrientsRaw.vitaminC}mg/100g</div>
+                    <div>{t('input.nutrient.vitaminC')}: {selectedFoodData.nutrientsRaw.vitaminC}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.vitaminK && (
-                    <div>ビタミンK: {selectedFoodData.nutrientsRaw.vitaminK}μg/100g</div>
+                    <div>{t('input.nutrient.vitaminK')}: {selectedFoodData.nutrientsRaw.vitaminK}μg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.vitaminE && (
-                    <div>ビタミンE: {selectedFoodData.nutrientsRaw.vitaminE}mg/100g</div>
+                    <div>{t('input.nutrient.vitaminE')}: {selectedFoodData.nutrientsRaw.vitaminE}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.hemeIron && (
-                    <div>鉄分（ヘム）: {selectedFoodData.nutrientsRaw.hemeIron}mg/100g</div>
+                    <div>{t('input.nutrient.hemeIron')}: {selectedFoodData.nutrientsRaw.hemeIron}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.nonHemeIron && (
-                    <div>鉄分（非ヘム）: {selectedFoodData.nutrientsRaw.nonHemeIron}mg/100g</div>
+                    <div>{t('input.nutrient.nonHemeIron')}: {selectedFoodData.nutrientsRaw.nonHemeIron}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.zinc && (
-                    <div>亜鉛: {selectedFoodData.nutrientsRaw.zinc}mg/100g</div>
+                    <div>{t('input.nutrient.zinc')}: {selectedFoodData.nutrientsRaw.zinc}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.sodium && (
-                    <div>ナトリウム: {selectedFoodData.nutrientsRaw.sodium}mg/100g</div>
+                    <div>{t('input.nutrient.sodium')}: {selectedFoodData.nutrientsRaw.sodium}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.magnesium && (
-                    <div>マグネシウム: {selectedFoodData.nutrientsRaw.magnesium}mg/100g</div>
+                    <div>{t('input.nutrient.magnesium')}: {selectedFoodData.nutrientsRaw.magnesium}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.calcium && (
-                    <div>カルシウム: {selectedFoodData.nutrientsRaw.calcium}mg/100g</div>
+                    <div>{t('input.nutrient.calcium')}: {selectedFoodData.nutrientsRaw.calcium}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.phosphorus && (
-                    <div>リン: {selectedFoodData.nutrientsRaw.phosphorus}mg/100g</div>
+                    <div>{t('input.nutrient.phosphorus')}: {selectedFoodData.nutrientsRaw.phosphorus}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.selenium && (
-                    <div>セレン: {selectedFoodData.nutrientsRaw.selenium}μg/100g</div>
+                    <div>{t('input.nutrient.selenium')}: {selectedFoodData.nutrientsRaw.selenium}μg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.copper && (
-                    <div>銅: {selectedFoodData.nutrientsRaw.copper}mg/100g</div>
+                    <div>{t('input.nutrient.copper')}: {selectedFoodData.nutrientsRaw.copper}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.manganese && (
-                    <div>マンガン: {selectedFoodData.nutrientsRaw.manganese}mg/100g</div>
+                    <div>{t('input.nutrient.manganese')}: {selectedFoodData.nutrientsRaw.manganese}mg/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.carbs && (
-                    <div>炭水化物: {selectedFoodData.nutrientsRaw.carbs}g/100g</div>
+                    <div>{t('input.nutrient.carbs')}: {selectedFoodData.nutrientsRaw.carbs}g/100g</div>
                   )}
                   {selectedFoodData.nutrientsRaw.fiber && (
-                    <div>食物繊維: {selectedFoodData.nutrientsRaw.fiber}g/100g</div>
+                    <div>{t('input.nutrient.fiber')}: {selectedFoodData.nutrientsRaw.fiber}g/100g</div>
                   )}
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -607,7 +607,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                       fontSize: '0.9rem',
                     }}
                   >
-                    プレビュー
+                    {t('input.preview')}
                   </button>
                   <button
                     onClick={() => {
@@ -631,14 +631,14 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                       fontSize: '0.9rem',
                     }}
                   >
-                    栄養解説を見る
+                    {t('input.viewNutrientInfo')}
                   </button>
                 </div>
               </div>
             )}
 
             <div className="input-screen-amount-row">
-              <label className="input-screen-label">量:</label>
+              <label className="input-screen-label">{t('input.amountLabel')}</label>
               <div className="input-screen-amount-input-group">
                 <input
                   type="number"
@@ -664,7 +664,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                   }}
                 >
                   <option value="g">g</option>
-                  <option value="個">個</option>
+                  <option value="個">{t('input.unitPiece')}</option>
                 </select>
               </div>
             </div>
@@ -674,17 +674,17 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
               onClick={handleAddFood}
               style={{ marginTop: '1rem' }}
             >
-              食べ物を追加
+              {t('input.addFood')}
             </button>
           </div>
         </div>
 
         {/* Section A: Status (The Machine) - 後で表示 */}
         <div className="input-screen-section">
-          <h2 className="input-screen-section-title">状態（マシン）</h2>
+          <h2 className="input-screen-section-title">{t('input.statusSection')}</h2>
 
           <div className="input-screen-input-group">
-            <label className="input-screen-label">睡眠の質: {sleepScore}</label>
+            <label className="input-screen-label">{t('input.sleepQuality')} {sleepScore}</label>
             <div className="input-screen-slider-container">
               <input
                 type="range"
@@ -696,13 +696,13 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 className="input-screen-slider"
               />
               <div className="input-screen-slider-hint">
-                感覚的な評価で問題ありません（0=最悪、100=最高）
+                {t('input.sleepQualityHint')}
               </div>
             </div>
           </div>
 
           <div className="input-screen-input-group">
-            <label className="input-screen-label">睡眠時間 (時間)</label>
+            <label className="input-screen-label">{t('input.sleepHoursLabel')}</label>
             <div className="input-screen-solar-charge-row">
               <input
                 type="number"
@@ -714,13 +714,13 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 max="24"
                 className="input-screen-text-input input-screen-solar-charge-input"
               />
-              <span className="input-screen-unit">時間</span>
+              <span className="input-screen-unit">{t('input.sleepHoursUnit')}</span>
             </div>
-            <div className="input-screen-slider-hint">睡眠時間を記録（任意）</div>
+            <div className="input-screen-slider-hint">{t('input.sleepHoursHint')}</div>
           </div>
 
           <div className="input-screen-input-group">
-            <label className="input-screen-label">太陽光暴露（ソーラーチャージ）:</label>
+            <label className="input-screen-label">{t('input.sunExposure')}</label>
             <div className="input-screen-solar-charge-row">
               <input
                 type="number"
@@ -729,7 +729,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 placeholder="30"
                 className="input-screen-text-input input-screen-solar-charge-input"
               />
-              <span className="input-screen-unit">分</span>
+              <span className="input-screen-unit">{t('input.sunUnit')}</span>
               <div className="input-screen-weather-buttons">
                 <button
                   className={`input-screen-weather-button ${isSunny ? 'active' : ''}`}
@@ -762,7 +762,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                     }
                   }}
                   disabled={isLoadingWeather}
-                  title="天気情報を自動取得"
+                  title={t('input.weatherAutoTitle')}
                 >
                   {isLoadingWeather ? '⏳' : '🌤️'}
                 </button>
@@ -775,14 +775,14 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
               >
                 {weatherData.location && `${weatherData.location} - `}
                 {weatherData.condition === 'sunny'
-                  ? '☀️ 晴れ'
+                  ? t('input.weatherSunny')
                   : weatherData.condition === 'partly-cloudy'
-                    ? '⛅ 曇りがち'
+                    ? t('input.weatherPartlyCloudy')
                     : weatherData.condition === 'cloudy'
-                      ? '☁️ 曇り'
+                      ? t('input.weatherCloudy')
                       : weatherData.condition === 'rainy'
-                        ? '🌧️ 雨'
-                        : '❄️ 雪'}
+                        ? t('input.weatherRainy')
+                        : t('input.weatherSnowy')}
                 {weatherData.temperature > 0 && ` ${Math.round(weatherData.temperature)}℃`}
                 {weatherData.uvIndex > 0 && ` UV: ${weatherData.uvIndex}`}
               </div>
@@ -792,7 +792,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 Estimated Vitamin D: ~{vitaminD.toLocaleString()} IU
                 {weatherData && weatherData.uvIndex > 0 && (
                   <span style={{ fontSize: '0.75rem', color: '#666', marginLeft: '0.5rem' }}>
-                    (天気情報を考慮)
+                    {t('input.weatherConsidered')}
                   </span>
                 )}
               </div>
@@ -800,40 +800,40 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
           </div>
 
           <div className="input-screen-input-group">
-            <label className="input-screen-label">排泄記録 (Bio-Tuner):</label>
+            <label className="input-screen-label">{t('input.bowelLabel')}</label>
             <div className="input-screen-button-row">
               <button
                 className={`input-screen-level-button ${bowelMovement.status === 'normal' ? 'active' : ''}`}
                 onClick={() => setBowelMovement({ ...bowelMovement, status: 'normal' })}
               >
-                正常
+                {t('input.bowelNormal')}
               </button>
               <button
                 className={`input-screen-level-button ${bowelMovement.status === 'constipated' ? 'active' : ''}`}
                 onClick={() => setBowelMovement({ ...bowelMovement, status: 'constipated' })}
               >
-                硬い
+                {t('input.bowelHard')}
               </button>
               <button
                 className={`input-screen-level-button ${bowelMovement.status === 'loose' ? 'active' : ''}`}
                 onClick={() => setBowelMovement({ ...bowelMovement, status: 'loose' })}
               >
-                緩い
+                {t('input.bowelLoose')}
               </button>
               <button
                 className={`input-screen-level-button ${bowelMovement.status === 'watery' ? 'active' : ''}`}
                 onClick={() => setBowelMovement({ ...bowelMovement, status: 'watery' })}
               >
-                水状
+                {t('input.bowelWatery')}
               </button>
             </div>
             <div className="input-screen-slider-hint">
-              排泄状態に応じて翌日の脂質目標を自動調整します
+              {t('input.bowelHint')}
             </div>
           </div>
 
           <div className="input-screen-input-group">
-            <label className="input-screen-label">活動レベル:</label>
+            <label className="input-screen-label">{t('input.activityLabel')}</label>
             <div className="input-screen-button-row">
               {(['high', 'moderate', 'low'] as const).map((level) => (
                 <button
@@ -850,10 +850,10 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
 
         {/* 体重・体組成セクション */}
         <div className="input-screen-section">
-          <h2 className="input-screen-section-title">体重・体組成</h2>
+          <h2 className="input-screen-section-title">{t('input.bodySection')}</h2>
 
           <div className="input-screen-input-group">
-            <label className="input-screen-label">体重 (kg)</label>
+            <label className="input-screen-label">{t('input.weightLabel')}</label>
             <div className="input-screen-solar-charge-row">
               <input
                 type="number"
@@ -877,7 +877,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
           </div>
 
           <div className="input-screen-input-group">
-            <label className="input-screen-label">体脂肪率 (%)</label>
+            <label className="input-screen-label">{t('input.bodyFatLabel')}</label>
             <div className="input-screen-solar-charge-row">
               <input
                 type="number"
@@ -914,7 +914,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 {(Number(weight) / (userProfile.height / 100) ** 2).toFixed(1)}
                 {userProfile.height && (
                   <span style={{ marginLeft: '1rem', fontSize: '12px' }}>
-                    (身長: {userProfile.height}cm)
+                    ({t('input.heightLabel')} {userProfile.height}cm)
                   </span>
                 )}
               </div>
@@ -924,10 +924,10 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
 
         {/* 水分セクション */}
         <div className="input-screen-section">
-          <h2 className="input-screen-section-title">水分 (ml)</h2>
+          <h2 className="input-screen-section-title">{t('input.waterSection')}</h2>
           <div className="input-screen-input-group">
             <div style={{ marginBottom: '0.5rem', fontSize: '14px', color: '#78716c' }}>
-              今日: {currentWaterMl}ml
+              {t('input.waterToday')} {currentWaterMl}ml
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {[100, 200, 500, 1000].map((ml) => (
@@ -952,7 +952,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
 
         {/* 断食タイマーセクション */}
         <div className="input-screen-section">
-          <h2 className="input-screen-section-title">⚡ 断食タイマー</h2>
+          <h2 className="input-screen-section-title">{t('input.fastingSection')}</h2>
           <div className="input-screen-input-group">
             {fastingEndTime ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -969,7 +969,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                     {fastingRemainingTime}
                   </div>
                   <div style={{ fontSize: '14px', color: '#78716c', marginTop: '0.25rem' }}>
-                    残り時間
+                    {t('input.fastingRemaining')}
                   </div>
                 </div>
                 <button
@@ -983,13 +983,13 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                     fontSize: '14px',
                   }}
                 >
-                  タイマー停止
+                  {t('input.fastingStop')}
                 </button>
               </div>
             ) : (
               <div>
                 <div style={{ marginBottom: '1rem', fontSize: '14px', color: '#78716c' }}>
-                  断食時間を選択してスタート
+                  {t('input.fastingSelectHint')}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                   {Object.entries(FASTING_TEMPLATES).map(([key, { name, hours }]) => (
@@ -1010,7 +1010,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                       }}
                     >
                       <div style={{ fontWeight: 'bold', color: '#92400e' }}>{name}</div>
-                      <div style={{ fontSize: '12px', color: '#78716c' }}>{hours}時間</div>
+                      <div style={{ fontSize: '12px', color: '#78716c' }}>{hours}{t('input.fastingHours')}</div>
                     </button>
                   ))}
                 </div>
@@ -1030,7 +1030,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                     width: '100%',
                   }}
                 >
-                  カスタム ({getFastingDefaultHours()}時間)
+                  {t('input.fastingCustom')} ({getFastingDefaultHours()}{t('input.fastingHours')})
                 </button>
               </div>
             )}
@@ -1039,10 +1039,10 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
 
         {/* 日記セクション */}
         <div className="input-screen-section">
-          <h2 className="input-screen-section-title">日記</h2>
+          <h2 className="input-screen-section-title">{t('input.diarySection')}</h2>
           <div className="input-screen-input-group">
             <label className="input-screen-label">
-              今日の記録（体調・メンタル・身体能力など自由に記録してください）
+              {t('input.diaryLabel')}
             </label>
             <textarea
               className="input-screen-text-input"
@@ -1051,7 +1051,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 setDiary(e.target.value);
                 updateDiary(e.target.value);
               }}
-              placeholder="例：今日は調子が良かった。うんこは正常。気分も良い。"
+              placeholder={t('input.diaryPlaceholder')}
               rows={5}
               style={{
                 resize: 'vertical',
@@ -1063,13 +1063,13 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
         </div>
 
         <button className="input-screen-save-button" onClick={handleSaveStatus}>
-          日次状態を保存
+          {t('input.saveStatus')}
         </button>
 
         {/* Added Foods List */}
         {dailyLog && dailyLog.fuel.length > 0 && (
           <div className="input-screen-added-foods">
-            <h3 className="input-screen-section-title">今日食べたもの:</h3>
+            <h3 className="input-screen-section-title">{t('input.todayFoods')}</h3>
             {dailyLog.fuel.map((food, index) => (
               <div
                 key={index}
@@ -1092,7 +1092,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                   <button
                     onClick={() => {
                       const newAmount = prompt(
-                        '量を入力してください（g）:',
+                        t('input.editAmountPrompt'),
                         food.amount.toString()
                       );
                       if (newAmount && !isNaN(Number(newAmount))) {
@@ -1120,11 +1120,11 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                       cursor: 'pointer',
                     }}
                   >
-                    編集
+                    {t('input.editButton')}
                   </button>
                   <button
                     onClick={() => {
-                      if (window.confirm(`${food.item}を削除しますか？`)) {
+                      if (window.confirm(`${food.item}${t('input.deleteConfirm')}`)) {
                         removeFood(index);
                       }
                     }}
@@ -1138,7 +1138,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                       cursor: 'pointer',
                     }}
                   >
-                    削除
+                    {t('input.deleteButton')}
                   </button>
                 </div>
               </div>
@@ -1198,8 +1198,8 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                 ×
               </button>
               <h2 style={{ marginBottom: '1rem' }}>
-                プレビュー: {selectedFoodData.name} ({previewAmount}
-                {previewUnit}追加した場合)
+                {t('input.previewTitle')} {selectedFoodData.name} ({previewAmount}
+                {previewUnit} {t('input.previewAdded')})
               </h2>
               <div
                 style={{
@@ -1209,7 +1209,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                   alignItems: 'center',
                 }}
               >
-                <label>量:</label>
+                <label>{t('input.amountLabel')}</label>
                 <input
                   type="number"
                   value={previewAmount}
@@ -1237,7 +1237,7 @@ export default function InputScreen({ onClose }: InputScreenProps = {}) {
                   style={{ padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                 >
                   <option value="g">g</option>
-                  <option value="個">個</option>
+                  <option value="個">{t('input.unitPiece')}</option>
                 </select>
               </div>
               {(() => {
