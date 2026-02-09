@@ -43,23 +43,23 @@ export default function SaltSettingsScreen({ onBack }: SaltSettingsScreenProps) 
   const saltTypes = [
     {
       code: 'table_salt' as const,
-      name: '食卓塩',
-      description: '一般的な精製塩。ナトリウム含有量が高い。',
+      name: t('salt.tableSalt'),
+      description: t('salt.tableSaltDesc'),
     },
     {
       code: 'sea_salt' as const,
-      name: '海塩',
-      description: '海水から作られた塩。ミネラルが豊富。',
+      name: t('salt.seaSalt'),
+      description: t('salt.seaSaltDesc'),
     },
     {
       code: 'himalayan_salt' as const,
-      name: 'ヒマラヤ塩',
-      description: 'ヒマラヤ山脈の岩塩。84種類のミネラルを含む。',
+      name: t('salt.himalayanSalt'),
+      description: t('salt.himalayanSaltDesc'),
     },
     {
       code: 'celtic_salt' as const,
-      name: 'ケルト塩',
-      description: 'フランスのケルト地方の海塩。マグネシウムが豊富。',
+      name: t('salt.celticSalt'),
+      description: t('salt.celticSaltDesc'),
     },
   ];
 
@@ -75,8 +75,8 @@ export default function SaltSettingsScreen({ onBack }: SaltSettingsScreenProps) 
 
         <div className="salt-settings-screen-section">
           <h2 className="salt-settings-screen-section-title">
-            塩の種類
-            <HelpTooltip text="塩の種類によってナトリウム含有量が異なります。正確な栄養素計算のため、使用している塩の種類を選択してください。" />
+            {t('salt.saltType')}
+            <HelpTooltip text={t('salt.saltTypeTooltip')} />
           </h2>
           <div className="salt-settings-screen-button-group">
             {saltTypes.map((type) => (
@@ -84,7 +84,7 @@ export default function SaltSettingsScreen({ onBack }: SaltSettingsScreenProps) 
                 key={type.code}
                 className={`salt-settings-screen-button ${saltType === type.code ? 'active' : ''}`}
                 onClick={() => handleSaltTypeChange(type.code)}
-                aria-label={`${type.name}を選択`}
+                aria-label={type.name}
                 aria-current={saltType === type.code ? 'true' : 'false'}
               >
                 <div className="salt-settings-screen-button-name">{type.name}</div>
@@ -96,8 +96,8 @@ export default function SaltSettingsScreen({ onBack }: SaltSettingsScreenProps) 
 
         <div className="salt-settings-screen-section">
           <h2 className="salt-settings-screen-section-title">
-            1削りあたりの量 (g)
-            <HelpTooltip text="塩ミルを1回回したときの塩の重量（g）を設定します。デフォルトは0.5gです。" />
+            {t('salt.grindAmount')}
+            <HelpTooltip text={t('salt.grindAmountTooltip')} />
           </h2>
           <div className="salt-settings-screen-input-group">
             <input
@@ -108,7 +108,7 @@ export default function SaltSettingsScreen({ onBack }: SaltSettingsScreenProps) 
               value={saltUnitWeight}
               onChange={(e) => handleUnitWeightChange(parseFloat(e.target.value) || 0.5)}
               className="salt-settings-screen-input"
-              aria-label="1削りあたりの塩の重量"
+              aria-label={t('salt.grindAmountAriaLabel')}
             />
             <span className="salt-settings-screen-input-unit">g</span>
           </div>
@@ -117,7 +117,7 @@ export default function SaltSettingsScreen({ onBack }: SaltSettingsScreenProps) 
             className="salt-settings-screen-reset-button"
             onClick={() => handleUnitWeightChange(0.5)}
           >
-            デフォルトに戻す
+            {t('salt.resetDefault')}
           </button>
         </div>
       </div>

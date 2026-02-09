@@ -234,6 +234,20 @@ const translations: Record<Language, Record<string, string>> = {
 
     // 塩ミル設定画面
     'salt.title': '塩ミル設定',
+    'salt.saltType': '塩の種類',
+    'salt.saltTypeTooltip': '塩の種類によってナトリウム含有量が異なります。正確な栄養素計算のため、使用している塩の種類を選択してください。',
+    'salt.tableSalt': '食卓塩',
+    'salt.tableSaltDesc': '一般的な精製塩。ナトリウム含有量が高い。',
+    'salt.seaSalt': '海塩',
+    'salt.seaSaltDesc': '海水から作られた塩。ミネラルが豊富。',
+    'salt.himalayanSalt': 'ヒマラヤ塩',
+    'salt.himalayanSaltDesc': 'ヒマラヤ山脈の岩塩。84種類のミネラルを含む。',
+    'salt.celticSalt': 'ケルト塩',
+    'salt.celticSaltDesc': 'フランスのケルト地方の海塩。マグネシウムが豊富。',
+    'salt.grindAmount': '1削りあたりの量 (g)',
+    'salt.grindAmountTooltip': '塩ミルを1回回したときの塩の重量（g）を設定します。デフォルトは0.5gです。',
+    'salt.grindAmountAriaLabel': '1削りあたりの塩の重量',
+    'salt.resetDefault': 'デフォルトに戻す',
     'salt.defaultHint': 'デフォルト: 0.5g/削り',
 
     // レシピ画面
@@ -1409,6 +1423,20 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Salt Mill Settings screen
     'salt.title': 'Salt Mill Settings',
+    'salt.saltType': 'Salt Type',
+    'salt.saltTypeTooltip': 'Sodium content varies by salt type. Select your salt type for accurate nutrient calculations.',
+    'salt.tableSalt': 'Table Salt',
+    'salt.tableSaltDesc': 'Common refined salt. High sodium content.',
+    'salt.seaSalt': 'Sea Salt',
+    'salt.seaSaltDesc': 'Salt made from seawater. Rich in minerals.',
+    'salt.himalayanSalt': 'Himalayan Salt',
+    'salt.himalayanSaltDesc': 'Rock salt from the Himalayas. Contains 84 types of minerals.',
+    'salt.celticSalt': 'Celtic Salt',
+    'salt.celticSaltDesc': 'Sea salt from the Celtic region of France. Rich in magnesium.',
+    'salt.grindAmount': 'Amount per grind (g)',
+    'salt.grindAmountTooltip': 'Set the weight (g) of salt per single grind. Default is 0.5g.',
+    'salt.grindAmountAriaLabel': 'Salt weight per grind',
+    'salt.resetDefault': 'Reset to default',
     'salt.defaultHint': 'Default: 0.5g/grind',
 
     // Recipe screen
