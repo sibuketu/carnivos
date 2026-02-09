@@ -5,6 +5,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from '../utils/i18n';
 
 interface ErrorReportButtonProps {
   /** 現在の画面名 */
@@ -12,6 +13,7 @@ interface ErrorReportButtonProps {
 }
 
 export default function ErrorReportButton({ screenName }: ErrorReportButtonProps) {
+  const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   const [description, setDescription] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -170,11 +172,11 @@ ${description}
                 />
 
                 <div style={{ fontSize: '0.75rem', color: '#78716c', marginBottom: '1rem' }}>
-                  <p style={{ margin: '0 0 0.5rem 0' }}>自動収集される情報:</p>
+                  <p style={{ margin: '0 0 0.5rem 0' }}>{t('errorReport.autoCollected')}</p>
                   <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
-                    <li>画面: {screenName || '不明'}</li>
-                    <li>日時: {new Date().toLocaleString('ja-JP')}</li>
-                    <li>ブラウザ情報</li>
+                    <li>{t('errorReport.screen')}: {screenName || t('errorReport.unknown')}</li>
+                    <li>{t('errorReport.dateTime')}: {new Date().toLocaleString('ja-JP')}</li>
+                    <li>{t('errorReport.browserInfo')}</li>
                   </ul>
                 </div>
 

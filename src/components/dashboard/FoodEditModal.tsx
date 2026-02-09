@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { FoodItem } from '../../types';
+import { useTranslation } from '../../utils/i18n';
 import './FoodEditModal.css';
 
 interface FoodEditModalProps {
@@ -10,6 +11,7 @@ interface FoodEditModalProps {
 }
 
 export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: FoodEditModalProps) {
+    const { t } = useTranslation();
     const [editedFood, setEditedFood] = useState<FoodItem>(initialFood);
     const [isCooked, setIsCooked] = useState(false);
     const [weight, setWeight] = useState(initialFood.amount || 100);
@@ -88,7 +90,7 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
                     {/* 重量と状態 */}
                     <div className="input-group weight-group">
                         <div className="weight-input-wrapper">
-                            <label>重量 (g)</label>
+                            <label>{t('foodEdit.weight')}</label>
                             <input
                                 type="number"
                                 value={weight}
@@ -128,7 +130,7 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
                         <div className="nutrition-stat">
                             <span className="stat-label">P:F 比率</span>
                             <span className="stat-value highlight">{pfRatio}</span>
-                            <span className="stat-unit">重量比</span>
+                            <span className="stat-unit">{t('foodEdit.pfRatioUnit')}</span>
                         </div>
                     </div>
 
@@ -136,7 +138,7 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
                     <div className="slider-section">
                         <div className="slider-group">
                             <div className="slider-header">
-                                <label>タンパク質 (Protein)</label>
+                                <label>{t('foodEdit.proteinLabel')}</label>
                                 <span className="slider-current-value">{Math.round(proteinPer100g)}g / 100g</span>
                                 {/* トッピングボタン (削除済) */}
                             </div>
@@ -149,12 +151,12 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
                                 onChange={(e) => setProteinPer100g(Number(e.target.value))}
                                 className="nutrient-slider protein-slider"
                             />
-                            <div className="actual-value">計: {editedFood.nutrients?.protein ?? 0}g</div>
+                            <div className="actual-value">{t('foodEdit.total')}: {editedFood.nutrients?.protein ?? 0}g</div>
                         </div>
 
                         <div className="slider-group">
                             <div className="slider-header">
-                                <label>脂質 (Fat)</label>
+                                <label>{t('foodEdit.fatLabel')}</label>
                                 <span className="slider-current-value">{Math.round(fatPer100g)}g / 100g</span>
                             </div>
                             <input
@@ -166,7 +168,7 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
                                 onChange={(e) => setFatPer100g(Number(e.target.value))}
                                 className="nutrient-slider fat-slider"
                             />
-                            <div className="actual-value">計: {editedFood.nutrients?.fat ?? 0}g</div>
+                            <div className="actual-value">{t('foodEdit.total')}: {editedFood.nutrients?.fat ?? 0}g</div>
                         </div>
                     </div>
 
@@ -215,7 +217,7 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
 
                     {/* アコーディオン (詳細) */}
                     <details className="advanced-details">
-                        <summary>詳細設定・その他</summary>
+                        <summary>{t('foodEdit.advancedSettings')}</summary>
                         <div className="detail-inputs">
                             <label>
                                 食品名:
@@ -232,7 +234,7 @@ export default function FoodEditModal({ isOpen, onClose, onSave, initialFood }: 
                 </div>
 
                 <div className="food-edit-footer">
-                    <button className="cancel-button" onClick={onClose}>キャンセル</button>
+                    <button className="cancel-button" onClick={onClose}>{t('foodEdit.cancel')}</button>
                     <button className="confirm-button" onClick={() => onSave(editedFood)}>
                         確定して記録
                     </button>

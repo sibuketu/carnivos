@@ -341,6 +341,51 @@ const translations: Record<Language, Record<string, string>> = {
     'terms.backToSettings': '← 設定に戻る',
     'terms.title': '利用規約',
 
+    // InteractiveButcher コンポーネント
+    'butcher.svgNotImplemented': 'この動物タイプのSVGはまだ実装されていません',
+    'butcher.hint': '図の部位を直接タップして選択',
+    'butcher.availableFoods': '選択可能な食品:',
+    'butcher.protein': 'タンパク質',
+    'butcher.fat': '脂質',
+    'butcher.saturatedFat': '飽和脂肪酸（善）',
+    'butcher.omega6': 'オメガ6（炎症注意）',
+    'butcher.zinc': '亜鉛',
+    'butcher.vitaminB12': 'ビタミンB12',
+    'butcher.standardAmount': '標準量:',
+    'butcher.packPortion': 'パック & 割合:',
+    'butcher.packTotal': 'パックの総量',
+    'butcher.pieceCount': '個数:',
+    'butcher.noData': 'この部位のデータはまだありません',
+
+    // AISpeedDial コンポーネント
+    'ai.thinking': '考え中...',
+    'ai.saltUsed': '塩を振った',
+    'ai.saltNuchiMasu': 'ぬちまーす',
+    'ai.saltSea': '海塩',
+    'ai.saltRock': '岩塩',
+    'ai.saltOther': 'その他',
+    'ai.cookingRaw': '生',
+    'ai.cookingGrilled': '焼く',
+    'ai.cookingBoiled': '煮る',
+    'ai.cookingOther': 'その他',
+
+    // FoodEditModal コンポーネント
+    'foodEdit.weight': '重量 (g)',
+    'foodEdit.pfRatioUnit': '重量比',
+    'foodEdit.proteinLabel': 'タンパク質 (Protein)',
+    'foodEdit.fatLabel': '脂質 (Fat)',
+    'foodEdit.total': '計',
+    'foodEdit.advancedSettings': '詳細設定・その他',
+    'foodEdit.cancel': 'キャンセル',
+    'foodEdit.confirmRecord': '確定して記録',
+
+    // ErrorReportButton コンポーネント
+    'errorReport.autoCollected': '自動収集される情報:',
+    'errorReport.screen': '画面',
+    'errorReport.unknown': '不明',
+    'errorReport.dateTime': '日時',
+    'errorReport.browserInfo': 'ブラウザ情報',
+
     // InputScreen追加
     'input.currentValues': '現在の値',
     'input.afterAddValues': '追加後の値',
@@ -1583,6 +1628,51 @@ const translations: Record<Language, Record<string, string>> = {
     // Terms of Service screen
     'terms.backToSettings': '← Back to Settings',
     'terms.title': 'Terms of Service',
+
+    // InteractiveButcher component
+    'butcher.svgNotImplemented': 'SVG for this animal type is not yet implemented',
+    'butcher.hint': 'Tap a part on the diagram to select',
+    'butcher.availableFoods': 'Available foods:',
+    'butcher.protein': 'Protein',
+    'butcher.fat': 'Fat',
+    'butcher.saturatedFat': 'Saturated Fat (good)',
+    'butcher.omega6': 'Omega-6 (inflammatory)',
+    'butcher.zinc': 'Zinc',
+    'butcher.vitaminB12': 'Vitamin B12',
+    'butcher.standardAmount': 'Standard amounts:',
+    'butcher.packPortion': 'Pack & Portion:',
+    'butcher.packTotal': 'Pack total weight',
+    'butcher.pieceCount': 'Pieces:',
+    'butcher.noData': 'No data available for this part yet',
+
+    // AISpeedDial component
+    'ai.thinking': 'Thinking...',
+    'ai.saltUsed': 'Added salt',
+    'ai.saltNuchiMasu': 'Nuchi Masu',
+    'ai.saltSea': 'Sea Salt',
+    'ai.saltRock': 'Rock Salt',
+    'ai.saltOther': 'Other',
+    'ai.cookingRaw': 'Raw',
+    'ai.cookingGrilled': 'Grilled',
+    'ai.cookingBoiled': 'Boiled',
+    'ai.cookingOther': 'Other',
+
+    // FoodEditModal component
+    'foodEdit.weight': 'Weight (g)',
+    'foodEdit.pfRatioUnit': 'by weight',
+    'foodEdit.proteinLabel': 'Protein',
+    'foodEdit.fatLabel': 'Fat',
+    'foodEdit.total': 'Total',
+    'foodEdit.advancedSettings': 'Advanced Settings',
+    'foodEdit.cancel': 'Cancel',
+    'foodEdit.confirmRecord': 'Confirm & Record',
+
+    // ErrorReportButton component
+    'errorReport.autoCollected': 'Automatically collected info:',
+    'errorReport.screen': 'Screen',
+    'errorReport.unknown': 'Unknown',
+    'errorReport.dateTime': 'Date/Time',
+    'errorReport.browserInfo': 'Browser info',
 
     // InputScreen additional
     'input.currentValues': 'Current values',

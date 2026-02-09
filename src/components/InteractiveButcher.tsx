@@ -12,6 +12,7 @@ import {
   type DeepFoodItem,
 } from '../data/deepNutritionData';
 import { getRecommendedAmount } from '../utils/foodHistory';
+import { useTranslation } from '../utils/i18n';
 import InteractiveChicken from './InteractiveChicken';
 import './InteractiveButcher.css';
 
@@ -37,6 +38,7 @@ export default function InteractiveButcher({
   onFoodSelect,
   onBack,
 }: InteractiveButcherProps) {
+  const { t } = useTranslation();
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
   const [selectedFood, setSelectedFood] = useState<DeepFoodItem | null>(null);
   const [amount, setAmount] = useState(300);
@@ -114,7 +116,7 @@ export default function InteractiveButcher({
       case 'fish':
         return <FishSVG selectedPart={selectedPart} onSelectPart={handlePartClick} />;
       default:
-        return <div>この動物タイプのSVGはまだ実装されていません</div>;
+        return <div>{t('butcher.svgNotImplemented')}</div>;
     }
   };
 
@@ -148,13 +150,13 @@ export default function InteractiveButcher({
       {/* SVG解剖図 */}
       <div className="interactive-butcher-svg-container">
         {renderSVG()}
-        <p className="interactive-butcher-hint">図の部位を直接タップして選択</p>
+        <p className="interactive-butcher-hint">{t('butcher.hint')}</p>
       </div>
 
       {/* 選択した部位の食品リスト */}
       {selectedPart && availableFoods.length > 0 && !selectedFood && (
         <div className="interactive-butcher-foods-list">
-          <h3 className="interactive-butcher-foods-title">選択可能な食品:</h3>
+          <h3 className="interactive-butcher-foods-title">{t('butcher.availableFoods')}</h3>
           {availableFoods.map((food) => (
             <button
               key={food.id}
@@ -164,12 +166,12 @@ export default function InteractiveButcher({
               <div className="interactive-butcher-food-name">{food.name_ja}</div>
               <div className="interactive-butcher-food-verdict">{food.primal_verdict}</div>
               <div className="interactive-butcher-food-stats">
-                <span>タンパク質: {food.protein}g</span>
-                <span>脂質: {food.fat}g</span>
-                <span>飽和脂肪酸（善）: {food.saturated_fat}g</span>
-                <span>オメガ6（炎症注意）: {food.omega_6}g</span>
-                <span>亜鉛: {food.zinc}mg</span>
-                <span>ビタミンB12: {food.vitamin_b12}μg</span>
+                <span>{t('butcher.protein')}: {food.protein}g</span>
+                <span>{t('butcher.fat')}: {food.fat}g</span>
+                <span>{t('butcher.saturatedFat')}: {food.saturated_fat}g</span>
+                <span>{t('butcher.omega6')}: {food.omega_6}g</span>
+                <span>{t('butcher.zinc')}: {food.zinc}mg</span>
+                <span>{t('butcher.vitaminB12')}: {food.vitamin_b12}μg</span>
               </div>
             </button>
           ))}
@@ -191,7 +193,7 @@ export default function InteractiveButcher({
 
           {/* A. スマートプリセット */}
           <div className="interactive-butcher-presets">
-            <h4>標準量:</h4>
+            <h4>{t('butcher.standardAmount')}</h4>
             <div className="interactive-butcher-preset-buttons">
               {getSmartPresets().map((preset) => (
                 <button
@@ -213,9 +215,9 @@ export default function InteractiveButcher({
           {/* B. Pack & Portion スライダー（g単位の場合のみ） */}
           {unit === 'g' && (
             <div className="interactive-butcher-pack-portion">
-              <h4>パック & 割合:</h4>
+              <h4>{t('butcher.packPortion')}</h4>
               <div className="interactive-butcher-pack-slider">
-                <label>パックの総量: {packSize}g</label>
+                <label>{t('butcher.packTotal')}: {packSize}g</label>
                 <input
                   type="range"
                   min="100"
@@ -266,7 +268,7 @@ export default function InteractiveButcher({
           {/* 個数入力（卵の場合） */}
           {unit === '個' && animalType === 'egg' && (
             <div className="interactive-butcher-piece-input">
-              <h4>個数:</h4>
+              <h4>{t('butcher.pieceCount')}</h4>
               <div className="interactive-butcher-piece-buttons">
                 {[1, 2, 3, 4, 5, 6, 8, 10].map((count) => (
                   <button
@@ -290,7 +292,7 @@ export default function InteractiveButcher({
       )}
 
       {selectedPart && availableFoods.length === 0 && (
-        <div className="interactive-butcher-empty">この部位のデータはまだありません</div>
+        <div className="interactive-butcher-empty">{t('butcher.noData')}</div>
       )}
     </div>
   );

@@ -1275,7 +1275,7 @@ export default function AISpeedDial({
                         <div className="ai-chat-message ai-chat-message-assistant">
                           <div className="ai-chat-loading">
                             <div className="ai-chat-loading-spinner"></div>
-                            <span>考え中...</span>
+                            <span>{t('ai.thinking')}</span>
                           </div>
                           {/* ローディング中のTips表示 */}
                           {loadingTip && (
@@ -2305,7 +2305,7 @@ export default function AISpeedDial({
                     onChange={(e) => setConciergeData({ ...conciergeData, saltUsed: e.target.checked })}
                     style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                   />
-                  <span style={{ fontSize: '14px', fontWeight: '500' }}>塩を振った</span>
+                  <span style={{ fontSize: '14px', fontWeight: '500' }}>{t('ai.saltUsed')}</span>
                 </label>
                 {conciergeData.saltUsed && (
                   <div style={{ marginTop: '0.5rem', marginLeft: '26px' }}>
@@ -2321,10 +2321,10 @@ export default function AISpeedDial({
                         marginBottom: '0.5rem',
                       }}
                     >
-                      <option value="ぬちまーす">ぬちまーす</option>
-                      <option value="海塩">海塩</option>
-                      <option value="岩塩">岩塩</option>
-                      <option value="その他">その他</option>
+                      <option value="ぬちまーす">{t('ai.saltNuchiMasu')}</option>
+                      <option value="海塩">{t('ai.saltSea')}</option>
+                      <option value="岩塩">{t('ai.saltRock')}</option>
+                      <option value="その他">{t('ai.saltOther')}</option>
                     </select>
                     {/* ButcherSelectと同じスタイルの量入力UI */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
@@ -2430,10 +2430,10 @@ export default function AISpeedDial({
                     fontSize: '14px',
                   }}
                 >
-                  <option value="raw">生</option>
-                  <option value="grilled">焼く</option>
-                  <option value="boiled">煮る</option>
-                  <option value="other">その他</option>
+                  <option value="raw">{t('ai.cookingRaw')}</option>
+                  <option value="grilled">{t('ai.cookingGrilled')}</option>
+                  <option value="boiled">{t('ai.cookingBoiled')}</option>
+                  <option value="other">{t('ai.cookingOther')}</option>
                 </select>
               </div>
 
