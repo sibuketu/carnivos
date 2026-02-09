@@ -872,3 +872,15 @@
 - 触ったファイル:
   - docs/WINDSURF_TASK_STRIPE_PAYMENT.md（全面書き直し）
 - 動作影響: なし（ガイドmdのみ）。
+
+---
+
+## 2026-02-09 11:50 (Agent: Windsurf/Cascade)
+- 目的: Vercel移行ガイド作成
+- 変更点:
+  - **Vercel無料枠調査**: Vercel Hobbyは100GB/月・100万リクエスト/月・4時間CPU。Netlifyと同等だが、超過時はPro($20/月)で継続可能。
+  - **移行ガイド作成**: `docs/VERCEL_MIGRATION_GUIDE.md`を作成。アカウント作成→GitHubインポート→環境変数設定→ドメイン設定→Supabase CORS更新→ストアURL更新の完全手順を記載。
+- 根拠・ストーリー（Why）: Netlifyがクレジット超過でpaused状態。Vercelはシンプルな無料枠と明確なアップグレードパスがあるため、代替として適切。ユーザーが「Vercelいこう」と決めたため、即座に実行可能なガイドを提供。
+- 触ったファイル:
+  - docs/VERCEL_MIGRATION_GUIDE.md（新規）
+- 動作影響: なし（ガイドmdのみ）。
